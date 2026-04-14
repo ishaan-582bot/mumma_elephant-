@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+:root {
+  /* Warm Pastel Palette */
+  --blush: #F8C8DC;
+  --blush-light: #FDE4EE;
+  --blush-dark: #E8A0B8;
+  --cream: #FFF8F0;
+  --cream-dark: #F5EBE0;
+  --mauve: #C9A9C7;
+  --mauve-light: #E0D0DF;
+  --sage: #B7C9A8;
+  --sage-light: #D4E4C8;
+  --sage-dark: #8EAF7A;
+  --terracotta: #D4876C;
+  --terracotta-light: #E8B5A0;
+  --rose: #E8B4B8;
+  --lavender: #C5B3D4;
+  --lavender-light: #E0D5EB;
+  --peach: #F5C9A8;
+  --peach-light: #FAE0CC;
+  --sky-blue: #A8C8E8;
+  --sky-blue-light: #CCE0F5;
+
+  /* Text */
+  --text-primary: #4A3728;
+  --text-secondary: #7A6B5D;
+  --text-muted: #A89888;
+  --text-inverse: #FFF8F0;
+
+  /* Backgrounds */
+  --bg-primary: #FFF8F0;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFF0E8;
+  --bg-overlay: rgba(74, 55, 40, 0.4);
+
+  /* Radii */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(74, 55, 40, 0.06);
+  --shadow-md: 0 4px 16px rgba(74, 55, 40, 0.08);
+  --shadow-lg: 0 8px 32px rgba(74, 55, 40, 0.12);
+  --shadow-glow-blush: 0 0 20px rgba(248, 200, 220, 0.5);
+  --shadow-glow-sage: 0 0 20px rgba(183, 201, 168, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: 'Nunito', sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Skeleton Loader */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--cream-dark) 25%, var(--cream) 50%, var(--cream-dark) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+/* Confetti */
+@keyframes confetti-fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.confetti-piece {
+  position: fixed;
+  top: -10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confetti-fall 3s ease-out forwards;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Bounce animation */
+@keyframes gentle-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.bounce-toggle {
+  animation: gentle-bounce 0.3s ease-in-out;
+}
+
+/* Fade in animation */
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-up {
+  animation: fade-in-up 0.4s ease-out forwards;
+}
+
+/* Tag Colors */
+.tag-nutrition { background: var(--sage-light); color: #4A6B3A; }
+.tag-sleep { background: var(--sky-blue-light); color: #3A5A7A; }
+.tag-mental-health { background: var(--lavender-light); color: #5A3A7A; }
+.tag-breastfeeding { background: var(--peach-light); color: #7A5A3A; }
+.tag-postpartum { background: var(--rose); color: #7A3A4A; }
+
+/* Progress bar */
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+
+.progress-fill {
+  animation: progress-fill 1s ease-out forwards;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--mauve-light);
+  border-radius: var(--radius-full);
+}
+
+/* PIN Pad */
+.pin-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--mauve);
+  transition: all 0.2s ease;
+}
+.pin-dot.filled {
+  background: var(--blush-dark);
+  border-color: var(--blush-dark);
+  transform: scale(1.1);
+}
+
+/* Tap targets */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .confetti-piece { display: none; }
+}
