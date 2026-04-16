@@ -1,5 +1,7 @@
 'use client';
 import React from 'react';
+import { motion } from 'framer-motion';
+import { Heart } from 'lucide-react';
 
 interface EmptyStateProps {
   icon: React.ReactNode;
@@ -7,9 +9,10 @@ interface EmptyStateProps {
   subtitle: string;
   action?: { label: string; onClick: () => void };
   secondaryAction?: { label: string; onClick: () => void };
+  hint?: string;
 }
 
-export default function EmptyState({ icon, title, subtitle, action, secondaryAction }: EmptyStateProps) {
+export default function EmptyState({ icon, title, subtitle, action, secondaryAction, hint }: EmptyStateProps) {
   return (
     <div className="fade-in-up" style={{
       display: 'flex',
@@ -20,20 +23,24 @@ export default function EmptyState({ icon, title, subtitle, action, secondaryAct
       textAlign: 'center',
       gap: 16,
     }}>
-      <div style={{
-        width: 120,
-        height: 120,
-        borderRadius: '50%',
-        background: 'linear-gradient(135deg, var(--blush-light), var(--cream))',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 48,
-        boxShadow: 'var(--shadow-glow-blush)',
-        marginBottom: 8,
-      }}>
+      <motion.div 
+        animate={{ scale: [1, 1.05, 1] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          width: 120,
+          height: 120,
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, var(--blush-light), var(--cream))',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 48,
+          boxShadow: 'var(--shadow-glow-blush)',
+          marginBottom: 8,
+        }}
+      >
         {icon}
-      </div>
+      </motion.div>
       <h3 style={{
         fontSize: '1.15rem',
         fontWeight: 700,
@@ -53,7 +60,9 @@ export default function EmptyState({ icon, title, subtitle, action, secondaryAct
       </p>
       <div style={{ display: 'flex', gap: 12, marginTop: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
         {action && (
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={action.onClick}
             style={{
               background: 'linear-gradient(135deg, var(--blush), var(--blush-dark))',
@@ -66,16 +75,15 @@ export default function EmptyState({ icon, title, subtitle, action, secondaryAct
               fontSize: '0.95rem',
               fontFamily: 'inherit',
               boxShadow: 'var(--shadow-sm)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
             }}
-            onMouseOver={(e) => { e.currentTarget.style.transform = 'scale(1.03)'; }}
-            onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
           >
             {action.label}
-          </button>
+          </motion.button>
         )}
         {secondaryAction && (
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05, borderColor: 'var(--blush)' }}
+            whileTap={{ scale: 0.95 }}
             onClick={secondaryAction.onClick}
             style={{
               background: 'transparent',
@@ -87,15 +95,35 @@ export default function EmptyState({ icon, title, subtitle, action, secondaryAct
               cursor: 'pointer',
               fontSize: '0.95rem',
               fontFamily: 'inherit',
-              transition: 'all 0.2s ease',
             }}
-            onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--blush)'; }}
-            onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--cream-dark)'; }}
           >
             {secondaryAction.label}
-          </button>
+          </motion.button>
         )}
       </div>
+      
+      {hint && (
+        <div style={{
+          marginTop: 24,
+          padding: '12px 16px',
+          background: 'var(--cream)',
+          borderRadius: 'var(--radius-lg)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          maxWidth: 280,
+        }}>
+          <Heart size={16} color="var(--blush-dark)" style={{ flexShrink: 0 }} />
+          <p style={{
+            fontSize: '0.8rem',
+            color: 'var(--text-muted)',
+            lineHeight: 1.4,
+            textAlign: 'left',
+          }}>
+            {hint}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

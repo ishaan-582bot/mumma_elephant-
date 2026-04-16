@@ -10,6 +10,7 @@ import EmptyState from '../ui/EmptyState';
 import Badge from '../ui/Badge';
 import BottomSheet from '../ui/BottomSheet';
 import Toast from '../ui/Toast';
+import HoldToDeleteButton from '../ui/HoldToDeleteButton';
 import type { VaultDocument } from '@/lib/data';
 import { motherCategories, childCategories } from '@/lib/data';
 
@@ -17,28 +18,39 @@ interface SafeVaultProps {
   documents: VaultDocument[];
 }
 
-const VAULT_PIN = '1234';
-
 export default function SafeVault({ documents }: SafeVaultProps) {
   const [isLocked, setIsLocked] = useState(true);
-  const [isFirstTime, setIsFirstTime] = useState(false);
+  const [isSetupMode, setIsSetupMode] = useState(false);
+  const [setupPin, setSetupPin] = useState<string | null>(null);
   const [pinError, setPinError] = useState('');
   const [expandedSection, setExpandedSection] = useState<'mother' | 'child' | null>('mother');
   const [showUpload, setShowUpload] = useState(false);
   const [showDelete, setShowDelete] = useState<string | null>(null);
   const [previewDoc, setPreviewDoc] = useState<VaultDocument | null>(null);
-  const [toast, setToast] = useState({ show: false, message: '' });
+  const [toast, setToast] = useState({ 
+    show: false, 
+    message: '', 
+    type: 'default' as 'success' | 'warning' | 'info' | 'error' | 'default' 
+  });
   const [lastActivity, setLastActivity] = useState(Date.now());
 
-  // Auto-lock after 5 min
+  // Check for existing PIN on mount
+  useEffect(() => {
+    const storedPin = localStorage.getItem('mumma_vault_pin');
+    if (!storedPin) {
+      setIsSetupMode(true);
+    }
+  }, []);
+
+  // Auto-lock after 5 min of inactivity
   useEffect(() => {
     if (isLocked) return;
-    const interval = setInterval(() => {
-      if (Date.now() - lastActivity > 5 * 60 * 1000) {
-        setIsLocked(true);
-      }
-    }, 10000);
-    return () => clearInterval(interval);
+    
+    const timer = setTimeout(() => {
+      setIsLocked(true);
+    }, 5 * 60 * 1000); // 5 minutes
+    
+    return () => clearTimeout(timer);
   }, [isLocked, lastActivity]);
 
   const handleActivity = useCallback(() => {
@@ -46,12 +58,38 @@ export default function SafeVault({ documents }: SafeVaultProps) {
   }, []);
 
   const handlePinSubmit = (pin: string) => {
-    if (pin === VAULT_PIN) {
-      setIsLocked(false);
-      setPinError('');
-      setLastActivity(Date.now());
+    if (isSetupMode) {
+      handleSetupPin(pin);
     } else {
-      setPinError("That doesn't look right. Let's try again 🌿");
+      // Standard unlock mode
+      const storedPin = localStorage.getItem('mumma_vault_pin');
+      if (pin === storedPin) {
+        setIsLocked(false);
+        setToast({ show: true, message: 'Vault unlocked 🔓', type: 'success' });
+        setLastActivity(Date.now());
+      } else {
+        setPinError('Incorrect PIN, please try again');
+        setToast({ show: true, message: 'Access denied: Incorrect PIN', type: 'error' });
+      }
+    }
+  };
+
+  const handleSetupPin = (pin: string) => {
+    if (pin.length < 4) return;
+    if (!setupPin) {
+      setSetupPin(pin);
+      setToast({ show: true, message: 'Now, confirm your PIN', type: 'info' });
+    } else {
+      if (pin === setupPin) {
+        localStorage.setItem('mumma_vault_pin', pin);
+        setIsSetupMode(false);
+        setIsLocked(false);
+        setToast({ show: true, message: 'Vault PIN secured! 🐘🌿', type: 'success' });
+      } else {
+        setPinError('PINs do not match. Start again.');
+        setSetupPin(null);
+        setToast({ show: true, message: 'Setup failed: PINs do not match', type: 'warning' });
+      }
     }
   };
 
@@ -72,7 +110,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
         <div style={{
           width: 100,
           height: 100,
-          borderRadius: '50%',
+          borderRadius: 'var(--radius-full)',
           background: 'linear-gradient(135deg, var(--mauve-light), var(--lavender-light))',
           display: 'flex',
           alignItems: 'center',
@@ -85,20 +123,18 @@ export default function SafeVault({ documents }: SafeVaultProps) {
         </div>
 
         <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8, textAlign: 'center' }}>
-          Your Safe Vault
+          {isSetupMode ? (setupPin ? 'Confirm your PIN' : 'Create your Vault PIN') : 'Your Safe Vault'}
         </h2>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textAlign: 'center', maxWidth: 260, marginBottom: 24 }}>
-          Enter your PIN to access your documents. Everything here stays private and secure.
+          {isSetupMode 
+            ? 'Set a 4-digit PIN to keep your documents safe and private. 🌿' 
+            : 'Enter your PIN to access your documents. Everything here stays private and secure.'}
         </p>
 
         <PinPad
           onComplete={handlePinSubmit}
           error={pinError}
         />
-
-        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 16 }}>
-          Default PIN: 1234
-        </p>
       </div>
     );
   }
@@ -110,7 +146,12 @@ export default function SafeVault({ documents }: SafeVaultProps) {
       onClick={handleActivity}
       style={{ padding: '16px', maxWidth: 600, margin: '0 auto' }}
     >
-      <Toast message={toast.message} show={toast.show} onClose={() => setToast({ show: false, message: '' })} />
+      <Toast 
+        message={toast.message} 
+        show={toast.show} 
+        type={toast.type}
+        onClose={() => setToast({ ...toast, show: false })} 
+      />
 
       {/* Welcome header */}
       <div style={{
@@ -275,7 +316,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
           right: 24,
           width: 56,
           height: 56,
-          borderRadius: '50%',
+          borderRadius: 'var(--radius-full)',
           background: 'linear-gradient(135deg, var(--mauve), var(--lavender))',
           border: 'none',
           boxShadow: 'var(--shadow-lg)',
@@ -302,7 +343,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
               {motherCategories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => { setShowUpload(false); setToast({ show: true, message: `Ready to upload to "${cat}" 📁` }); }}
+                  onClick={() => { setShowUpload(false); setToast({ show: true, message: `Ready to upload to "${cat}" 📁`, type: 'info' }); }}
                   style={{
                     padding: '8px 14px',
                     borderRadius: 'var(--radius-md)',
@@ -329,7 +370,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
               {childCategories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => { setShowUpload(false); setToast({ show: true, message: `Ready to upload to "${cat}" 📁` }); }}
+                  onClick={() => { setShowUpload(false); setToast({ show: true, message: `Ready to upload to "${cat}" 📁`, type: 'info' }); }}
                   style={{
                     padding: '8px 14px',
                     borderRadius: 'var(--radius-md)',
@@ -374,17 +415,10 @@ export default function SafeVault({ documents }: SafeVaultProps) {
             >
               Keep It
             </button>
-            <button
-              onClick={() => { setShowDelete(null); setToast({ show: true, message: 'Document moved to trash. Undo?' }); }}
-              style={{
-                flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
-                border: 'none', background: 'var(--terracotta)',
-                fontWeight: 700, fontSize: '0.9rem', color: 'white',
-                cursor: 'pointer', fontFamily: 'inherit',
-              }}
-            >
-              Delete
-            </button>
+            <HoldToDeleteButton 
+              onConfirm={() => { setShowDelete(null); setToast({ show: true, message: 'Document moved to trash. Undo?', type: 'warning' }); }} 
+              label="Hold to Delete"
+            />
           </div>
         </div>
       </BottomSheet>

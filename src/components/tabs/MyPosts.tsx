@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Grid3X3, List, Plus, Lock, Globe, X, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
+import { Grid3X3, LayoutList, Plus, Lock, Globe, X, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
 import EmptyState from '../ui/EmptyState';
 import BottomSheet from '../ui/BottomSheet';
 import type { Post } from '@/lib/data';
@@ -28,8 +28,9 @@ export default function MyPosts({ posts }: MyPostsProps) {
     return (
       <EmptyState
         icon="📸"
-        title="Share your first moment, mama 🌸"
-        subtitle="Capture the precious memories of your journey"
+        title="Capture the beautiful chaos, mum 🌸"
+        subtitle="Your journey is unique and worth holding onto. Add photos to create a private timeline of your motherhood story."
+        hint="Documenting moments helps you reflect on your beautiful journey and see how far you've come."
         action={{ label: 'Upload Photo', onClick: () => {} }}
       />
     );
@@ -45,6 +46,7 @@ export default function MyPosts({ posts }: MyPostsProps) {
         <div style={{ display: 'flex', gap: 4, background: 'var(--cream-dark)', borderRadius: 'var(--radius-sm)', padding: 3 }}>
           <button
             onClick={() => setViewMode('grid')}
+            aria-label="Grid view"
             style={{
               padding: '6px 10px', borderRadius: 'var(--radius-sm)', border: 'none',
               background: viewMode === 'grid' ? 'var(--bg-card)' : 'transparent',
@@ -57,6 +59,7 @@ export default function MyPosts({ posts }: MyPostsProps) {
           </button>
           <button
             onClick={() => setViewMode('feed')}
+            aria-label="Feed view"
             style={{
               padding: '6px 10px', borderRadius: 'var(--radius-sm)', border: 'none',
               background: viewMode === 'feed' ? 'var(--bg-card)' : 'transparent',
@@ -65,7 +68,7 @@ export default function MyPosts({ posts }: MyPostsProps) {
               display: 'flex', alignItems: 'center',
             }}
           >
-            <List size={16} />
+            <LayoutList size={16} />
           </button>
         </div>
       </div>
@@ -201,7 +204,7 @@ export default function MyPosts({ posts }: MyPostsProps) {
               onClick={() => setSelectedPost(null)}
               style={{
                 position: 'absolute', top: 16, right: 16, width: 44, height: 44,
-                borderRadius: '50%', background: 'rgba(255,255,255,0.15)',
+                borderRadius: 'var(--radius-full)', background: 'rgba(255,255,255,0.15)',
                 border: 'none', cursor: 'pointer', display: 'flex',
                 alignItems: 'center', justifyContent: 'center', zIndex: 10,
               }}

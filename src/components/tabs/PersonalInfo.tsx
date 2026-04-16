@@ -8,36 +8,89 @@ import {
 import Badge from '../ui/Badge';
 import ConfettiEffect from '../ui/ConfettiEffect';
 import Toast from '../ui/Toast';
-import type { UserProfile } from '@/lib/data';
+import { type UserProfile, calculateProfileCompletion } from '@/lib/data';
 
 interface PersonalInfoProps {
   user: UserProfile;
   onUpdate: (user: UserProfile) => void;
+  initialEditMode?: boolean;
+  onEditConsumed?: () => void;
 }
 
-export default function PersonalInfo({ user, onUpdate }: PersonalInfoProps) {
+export default function PersonalInfo({ 
+  user, 
+  onUpdate, 
+  initialEditMode, 
+  onEditConsumed 
+}: PersonalInfoProps) {
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState(user);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [showConfetti, setShowConfetti] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: '' });
+  const [toast, setToast] = useState({ 
+    show: false, 
+    message: '', 
+    type: 'default' as 'success' | 'warning' | 'info' | 'error' | 'default' 
+  });
+
+  // Handle external edit requests from header
+  React.useEffect(() => {
+    if (initialEditMode) {
+      setEditing(true);
+      onEditConsumed?.();
+    }
+  }, [initialEditMode, onEditConsumed]);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    if (!editData.name.trim()) newErrors.name = 'Name is required';
+    
+    // Basic email regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!editData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!emailRegex.test(editData.email)) {
+      newErrors.email = 'Please enter a valid email';
+    }
+
+    if (editData.phone && !/^[0-9+\s-]{8,20}$/.test(editData.phone)) {
+      newErrors.phone = 'Invalid phone format';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSave = () => {
+    if (!validateForm()) return;
+
+    // Recalculate completion percentage
+    const updatedData = {
+      ...editData,
+      profileCompletion: calculateProfileCompletion(editData)
+    };
+
+    if (updatedData.motherhoodStage !== user.motherhoodStage) {
+      setShowConfetti(true);
+      setToast({ 
+        show: true, 
+        message: `Congratulations on your new journey as ${updatedData.motherhoodStage}! 🎉`,
+        type: 'success'
+      });
+    }
+    onUpdate(updatedData);
+    setEditing(false);
+    setErrors({});
+  };
 
   const fields = [
     { icon: <User size={18} />, label: 'Name', value: user.name, key: 'name' },
     { icon: <Briefcase size={18} />, label: 'Occupation', value: user.occupation, key: 'occupation', optional: true },
     { icon: <Globe size={18} />, label: 'Country', value: `${user.countryFlag} ${user.country}`, key: 'country' },
-    { icon: <MapPin size={18} />, label: 'Location', value: user.location, key: 'location', optional: true },
+    { icon: <MapPin size={18} />, label: 'Location', value: user.location, key: 'location', optional: true, helpText: 'Find local community groups and nearby mums' },
     { icon: <Mail size={18} />, label: 'Email', value: user.email, key: 'email', masked: true },
     { icon: <Phone size={18} />, label: 'Phone', value: user.phone, key: 'phone', masked: true },
   ];
-
-  const handleSave = () => {
-    if (editData.motherhoodStage !== user.motherhoodStage) {
-      setShowConfetti(true);
-      setToast({ show: true, message: `Congratulations on your new journey as ${editData.motherhoodStage}! 🎉` });
-    }
-    onUpdate(editData);
-    setEditing(false);
-  };
 
   const stages: UserProfile['motherhoodStage'][] = [
     'Trying to Conceive', 'Pregnant', 'New Mum', 'Toddler Mum', 'Experienced Mum'
@@ -46,7 +99,12 @@ export default function PersonalInfo({ user, onUpdate }: PersonalInfoProps) {
   return (
     <div className="fade-in-up" style={{ padding: '20px 16px', maxWidth: 600, margin: '0 auto' }}>
       <ConfettiEffect trigger={showConfetti} />
-      <Toast message={toast.message} show={toast.show} onClose={() => setToast({ show: false, message: '' })} />
+      <Toast 
+        message={toast.message} 
+        show={toast.show} 
+        type={toast.type}
+        onClose={() => setToast({ ...toast, show: false })} 
+      />
 
       {/* Progress Bar */}
       <div style={{
@@ -148,18 +206,23 @@ export default function PersonalInfo({ user, onUpdate }: PersonalInfoProps) {
           <div>
             <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Motherhood Stage</div>
             {editing ? (
-              <select
-                value={editData.motherhoodStage}
-                onChange={(e) => setEditData({ ...editData, motherhoodStage: e.target.value as UserProfile['motherhoodStage'] })}
-                style={{
-                  fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)',
-                  border: '2px solid var(--blush)', borderRadius: 'var(--radius-sm)',
-                  padding: '4px 8px', fontFamily: 'inherit', background: 'var(--cream)',
-                  marginTop: 4, cursor: 'pointer',
-                }}
-              >
-                {stages.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
+              <>
+                <select
+                  value={editData.motherhoodStage}
+                  onChange={(e) => setEditData({ ...editData, motherhoodStage: e.target.value as UserProfile['motherhoodStage'] })}
+                  style={{
+                    fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)',
+                    border: '2px solid var(--blush)', borderRadius: 'var(--radius-sm)',
+                    padding: '4px 8px', fontFamily: 'inherit', background: 'var(--cream)',
+                    marginTop: 4, cursor: 'pointer', width: '100%'
+                  }}
+                >
+                  {stages.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8, fontStyle: 'italic', lineHeight: 1.3 }}>
+                  This helps us personalize content and connect you with mums at similar stages
+                </p>
+              </>
             ) : (
               <Badge label={`${user.motherhoodStage} · ${user.motherhoodMonths} months`} variant="blush" />
             )}
@@ -199,18 +262,31 @@ export default function PersonalInfo({ user, onUpdate }: PersonalInfoProps) {
                 {field.label}
               </div>
               {editing && !field.masked ? (
-                <input
-                  type="text"
-                  value={(editData as any)[field.key] || ''}
-                  onChange={(e) => setEditData({ ...editData, [field.key]: e.target.value })}
-                  placeholder={field.optional ? `Add ${field.label.toLowerCase()} +` : ''}
-                  style={{
-                    width: '100%', fontSize: '0.95rem', fontWeight: 600,
-                    color: 'var(--text-primary)', border: 'none',
-                    borderBottom: '2px solid var(--blush-light)', padding: '6px 0',
-                    outline: 'none', background: 'transparent', fontFamily: 'inherit',
-                  }}
-                />
+                <div style={{ width: '100%' }}>
+                  <input
+                    type="text"
+                    value={(editData as any)[field.key] || ''}
+                    onChange={(e) => setEditData({ ...editData, [field.key]: e.target.value })}
+                    placeholder={field.optional ? `Add ${field.label.toLowerCase()} +` : ''}
+                    style={{
+                      width: '100%', fontSize: '0.95rem', fontWeight: 600,
+                      color: 'var(--text-primary)', border: 'none',
+                      borderBottom: `2px solid ${errors[field.key] ? 'var(--terracotta)' : 'var(--blush-light)'}`,
+                      padding: '6px 0',
+                      outline: 'none', background: 'transparent', fontFamily: 'inherit',
+                    }}
+                  />
+                  {errors[field.key] && (
+                    <div style={{ color: '#E05D5D', fontSize: '0.75rem', marginTop: 4, fontWeight: 600 }}>
+                      {errors[field.key]}
+                    </div>
+                  )}
+                  {field.helpText && !errors[field.key] && (
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 6, fontStyle: 'italic', lineHeight: 1.3 }}>
+                      {field.helpText}
+                    </p>
+                  )}
+                </div>
               ) : (
                 <div style={{
                   fontSize: '0.95rem',

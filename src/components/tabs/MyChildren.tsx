@@ -3,12 +3,14 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Lock, Unlock, ChevronDown, ChevronUp, CalendarDays,
-  Scale, Ruler, Syringe, Star, AlertTriangle, FileText, Baby
+  Scale, Ruler, Syringe, Star, AlertTriangle, FileText, Baby,
+  ShieldCheck, Globe, Share2, Sparkles, MessageCircle, ArrowRight
 } from 'lucide-react';
 import Badge from '../ui/Badge';
 import EmptyState from '../ui/EmptyState';
 import ConfettiEffect from '../ui/ConfettiEffect';
 import Toast from '../ui/Toast';
+import GrowthChart from '../ui/GrowthChart';
 import type { Child } from '@/lib/data';
 
 interface MyChildrenProps {
@@ -31,7 +33,12 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
   );
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: '' });
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type?: 'success' | 'warning' | 'info' | 'error' | 'default';
+    action?: { label: string; onClick: () => void };
+  }>({ show: false, message: '', type: 'default' });
   const [publicFields, setPublicFields] = useState<Record<string, string[]>>(() => {
     const init: Record<string, string[]> = {};
     childrenData.forEach((c) => { init[c.id] = [...c.publicFields]; });
@@ -49,7 +56,15 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
       if (current.includes(field)) {
         return { ...prev, [childId]: current.filter((f) => f !== field) };
       } else {
-        setToast({ show: true, message: `${field} is now public · Undo` });
+        setToast({
+          show: true,
+          message: `${field} is now public`,
+          type: 'success',
+          action: {
+            label: 'Undo',
+            onClick: () => toggleFieldPrivacy(childId, field)
+          }
+        });
         return { ...prev, [childId]: [...current, field] };
       }
     });
@@ -57,15 +72,21 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
 
   const handleMilestoneToggle = (milestoneId: string) => {
     setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 100);
+    setToast({
+      show: true,
+      message: 'Milestone captured! 🌟🐘',
+      type: 'success'
+    });
+    setTimeout(() => setShowConfetti(false), 2000);
   };
 
   if (childrenData.length === 0) {
     return (
       <EmptyState
         icon="🌿"
-        title="This space is ready for your little one 🌿"
-        subtitle="There's no rush — add details whenever you're ready"
+        title="Your little ones' safe space 🐘"
+        subtitle="Keep track of milestones, allergies, and the tiny details that matter most. You're building their story."
+        hint="Having everything in one place gives you peace of mind during doctor visits and playdates."
         action={{ label: 'Add Child', onClick: () => {} }}
         secondaryAction={{ label: 'Skip for Now', onClick: () => {} }}
       />
@@ -86,7 +107,13 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
   return (
     <div className="fade-in-up" style={{ padding: '16px', maxWidth: 600, margin: '0 auto' }}>
       <ConfettiEffect trigger={showConfetti} />
-      <Toast message={toast.message} show={toast.show} onClose={() => setToast({ show: false, message: '' })} />
+      <Toast
+        message={toast.message}
+        show={toast.show}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, show: false })}
+        action={toast.action}
+      />
 
       {/* Child Carousel */}
       <div style={{
@@ -116,7 +143,7 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
             <div style={{
               width: 64,
               height: 64,
-              borderRadius: '50%',
+              borderRadius: 'var(--radius-full)',
               background: selectedChild === c.id
                 ? 'linear-gradient(135deg, var(--blush), var(--mauve))'
                 : 'var(--cream-dark)',
@@ -167,7 +194,7 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
           <div style={{
             width: 64,
             height: 64,
-            borderRadius: '50%',
+            borderRadius: 'var(--radius-full)',
             border: '2px dashed var(--mauve-light)',
             display: 'flex',
             alignItems: 'center',
@@ -189,20 +216,22 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          {/* Privacy Summary */}
           <div style={{
             background: 'var(--bg-card)',
             borderRadius: 'var(--radius-lg)',
-            padding: '12px 16px',
-            marginBottom: 12,
+            padding: '12px 18px',
+            marginBottom: 16,
             boxShadow: 'var(--shadow-sm)',
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
+            gap: 12,
+            border: '1px solid var(--cream-dark)',
           }}>
-            <Lock size={14} color="var(--text-muted)" />
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-              {publicCount} fields shared publicly · {privateCount} private 🔒
+            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--mauve-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ShieldCheck size={16} color="var(--mauve)" />
+            </div>
+            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+              {publicCount} items are currently <span style={{ color: 'var(--sage-dark)' }}>visible to your connections</span>. {privateCount} items are private.
             </span>
           </div>
 
@@ -232,24 +261,46 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                   <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     {field.label}
                   </div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', marginTop: 2 }}>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: 2 }}>
                     {field.value}
                   </div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 600, color: isPublic ? 'var(--sage-dark)' : 'var(--text-muted)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {isPublic ? <Globe size={11} /> : <Lock size={11} />}
+                    {isPublic ? 'Visible to connections' : 'Only you can see this'}
+                  </div>
                 </div>
-                <button
+                
+                {/* Modern Toggle Switch */}
+                <div 
                   onClick={() => toggleFieldPrivacy(child.id, field.field)}
                   style={{
-                    width: 36, height: 36, borderRadius: '50%',
-                    background: isPublic ? 'var(--sage-light)' : 'var(--cream-dark)',
-                    border: 'none', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer', transition: 'all 0.2s ease',
-                    color: isPublic ? '#4A6B3A' : 'var(--text-muted)',
+                    width: 44,
+                    height: 24,
+                    borderRadius: 'var(--radius-full)',
+                    background: isPublic ? 'var(--sage)' : 'var(--cream-dark)',
+                    padding: 2,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: isPublic ? 'flex-end' : 'flex-start',
+                    transition: 'background-color 0.2s ease',
                   }}
-                  aria-label={isPublic ? 'Make private' : 'Make public'}
+                  role="switch"
+                  aria-checked={isPublic}
+                  aria-label={`Share ${field.label} with connections`}
                 >
-                  {isPublic ? <Unlock size={14} /> : <Lock size={14} />}
-                </button>
+                  <motion.div 
+                    layout
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 'var(--radius-full)',
+                      background: 'white',
+                      boxShadow: 'var(--shadow-sm)',
+                    }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                </div>
               </div>
             );
           })}
@@ -304,28 +355,61 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                         {/* Growth */}
                         {section.id === 'growth' && (
                           <div>
-                            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                              <div style={{ flex: 1, minWidth: 130 }}>
-                                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
-                                  <Scale size={13} /> Weight (kg)
-                                </p>
-                                {child.weight.map((w, i) => (
-                                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '0.82rem', color: 'var(--text-primary)' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>{w.date}</span>
-                                    <span style={{ fontWeight: 700 }}>{w.value} kg</span>
-                                  </div>
-                                ))}
+                            <div style={{ 
+                              background: 'var(--sage-light)', 
+                              padding: '12px', 
+                              borderRadius: 'var(--radius-md)', 
+                              marginBottom: 16,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 10,
+                              border: '1px solid rgba(74, 107, 58, 0.1)'
+                            }}>
+                              <Sparkles size={18} color="var(--sage-dark)" />
+                              <p style={{ fontSize: '0.78rem', color: 'var(--sage-dark)', fontWeight: 600, lineHeight: 1.4 }}>
+                                Olivia is in the 82nd percentile for weight! She&apos;s growing beautifully and right on track. ✨
+                              </p>
+                            </div>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                              <GrowthChart data={child.weight} color="var(--mauve)" unit="kg" label="Weight Journey" />
+                              <GrowthChart data={child.height} color="var(--sky-blue)" unit="cm" label="Height Progress" />
+                              
+                              <button 
+                                onClick={() => setToast({ show: true, message: 'Olivia\'s health history has been prepared for export! 📄', type: 'info' })}
+                                style={{
+                                  width: '100%',
+                                  padding: '12px',
+                                  borderRadius: 'var(--radius-md)',
+                                  background: 'var(--bg-card)',
+                                  border: '2px solid var(--cream-dark)',
+                                  color: 'var(--text-secondary)',
+                                  fontSize: '0.85rem',
+                                  fontWeight: 700,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: 8,
+                                  cursor: 'pointer',
+                                  marginTop: 8,
+                                }}
+                              >
+                                <Share2 size={16} /> Share with Pediatrician
+                              </button>
+                            </div>
+
+                            {/* AI Prompt */}
+                            <div style={{ marginTop: 20, padding: 16, borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, var(--mauve-light), var(--sky-blue-light))', border: '1px solid rgba(138, 107, 138, 0.1)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                                <MessageCircle size={16} color="var(--mauve)" />
+                                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Ask Mira About Olivia</span>
                               </div>
-                              <div style={{ flex: 1, minWidth: 130 }}>
-                                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
-                                  <Ruler size={13} /> Height (cm)
-                                </p>
-                                {child.height.map((h, i) => (
-                                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '0.82rem', color: 'var(--text-primary)' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>{h.date}</span>
-                                    <span style={{ fontWeight: 700 }}>{h.value} cm</span>
-                                  </div>
-                                ))}
+                              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 12 }}>
+                                Get insights on Olivia&apos;s sleep and feeding patterns based on her recent growth.
+                              </p>
+                              <div style={{ background: 'white', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                                <span>Try: &quot;How is Olivia&quot;s growth percentile?&quot;</span>
+                                <ArrowRight size={14} />
                               </div>
                             </div>
                           </div>
@@ -353,7 +437,12 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                                 {v.date ? (
                                   <Badge label={`Done · ${v.date}`} variant="success" size="sm" />
                                 ) : (
-                                  <Badge label={v.isDue ? 'Due Soon' : 'Upcoming'} variant={v.isDue ? 'warning' : 'cream'} size="sm" />
+                                  <div style={{ display: 'flex', gap: 6 }}>
+                                    {v.isDue && new Date(v.dueDate || '').getTime() < new Date().getTime() && (
+                                      <Badge label="OVERDUE" variant="terracotta" size="sm" />
+                                    )}
+                                    <Badge label={v.isDue ? 'Due Soon' : 'Upcoming'} variant={v.isDue ? 'warning' : 'cream'} size="sm" />
+                                  </div>
                                 )}
                               </div>
                             ))}
@@ -369,10 +458,18 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                                 padding: '10px 0',
                                 borderBottom: '1px solid var(--cream-dark)',
                               }}>
-                                <button
-                                  onClick={() => { if (!m.achieved) handleMilestoneToggle(m.id); }}
+                                <motion.button
+                                  whileTap={{ scale: 0.8 }}
+                                  onClick={() => { 
+                                    if (!m.achieved) {
+                                      handleMilestoneToggle(m.id);
+                                      setShowConfetti(true);
+                                      setTimeout(() => setShowConfetti(false), 3000);
+                                      setToast({ show: true, message: `Amazing! Olivia reached a new milestone: ${m.label} 🎉`, type: 'success' });
+                                    }
+                                  }}
                                   style={{
-                                    width: 28, height: 28, borderRadius: '50%',
+                                    width: 28, height: 28, borderRadius: 'var(--radius-full)',
                                     border: m.achieved ? 'none' : '2px solid var(--mauve-light)',
                                     background: m.achieved ? 'linear-gradient(135deg, var(--sage), var(--sage-dark))' : 'transparent',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -381,7 +478,7 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                                   }}
                                 >
                                   {m.achieved && '✓'}
-                                </button>
+                                </motion.button>
                                 <div>
                                   <span style={{
                                     fontSize: '0.85rem', fontWeight: 600,

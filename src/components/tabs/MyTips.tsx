@@ -1,9 +1,11 @@
 'use client';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Eye, ThumbsUp, ThumbsDown, MoreHorizontal, X, Share2 } from 'lucide-react';
+import { Plus, Eye, ThumbsUp, ThumbsDown, MoreHorizontal, X, Share2, Trash2, Info } from 'lucide-react';
 import EmptyState from '../ui/EmptyState';
 import BottomSheet from '../ui/BottomSheet';
+import Toast from '../ui/Toast';
+import HoldToDeleteButton from '../ui/HoldToDeleteButton';
 import type { Tip, TipTag } from '@/lib/data';
 
 const TAG_CLASSES: Record<TipTag, string> = {
@@ -23,6 +25,7 @@ export default function MyTips({ tips }: MyTipsProps) {
   const [showNewTip, setShowNewTip] = useState(false);
   const [newTipText, setNewTipText] = useState('');
   const [newTipTags, setNewTipTags] = useState<TipTag[]>([]);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'default' as any });
 
   const allTags: TipTag[] = ['Nutrition', 'Sleep', 'Mental Health', 'Breastfeeding', 'Postpartum'];
 
@@ -38,8 +41,9 @@ export default function MyTips({ tips }: MyTipsProps) {
     return (
       <EmptyState
         icon="💡"
-        title="You have wisdom to share, mama 💛"
-        subtitle="Add your first tip and help other mums on their journey"
+        title="Your voice matters here, mum 💛"
+        subtitle="Every mother's experience is valuable. Share what worked for you—it might be exactly what another mum needs to hear today."
+        hint="Sharing your wisdom builds a supportive village for mums everywhere."
         action={{ label: 'Add Your First Tip', onClick: () => setShowNewTip(true) }}
       />
     );
@@ -47,6 +51,12 @@ export default function MyTips({ tips }: MyTipsProps) {
 
   return (
     <div className="fade-in-up" style={{ padding: '16px', maxWidth: 600, margin: '0 auto' }}>
+      <Toast 
+        message={toast.message} 
+        show={toast.show} 
+        type={toast.type}
+        onClose={() => setToast({ ...toast, show: false })} 
+      />
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
@@ -202,7 +212,7 @@ export default function MyTips({ tips }: MyTipsProps) {
             </div>
 
             {/* CTAs */}
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
               <button style={{
                 flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 padding: '12px', borderRadius: 'var(--radius-md)',
@@ -221,6 +231,19 @@ export default function MyTips({ tips }: MyTipsProps) {
               }}>
                 <Share2 size={16} /> Share
               </button>
+            </div>
+
+            <div style={{ borderTop: '1px solid var(--cream-dark)', paddingTop: 16 }}>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 12, textAlign: 'center' }}>
+                Destructive Action
+              </p>
+              <HoldToDeleteButton 
+                onConfirm={() => {
+                  setExpandedTip(null);
+                  setToast({ show: true, message: 'Your tip has been removed 🌿', type: 'info' });
+                }}
+                label="Hold to Delete Tip"
+              />
             </div>
           </div>
         )}
@@ -260,8 +283,16 @@ export default function MyTips({ tips }: MyTipsProps) {
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 8 }}>
-              Tags (up to 3)
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+              <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+                Tags (up to 3)
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)' }} title="Tags help other mums find your tip when they need it most.">
+                <Info size={14} />
+              </div>
+            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.4 }}>
+              Tags help other mums find your tip when they need it most. Choose up to 3 that best describe your advice.
             </p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {allTags.map((tag) => {

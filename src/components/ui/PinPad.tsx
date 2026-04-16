@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { Delete } from 'lucide-react';
 
 interface PinPadProps {
@@ -80,13 +81,14 @@ export default function PinPad({ length = 4, onComplete, title, subtitle, error 
           if (btn === '') return <div key={i} />;
           if (btn === 'del') {
             return (
-              <button
+              <motion.button
                 key={i}
                 onClick={handleDelete}
+                whileTap={{ scale: 0.9, color: 'var(--terracotta)' }}
                 style={{
                   width: 72,
                   height: 72,
-                  borderRadius: '50%',
+                  borderRadius: 'var(--radius-full)',
                   border: 'none',
                   background: 'transparent',
                   display: 'flex',
@@ -98,13 +100,18 @@ export default function PinPad({ length = 4, onComplete, title, subtitle, error 
                 }}
               >
                 <Delete size={24} />
-              </button>
+              </motion.button>
             );
           }
           return (
-            <button
+            <motion.button
               key={i}
               onClick={() => handlePress(btn)}
+              whileTap={{ 
+                scale: 0.94, 
+                backgroundColor: 'var(--blush-light)',
+                borderColor: 'var(--blush)'
+              }}
               style={{
                 width: 72,
                 height: 72,
@@ -116,24 +123,12 @@ export default function PinPad({ length = 4, onComplete, title, subtitle, error 
                 color: 'var(--text-primary)',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
-                transition: 'all 0.15s ease',
+                transition: 'background-color 0.1s ease, border-color 0.1s ease',
                 justifySelf: 'center',
-              }}
-              onMouseDown={(e) => {
-                e.currentTarget.style.background = 'var(--blush-light)';
-                e.currentTarget.style.transform = 'scale(0.95)';
-              }}
-              onMouseUp={(e) => {
-                e.currentTarget.style.background = 'var(--bg-card)';
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'var(--bg-card)';
-                e.currentTarget.style.transform = 'scale(1)';
               }}
             >
               {btn}
-            </button>
+            </motion.button>
           );
         })}
       </div>

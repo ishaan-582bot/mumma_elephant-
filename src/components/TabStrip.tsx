@@ -1,9 +1,9 @@
 'use client';
-import React from 'react';
-import { motion } from 'framer-motion';
-import { User, Image, Lightbulb, Baby, Lock } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, Image, Lightbulb, Baby, Lock, Shield, Users, Sparkles, History } from 'lucide-react';
 
-export type TabId = 'personal' | 'posts' | 'tips' | 'children' | 'vault';
+export type TabId = 'personal' | 'posts' | 'tips' | 'children' | 'vault' | 'privacy' | 'community' | 'wellbeing' | 'journey';
 
 interface Tab {
   id: TabId;
@@ -17,6 +17,10 @@ const tabs: Tab[] = [
   { id: 'tips', label: 'My Tips', icon: <Lightbulb size={18} /> },
   { id: 'children', label: 'Children', icon: <Baby size={18} /> },
   { id: 'vault', label: 'Safe Vault', icon: <Lock size={18} /> },
+  { id: 'privacy', label: 'Privacy', icon: <Shield size={18} /> },
+  { id: 'community', label: 'Community', icon: <Users size={18} /> },
+  { id: 'wellbeing', label: 'Wellbeing', icon: <Sparkles size={18} /> },
+  { id: 'journey', label: 'Journey', icon: <History size={18} /> },
 ];
 
 interface TabStripProps {
@@ -25,23 +29,49 @@ interface TabStripProps {
 }
 
 export default function TabStrip({ activeTab, onChange }: TabStripProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showRightFade, setShowRightFade] = useState(false);
+
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      // Show fade if there's more than 5px to scroll on the right
+      setShowRightFade(scrollLeft + clientWidth < scrollWidth - 5);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, []);
+
   return (
-    <div style={{
+    <div style={{ position: 'relative' }}>
+      <div 
+        ref={scrollContainerRef}
+        onScroll={checkScroll}
+        style={{
       display: 'flex',
       borderBottom: '2px solid var(--cream-dark)',
       background: 'var(--bg-card)',
-      overflowX: 'auto',
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      paddingTop: 4,
-    }}>
+          overflowX: 'auto',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+          paddingTop: 4,
+          scrollbarWidth: 'none', // hide scrollbar for Firefox
+        }}
+        className="hide-scrollbar" // ensure custom CSS hides it too
+      >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
-          <button
+          <motion.button
             key={tab.id}
             onClick={() => onChange(tab.id)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             style={{
               flex: '1 0 auto',
               display: 'flex',
@@ -85,9 +115,30 @@ export default function TabStrip({ activeTab, onChange }: TabStripProps) {
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             )}
-          </button>
+          </motion.button>
         );
       })}
+      </div>
+      
+      <AnimatePresence>
+        {showRightFade && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: 40,
+              background: 'linear-gradient(to right, transparent, var(--bg-card))',
+              pointerEvents: 'none',
+              zIndex: 101,
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

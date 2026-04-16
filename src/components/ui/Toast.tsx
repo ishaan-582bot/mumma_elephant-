@@ -7,10 +7,22 @@ interface ToastProps {
   onClose: () => void;
   action?: { label: string; onClick: () => void };
   duration?: number;
+  type?: 'success' | 'warning' | 'info' | 'error' | 'default';
 }
 
-export default function Toast({ message, show, onClose, action, duration = 5000 }: ToastProps) {
+export default function Toast({ message, show, onClose, action, duration = 5000, type = 'default' }: ToastProps) {
   const [visible, setVisible] = useState(false);
+
+  const getAccentColor = (t: string) => {
+    switch (t) {
+      case 'success': return 'var(--sage)';
+      case 'warning': return 'var(--terracotta)';
+      case 'info': return '#60A5FA';
+      case 'error': return '#E05D5D';
+      default: return 'transparent';
+    }
+  };
+
 
   useEffect(() => {
     if (show) {
@@ -39,6 +51,7 @@ export default function Toast({ message, show, onClose, action, duration = 5000 
         padding: '14px 24px',
         borderRadius: 'var(--radius-lg)',
         boxShadow: 'var(--shadow-lg)',
+        borderLeft: type && type !== 'default' ? `4px solid ${getAccentColor(type)}` : 'none',
         display: 'flex',
         alignItems: 'center',
         gap: 12,
