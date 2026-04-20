@@ -322,12 +322,14 @@ export const mockSelfCare: SelfCareGoal[] = [
   { id: '3', label: 'Read 2 pages of a book', completed: false },
 ];
 
+export type JourneyEventIconKind = 'calendar' | 'lightbulb' | 'baby' | 'heart';
+
 export interface JourneyEvent {
   id: string;
   type: 'milestone' | 'post' | 'system';
   title: string;
   date: string;
-  icon?: string;
+  icon: JourneyEventIconKind;
 }
 
 export interface LegacyLetter {
@@ -339,14 +341,14 @@ export interface LegacyLetter {
 }
 
 export const mockJourneyEvents: JourneyEvent[] = [
-  { id: '1', type: 'system', title: 'Joined MummaElephant', date: '2025-06-15', icon: '🐘' },
-  { id: '2', type: 'post', title: 'Shared first tip on Sleep', date: '2025-08-10', icon: '💡' },
-  { id: '3', type: 'milestone', title: 'Olivia Arrival! 🎀', date: '2025-12-13', icon: '👶' },
-  { id: '4', type: 'milestone', title: 'First 100 Hearts reached', date: '2026-02-20', icon: '❤️' },
+  { id: '1', type: 'system', title: 'Joined MummaElephant', date: '2025-06-15', icon: 'calendar' },
+  { id: '2', type: 'post', title: 'Shared first tip on Sleep', date: '2025-08-10', icon: 'lightbulb' },
+  { id: '3', type: 'milestone', title: 'Olivia Arrival!', date: '2025-12-13', icon: 'baby' },
+  { id: '4', type: 'milestone', title: 'First 100 Hearts reached', date: '2026-02-20', icon: 'heart' },
 ];
 
 export const mockHistoricalMemories = [
-  { id: 'h1', photo: '', caption: 'Feeling so nervous but excited today. The nursery is finally ready! 🍼', date: '1 Year Ago Today' },
+  { id: 'h1', photo: '', caption: 'Feeling so nervous but excited today. The nursery is finally ready!', date: '1 Year Ago Today' },
 ];
 
 export const mockLegacyLetters: LegacyLetter[] = [

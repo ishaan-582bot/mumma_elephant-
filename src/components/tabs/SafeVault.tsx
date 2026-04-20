@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Lock, FileText, Image, Upload, Download, Trash2,
+  Lock, Unlock, FileText, Image, Upload, Download, Trash2,
   ChevronDown, ChevronUp, WifiOff, Plus, Eye, Search
 } from 'lucide-react';
 import PinPad from '../ui/PinPad';
@@ -11,8 +11,10 @@ import Badge from '../ui/Badge';
 import BottomSheet from '../ui/BottomSheet';
 import Toast from '../ui/Toast';
 import HoldToDeleteButton from '../ui/HoldToDeleteButton';
+import TabContent from '../ui/TabContent';
 import type { VaultDocument } from '@/lib/data';
 import { motherCategories, childCategories } from '@/lib/data';
+import { typo } from '@/lib/typography';
 
 interface SafeVaultProps {
   documents: VaultDocument[];
@@ -65,7 +67,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
       const storedPin = localStorage.getItem('mumma_vault_pin');
       if (pin === storedPin) {
         setIsLocked(false);
-        setToast({ show: true, message: 'Vault unlocked 🔓', type: 'success' });
+        setToast({ show: true, message: 'Vault unlocked.', type: 'success' });
         setLastActivity(Date.now());
       } else {
         setPinError('Incorrect PIN, please try again');
@@ -84,7 +86,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
         localStorage.setItem('mumma_vault_pin', pin);
         setIsSetupMode(false);
         setIsLocked(false);
-        setToast({ show: true, message: 'Vault PIN secured! 🐘🌿', type: 'success' });
+        setToast({ show: true, message: 'Vault PIN secured.', type: 'success' });
       } else {
         setPinError('PINs do not match. Start again.');
         setSetupPin(null);
@@ -99,13 +101,14 @@ export default function SafeVault({ documents }: SafeVaultProps) {
   // Lock Screen
   if (isLocked) {
     return (
-      <div className="fade-in-up" style={{
-        padding: '48px 24px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        minHeight: 400,
-      }}>
+      <div className="fade-in-up">
+        <TabContent>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          minHeight: 400,
+        }}>
         {/* Padlock Illustration */}
         <div style={{
           width: 100,
@@ -115,19 +118,18 @@ export default function SafeVault({ documents }: SafeVaultProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 48,
           marginBottom: 24,
           boxShadow: '0 0 30px rgba(201, 169, 199, 0.4)',
         }}>
-          🔐
+          <Lock size={40} color="var(--mauve)" strokeWidth={1.75} />
         </div>
 
-        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8, textAlign: 'center' }}>
+        <h2 className={`mb-2 text-center ${typo.pageHeroBold}`}>
           {isSetupMode ? (setupPin ? 'Confirm your PIN' : 'Create your Vault PIN') : 'Your Safe Vault'}
         </h2>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textAlign: 'center', maxWidth: 260, marginBottom: 24 }}>
+        <p className={`mx-auto mb-6 max-w-xs text-center ${typo.bodyMuted}`}>
           {isSetupMode 
-            ? 'Set a 4-digit PIN to keep your documents safe and private. 🌿' 
+            ? 'Set a 4-digit PIN to keep your documents safe and private.' 
             : 'Enter your PIN to access your documents. Everything here stays private and secure.'}
         </p>
 
@@ -135,17 +137,16 @@ export default function SafeVault({ documents }: SafeVaultProps) {
           onComplete={handlePinSubmit}
           error={pinError}
         />
+        </div>
+        </TabContent>
       </div>
     );
   }
 
   // Unlocked Vault
   return (
-    <div
-      className="fade-in-up"
-      onClick={handleActivity}
-      style={{ padding: '16px', maxWidth: 600, margin: '0 auto' }}
-    >
+    <div className="fade-in-up" onClick={handleActivity}>
+      <TabContent>
       <Toast 
         message={toast.message} 
         show={toast.show} 
@@ -154,32 +155,21 @@ export default function SafeVault({ documents }: SafeVaultProps) {
       />
 
       {/* Welcome header */}
-      <div style={{
-        background: 'linear-gradient(135deg, var(--mauve-light), var(--lavender-light))',
-        borderRadius: 'var(--radius-lg)',
-        padding: '16px 20px',
-        marginBottom: 16,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-      }}>
-        <span style={{ fontSize: 28 }}>🔓</span>
-        <div>
-          <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+      <div className="mb-4 flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--mauve)] bg-[var(--bg-card)] px-5 py-4 shadow-[var(--shadow-md)] transition-shadow duration-200 hover:shadow-[var(--shadow-lg)]">
+        <Unlock size={24} className="shrink-0 text-[var(--mauve)]" strokeWidth={2} aria-hidden />
+        <div className="min-w-0 flex-1">
+          <span className="text-sm font-semibold text-[var(--text-primary)]">
             Welcome back, your documents are safe here
           </span>
-          <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+          <div className={`mt-0.5 ${typo.caption} text-[var(--text-secondary)]`}>
             {documents.length} document{documents.length !== 1 ? 's' : ''} stored
           </div>
         </div>
         <button
+          type="button"
           onClick={() => setIsLocked(true)}
-          style={{
-            marginLeft: 'auto', width: 36, height: 36, borderRadius: '50%',
-            background: 'rgba(255,255,255,0.5)', border: 'none',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', color: 'var(--text-secondary)',
-          }}
+          className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-full)] border-none bg-[var(--cream)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--cream-dark)]"
+          aria-label="Lock vault"
         >
           <Lock size={16} />
         </button>
@@ -187,9 +177,9 @@ export default function SafeVault({ documents }: SafeVaultProps) {
 
       {documents.length === 0 ? (
         <EmptyState
-          icon="📦"
+          icon={<FileText size={48} color="var(--mauve)" strokeWidth={1.5} />}
           title="Your vault is ready"
-          subtitle="Add your first document to keep it safe 🔐"
+          subtitle="Add your first document to keep it safe."
           action={{ label: "Add My Document", onClick: () => setShowUpload(true) }}
           secondaryAction={{ label: "Add Child's Document", onClick: () => setShowUpload(true) }}
         />
@@ -205,15 +195,18 @@ export default function SafeVault({ documents }: SafeVaultProps) {
                 borderRadius: expandedSection === 'mother' ? 'var(--radius-lg) var(--radius-lg) 0 0' : 'var(--radius-lg)',
                 padding: '14px 16px',
                 border: 'none',
-                boxShadow: 'var(--shadow-sm)',
+                boxShadow: 'var(--shadow-md)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
+                transition: 'box-shadow 0.2s ease',
               }}
+              onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
             >
-              <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              <span className={`flex items-center gap-2.5 ${typo.heading}`}>
                 👩 Mother&apos;s Documents
                 <Badge label={`${motherDocs.length}`} variant="mauve" size="sm" />
               </span>
@@ -230,12 +223,15 @@ export default function SafeVault({ documents }: SafeVaultProps) {
                     overflow: 'hidden',
                     background: 'var(--bg-card)',
                     borderRadius: '0 0 var(--radius-lg) var(--radius-lg)',
-                    boxShadow: 'var(--shadow-sm)',
+                    boxShadow: 'var(--shadow-md)',
+                    transition: 'box-shadow 0.2s ease',
                   }}
+                  onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
                 >
                   <div style={{ padding: '0 16px 16px' }}>
                     {motherDocs.length === 0 ? (
-                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '12px 0' }}>
+                      <p className={`py-3 italic ${typo.bodyMuted}`}>
                         No documents yet. Add one so it&apos;s always within reach 📋
                       </p>
                     ) : (
@@ -259,15 +255,18 @@ export default function SafeVault({ documents }: SafeVaultProps) {
                 borderRadius: expandedSection === 'child' ? 'var(--radius-lg) var(--radius-lg) 0 0' : 'var(--radius-lg)',
                 padding: '14px 16px',
                 border: 'none',
-                boxShadow: 'var(--shadow-sm)',
+                boxShadow: 'var(--shadow-md)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
+                transition: 'box-shadow 0.2s ease',
               }}
+              onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
             >
-              <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+              <span className={`flex items-center gap-2.5 ${typo.heading}`}>
                 👶 Child&apos;s Documents
                 <Badge label={`${childDocs.length}`} variant="blush" size="sm" />
               </span>
@@ -284,12 +283,15 @@ export default function SafeVault({ documents }: SafeVaultProps) {
                     overflow: 'hidden',
                     background: 'var(--bg-card)',
                     borderRadius: '0 0 var(--radius-lg) var(--radius-lg)',
-                    boxShadow: 'var(--shadow-sm)',
+                    boxShadow: 'var(--shadow-md)',
+                    transition: 'box-shadow 0.2s ease',
                   }}
+                  onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
                 >
                   <div style={{ padding: '0 16px 16px' }}>
                     {childDocs.length === 0 ? (
-                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '12px 0' }}>
+                      <p className={`py-3 italic ${typo.bodyMuted}`}>
                         No documents yet. Add one so it&apos;s always within reach 📋
                       </p>
                     ) : (
@@ -334,27 +336,20 @@ export default function SafeVault({ documents }: SafeVaultProps) {
       {/* Upload Sheet */}
       <BottomSheet isOpen={showUpload} onClose={() => setShowUpload(false)} title="Upload Document">
         <div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 16 }}>
+          <p className={`mb-4 ${typo.bodyMuted}`}>
             Choose a category, then pick your file 🌸
           </p>
           <div style={{ marginBottom: 16 }}>
-            <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>Mother&apos;s Documents</p>
+            <p className={`mb-2 ${typo.subheading} text-[var(--text-primary)]`}>Mother&apos;s Documents</p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {motherCategories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => { setShowUpload(false); setToast({ show: true, message: `Ready to upload to "${cat}" 📁`, type: 'info' }); }}
+                  className="rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-3.5 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150"
                   style={{
-                    padding: '8px 14px',
-                    borderRadius: 'var(--radius-md)',
-                    border: '2px solid var(--cream-dark)',
-                    background: 'transparent',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    color: 'var(--text-secondary)',
                     cursor: 'pointer',
                     fontFamily: 'inherit',
-                    transition: 'all 0.15s ease',
                   }}
                   onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--mauve)'; e.currentTarget.style.background = 'var(--mauve-light)'; }}
                   onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--cream-dark)'; e.currentTarget.style.background = 'transparent'; }}
@@ -365,23 +360,16 @@ export default function SafeVault({ documents }: SafeVaultProps) {
             </div>
           </div>
           <div>
-            <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>Child&apos;s Documents</p>
+            <p className={`mb-2 ${typo.subheading} text-[var(--text-primary)]`}>Child&apos;s Documents</p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {childCategories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => { setShowUpload(false); setToast({ show: true, message: `Ready to upload to "${cat}" 📁`, type: 'info' }); }}
+                  className="rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-3.5 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150"
                   style={{
-                    padding: '8px 14px',
-                    borderRadius: 'var(--radius-md)',
-                    border: '2px solid var(--cream-dark)',
-                    background: 'transparent',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    color: 'var(--text-secondary)',
                     cursor: 'pointer',
                     fontFamily: 'inherit',
-                    transition: 'all 0.15s ease',
                   }}
                   onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--blush)'; e.currentTarget.style.background = 'var(--blush-light)'; }}
                   onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--cream-dark)'; e.currentTarget.style.background = 'transparent'; }}
@@ -397,21 +385,18 @@ export default function SafeVault({ documents }: SafeVaultProps) {
       {/* Delete Confirmation */}
       <BottomSheet isOpen={showDelete !== null} onClose={() => setShowDelete(null)} title="Delete Document">
         <div style={{ textAlign: 'center', padding: '8px 0' }}>
-          <p style={{ fontSize: '1rem', marginBottom: 8, color: 'var(--text-primary)' }}>
+          <p className={`mb-2 ${typo.subheading} text-[var(--text-primary)]`}>
             Are you sure you want to delete this?
           </p>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: 20 }}>
+          <p className={`mb-5 ${typo.caption}`}>
             It will be kept for 30 days before permanent deletion.
           </p>
           <div style={{ display: 'flex', gap: 12 }}>
             <button
+              type="button"
               onClick={() => setShowDelete(null)}
-              style={{
-                flex: 1, padding: '12px', borderRadius: 'var(--radius-md)',
-                border: '2px solid var(--cream-dark)', background: 'transparent',
-                fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-secondary)',
-                cursor: 'pointer', fontFamily: 'inherit',
-              }}
+              className="flex-1 cursor-pointer rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent py-3 text-sm font-semibold text-[var(--text-secondary)]"
+              style={{ fontFamily: 'inherit' }}
             >
               Keep It
             </button>
@@ -453,31 +438,22 @@ export default function SafeVault({ documents }: SafeVaultProps) {
               <div style={{ fontSize: 64, marginBottom: 16 }}>
                 {previewDoc.type === 'pdf' ? '📄' : '🖼️'}
               </div>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>
+              <h3 className={`mb-2 text-lg font-medium text-[var(--text-primary)]`}>
                 {previewDoc.name}
               </h3>
               <Badge label={previewDoc.category} variant="mauve" />
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 12 }}>
+              <div className={`mt-3 ${typo.caption}`}>
                 {previewDoc.size} · {previewDoc.date}
               </div>
               <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'center' }}>
-                <button style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '10px 20px', borderRadius: 'var(--radius-md)',
-                  background: 'var(--sage-light)', border: 'none',
-                  fontWeight: 700, fontSize: '0.85rem', color: '#4A6B3A',
-                  cursor: 'pointer', fontFamily: 'inherit',
-                }}>
+                <button type="button" className="flex cursor-pointer items-center gap-1.5 rounded-[var(--radius-md)] border-none bg-[var(--sage-light)] px-5 py-2.5 text-sm font-semibold text-[#4A6B3A]" style={{ fontFamily: 'inherit' }}>
                   <Download size={16} /> Download
                 </button>
                 <button
+                  type="button"
                   onClick={() => setPreviewDoc(null)}
-                  style={{
-                    padding: '10px 20px', borderRadius: 'var(--radius-md)',
-                    border: '2px solid var(--cream-dark)', background: 'transparent',
-                    fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-secondary)',
-                    cursor: 'pointer', fontFamily: 'inherit',
-                  }}
+                  className="cursor-pointer rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)]"
+                  style={{ fontFamily: 'inherit' }}
                 >
                   Close
                 </button>
@@ -486,6 +462,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
           </motion.div>
         )}
       </AnimatePresence>
+      </TabContent>
     </div>
   );
 }
@@ -508,10 +485,16 @@ function DocumentCard({
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        padding: '12px 0',
-        borderBottom: '1px solid var(--cream-dark)',
+        padding: '12px 16px',
+        border: '1px solid var(--cream-dark)',
+        borderRadius: 'var(--radius-lg)',
+        background: 'var(--bg-card)',
+        boxShadow: 'var(--shadow-sm)',
         cursor: 'pointer',
+        transition: 'box-shadow 0.2s ease',
       }}
+      onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+      onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
       onClick={() => onPreview(doc)}
     >
       <div style={{
@@ -523,18 +506,15 @@ function DocumentCard({
         {doc.type === 'pdf' ? <FileText size={18} color="#7A4A3A" /> : <Image size={18} color="#3A5A7A" />}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)',
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>
+        <div className={`truncate ${typo.body}`}>
           {doc.name}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{doc.category}</span>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>·</span>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{doc.size}</span>
+        <div className="mt-0.5 flex items-center gap-2">
+          <span className={typo.caption}>{doc.category}</span>
+          <span className={typo.caption}>·</span>
+          <span className={typo.caption}>{doc.size}</span>
           {doc.isOffline && (
-            <span style={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: '0.65rem', color: 'var(--sage-dark)', fontWeight: 700 }}>
+            <span className={`flex items-center gap-0.5 font-semibold text-[var(--sage-dark)] ${typo.caption}`}>
               <WifiOff size={10} /> Offline
             </span>
           )}

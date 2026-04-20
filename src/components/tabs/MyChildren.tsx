@@ -3,8 +3,9 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Lock, Unlock, ChevronDown, ChevronUp, CalendarDays,
-  Scale, Ruler, Syringe, Star, AlertTriangle, FileText, Baby,
-  ShieldCheck, Globe, Share2, Sparkles, MessageCircle, ArrowRight
+  Ruler, Syringe, Star, AlertTriangle, FileText, Baby,
+  ShieldCheck, Globe, Share2, Sparkles, MessageCircle, ArrowRight,
+  Sprout, HeartPulse,
 } from 'lucide-react';
 import Badge from '../ui/Badge';
 import EmptyState from '../ui/EmptyState';
@@ -12,6 +13,9 @@ import ConfettiEffect from '../ui/ConfettiEffect';
 import Toast from '../ui/Toast';
 import GrowthChart from '../ui/GrowthChart';
 import type { Child } from '@/lib/data';
+import { typo } from '@/lib/typography';
+import FieldLabel from '@/components/ui/FieldLabel';
+import TabContent from '@/components/ui/TabContent';
 
 interface MyChildrenProps {
   childrenList: Child[];
@@ -74,7 +78,7 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
     setShowConfetti(true);
     setToast({
       show: true,
-      message: 'Milestone captured! 🌟🐘',
+      message: 'Milestone captured!',
       type: 'success'
     });
     setTimeout(() => setShowConfetti(false), 2000);
@@ -83,8 +87,8 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
   if (childrenData.length === 0) {
     return (
       <EmptyState
-        icon="🌿"
-        title="Your little ones' safe space 🐘"
+        icon={<Sprout size={48} color="var(--sage-dark)" strokeWidth={1.5} />}
+        title="Your little ones' safe space"
         subtitle="Keep track of milestones, allergies, and the tiny details that matter most. You're building their story."
         hint="Having everything in one place gives you peace of mind during doctor visits and playdates."
         action={{ label: 'Add Child', onClick: () => {} }}
@@ -105,7 +109,8 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
   ];
 
   return (
-    <div className="fade-in-up" style={{ padding: '16px', maxWidth: 600, margin: '0 auto' }}>
+    <div className="fade-in-up">
+      <TabContent>
       <ConfettiEffect trigger={showConfetti} />
       <Toast
         message={toast.message}
@@ -150,27 +155,24 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 28,
               boxShadow: selectedChild === c.id ? 'var(--shadow-glow-blush)' : 'none',
               border: selectedChild === c.id ? '3px solid white' : '3px solid transparent',
               transition: 'all 0.2s ease',
             }}>
-              {c.isPregnancy ? '🌿' : (c.photo ? <img src={c.photo} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} /> : '👶')}
+              {c.isPregnancy ? (
+                <Sprout size={28} color={selectedChild === c.id ? 'white' : 'var(--mauve)'} strokeWidth={2} />
+              ) : c.photo ? (
+                <img src={c.photo} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+              ) : (
+                <Baby size={28} color={selectedChild === c.id ? 'white' : 'var(--mauve)'} strokeWidth={2} />
+              )}
             </div>
-            <span style={{
-              fontSize: '0.75rem',
-              fontWeight: selectedChild === c.id ? 700 : 600,
-              color: selectedChild === c.id ? 'var(--text-primary)' : 'var(--text-muted)',
-              textAlign: 'center',
-              maxWidth: 80,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}>
+            <span className={`max-w-[80px] truncate text-center text-xs ${selectedChild === c.id ? 'font-bold text-[var(--text-primary)]' : 'font-semibold text-[var(--text-muted)]'}`}
+            >
               {c.isPregnancy ? 'Baby on the way' : c.name}
             </span>
             {!c.isPregnancy && (
-              <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+              <span className={typo.caption}>
                 {calculateAge(c.dateOfBirth)}
               </span>
             )}
@@ -203,7 +205,7 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
           }}>
             <Plus size={24} />
           </div>
-          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--mauve)' }}>
+          <span className="text-xs font-semibold text-[var(--mauve)]">
             Add Child
           </span>
         </motion.div>
@@ -221,23 +223,27 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
             borderRadius: 'var(--radius-lg)',
             padding: '12px 18px',
             marginBottom: 16,
-            boxShadow: 'var(--shadow-sm)',
+            boxShadow: 'var(--shadow-md)',
             display: 'flex',
             alignItems: 'center',
             gap: 12,
             border: '1px solid var(--cream-dark)',
-          }}>
+            transition: 'box-shadow 0.2s ease',
+          }}
+          onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+          onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          >
             <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--mauve-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ShieldCheck size={16} color="var(--mauve)" />
             </div>
-            <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-              {publicCount} items are currently <span style={{ color: 'var(--sage-dark)' }}>visible to your connections</span>. {privateCount} items are private.
+            <span className={`${typo.bodyMuted} font-semibold`}>
+              {publicCount} items are currently <span className="text-[var(--sage-dark)]">visible to your connections</span>. {privateCount} items are private.
             </span>
           </div>
 
           {/* Basic Info Cards */}
           {[
-            { label: 'Name', value: child.isPregnancy ? 'Baby on the way 🌿' : child.name, field: 'name' },
+            { label: 'Name', value: child.isPregnancy ? 'Baby on the way' : child.name, field: 'name' },
             { label: 'Date of Birth', value: child.isPregnancy ? `Due: ${child.dueDate || 'TBD'}` : child.dateOfBirth, field: 'dob' },
             { label: 'Age', value: child.isPregnancy ? '' : calculateAge(child.dateOfBirth), field: 'age' },
             { label: 'Biological Sex', value: child.sex || 'Not specified', field: 'sex' },
@@ -255,16 +261,18 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  transition: 'box-shadow 0.2s ease',
                 }}
+                onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+                onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
               >
                 <div>
-                  <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {field.label}
-                  </div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: 2 }}>
+                  <FieldLabel>{field.label}</FieldLabel>
+                  <div className={`mt-0.5 ${typo.fieldValue}`}>
                     {field.value}
                   </div>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 600, color: isPublic ? 'var(--sage-dark)' : 'var(--text-muted)', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <div className={`mt-1 flex items-center gap-1 ${typo.caption} ${isPublic ? 'font-semibold text-[var(--sage-dark)]' : ''}`}
+                  >
                     {isPublic ? <Globe size={11} /> : <Lock size={11} />}
                     {isPublic ? 'Visible to connections' : 'Only you can see this'}
                   </div>
@@ -307,8 +315,8 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
 
           {/* Health Section */}
           <div style={{ marginTop: 16 }}>
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18 }}>💊</span> Health & Development
+            <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
+              <HeartPulse size={18} color="var(--terracotta)" /> Health & Development
             </h3>
 
             {sections.map((section) => (
@@ -323,15 +331,18 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                       : 'var(--radius-lg)',
                     padding: '14px 16px',
                     border: 'none',
-                    boxShadow: 'var(--shadow-sm)',
+                    boxShadow: 'var(--shadow-md)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     cursor: 'pointer',
                     fontFamily: 'inherit',
+                    transition: 'box-shadow 0.2s ease',
                   }}
+                  onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
                 >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  <span className={`flex items-center gap-2.5 ${typo.subheading} text-[var(--text-primary)]`}>
                     {section.icon} {section.label}
                   </span>
                   {expandedSection === section.id ? <ChevronUp size={16} color="var(--text-muted)" /> : <ChevronDown size={16} color="var(--text-muted)" />}
@@ -348,8 +359,11 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                         overflow: 'hidden',
                         background: 'var(--bg-card)',
                         borderRadius: '0 0 var(--radius-lg) var(--radius-lg)',
-                        boxShadow: 'var(--shadow-sm)',
+                        boxShadow: 'var(--shadow-md)',
+                        transition: 'box-shadow 0.2s ease',
                       }}
+                      onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+                      onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
                     >
                       <div style={{ padding: '0 16px 16px' }}>
                         {/* Growth */}
@@ -366,8 +380,8 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                               border: '1px solid rgba(74, 107, 58, 0.1)'
                             }}>
                               <Sparkles size={18} color="var(--sage-dark)" />
-                              <p style={{ fontSize: '0.78rem', color: 'var(--sage-dark)', fontWeight: 600, lineHeight: 1.4 }}>
-                                Olivia is in the 82nd percentile for weight! She&apos;s growing beautifully and right on track. ✨
+                              <p className={`text-[var(--sage-dark)] ${typo.caption} font-semibold`}>
+                                Olivia is in the 82nd percentile for weight! She&apos;s growing beautifully and right on track.
                               </p>
                             </div>
                             
@@ -376,22 +390,10 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                               <GrowthChart data={child.height} color="var(--sky-blue)" unit="cm" label="Height Progress" />
                               
                               <button 
-                                onClick={() => setToast({ show: true, message: 'Olivia\'s health history has been prepared for export! 📄', type: 'info' })}
+                                onClick={() => setToast({ show: true, message: 'Olivia\'s health history has been prepared for export.', type: 'info' })}
+                                className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-[var(--bg-card)] py-3 text-sm font-semibold text-[var(--text-secondary)]"
                                 style={{
-                                  width: '100%',
-                                  padding: '12px',
-                                  borderRadius: 'var(--radius-md)',
-                                  background: 'var(--bg-card)',
-                                  border: '2px solid var(--cream-dark)',
-                                  color: 'var(--text-secondary)',
-                                  fontSize: '0.85rem',
-                                  fontWeight: 700,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  gap: 8,
-                                  cursor: 'pointer',
-                                  marginTop: 8,
+                                  fontFamily: 'inherit',
                                 }}
                               >
                                 <Share2 size={16} /> Share with Pediatrician
@@ -399,15 +401,16 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                             </div>
 
                             {/* AI Prompt */}
-                            <div style={{ marginTop: 20, padding: 16, borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, var(--mauve-light), var(--sky-blue-light))', border: '1px solid rgba(138, 107, 138, 0.1)' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            <div className="mt-5 rounded-[var(--radius-lg)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--blush)] bg-[var(--bg-card)] p-4 shadow-[var(--shadow-sm)]">
+                              <div className="mb-2 flex items-center gap-2">
                                 <MessageCircle size={16} color="var(--mauve)" />
-                                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Ask Mira About Olivia</span>
+                                <span className={`${typo.subheading} text-[var(--text-primary)]`}>Ask Mira About Olivia</span>
                               </div>
-                              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 12 }}>
+                              <p className={`mb-3 ${typo.bodyMuted}`}>
                                 Get insights on Olivia&apos;s sleep and feeding patterns based on her recent growth.
                               </p>
-                              <div style={{ background: 'white', borderRadius: 'var(--radius-md)', padding: '10px 14px', fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                              <div className={`flex cursor-pointer items-center justify-between rounded-[var(--radius-md)] bg-white px-3.5 py-2.5 ${typo.caption}`}
+                              >
                                 <span>Try: &quot;How is Olivia&quot;s growth percentile?&quot;</span>
                                 <ArrowRight size={14} />
                               </div>
@@ -425,11 +428,11 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                                 borderBottom: '1px solid var(--cream-dark)',
                               }}>
                                 <div>
-                                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                                  <span className={`${typo.body} font-semibold`}>
                                     {v.name}
                                   </span>
                                   {v.isDue && v.dueDate && (
-                                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--terracotta)', marginTop: 2 }}>
+                                    <div className={`mt-0.5 font-semibold text-[var(--terracotta)] ${typo.caption}`}>
                                       Due: {v.dueDate}
                                     </div>
                                   )}
@@ -465,31 +468,25 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                                       handleMilestoneToggle(m.id);
                                       setShowConfetti(true);
                                       setTimeout(() => setShowConfetti(false), 3000);
-                                      setToast({ show: true, message: `Amazing! Olivia reached a new milestone: ${m.label} 🎉`, type: 'success' });
+                                      setToast({ show: true, message: `Amazing! Olivia reached a new milestone: ${m.label}.`, type: 'success' });
                                     }
                                   }}
+                                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm text-white"
                                   style={{
-                                    width: 28, height: 28, borderRadius: 'var(--radius-full)',
                                     border: m.achieved ? 'none' : '2px solid var(--mauve-light)',
                                     background: m.achieved ? 'linear-gradient(135deg, var(--sage), var(--sage-dark))' : 'transparent',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     cursor: m.achieved ? 'default' : 'pointer',
-                                    color: 'white', fontSize: '0.8rem', flexShrink: 0,
                                   }}
                                 >
                                   {m.achieved && '✓'}
                                 </motion.button>
                                 <div>
-                                  <span style={{
-                                    fontSize: '0.85rem', fontWeight: 600,
-                                    color: m.achieved ? 'var(--text-primary)' : 'var(--text-muted)',
-                                    textDecoration: m.achieved ? 'none' : 'none',
-                                  }}>
+                                  <span className={`${typo.body} font-semibold ${m.achieved ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
                                     {m.label}
                                   </span>
                                   {m.achievedDate && (
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--sage-dark)', fontWeight: 600, marginTop: 2 }}>
-                                      🎉 {m.achievedDate}
+                                    <div className={`mt-0.5 flex items-center gap-1 font-semibold text-[var(--sage-dark)] ${typo.caption}`}>
+                                      <Star size={12} strokeWidth={2.5} /> {m.achievedDate}
                                     </div>
                                   )}
                                 </div>
@@ -502,8 +499,8 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                         {section.id === 'allergies' && (
                           <div>
                             {child.allergies.length === 0 ? (
-                              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '8px 0' }}>
-                                No allergies recorded. That&apos;s great! 🌸
+                              <p className={`py-2 italic ${typo.bodyMuted}`}>
+                                No allergies recorded. That&apos;s great!
                               </p>
                             ) : (
                               child.allergies.map((a, i) => (
@@ -512,7 +509,7 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                                   padding: '8px 0',
                                 }}>
                                   <AlertTriangle size={14} color="var(--terracotta)" />
-                                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{a}</span>
+                                  <span className={`${typo.body} font-semibold`}>{a}</span>
                                 </div>
                               ))
                             )}
@@ -522,18 +519,12 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                         {/* Medical Notes */}
                         {section.id === 'notes' && (
                           <div>
-                            <div style={{
-                              display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
-                              fontSize: '0.72rem', fontWeight: 700, color: 'var(--terracotta)',
-                            }}>
+                            <div className={`mb-2 flex items-center gap-1.5 font-semibold text-[var(--terracotta)] ${typo.caption}`}>
                               <Lock size={12} /> Always private — never shared
                             </div>
-                            <p style={{
-                              fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.6,
-                              background: 'var(--cream)',
-                              borderRadius: 'var(--radius-sm)',
-                              padding: '12px',
-                            }}>
+                            <p className={`rounded-[var(--radius-sm)] bg-[var(--cream)] p-3 ${typo.body}`}
+                            style={{ lineHeight: 1.6 }}
+                            >
                               {child.medicalNotes || 'No notes yet.'}
                             </p>
                           </div>
@@ -547,6 +538,7 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
           </div>
         </motion.div>
       )}
+      </TabContent>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Image as ImageIcon, Lightbulb, Baby, Lock, Shield, Users, Sparkles, History } from 'lucide-react';
+import { typo } from '@/lib/typography';
 
 export type TabId = 'personal' | 'posts' | 'tips' | 'children' | 'vault' | 'privacy' | 'community' | 'wellbeing' | 'journey';
 
@@ -62,12 +63,14 @@ export default function TabStrip({ activeTab, onChange }: TabStripProps) {
             onClick={() => onChange(tab.id)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`relative flex min-w-[92px] flex-1 flex-col items-center gap-1 rounded-[var(--radius-md)] border px-3 py-2.5 text-center transition-all duration-150 lg:min-w-0 ${isActive ? 'border-[var(--blush)] bg-[var(--blush-light)] text-[var(--blush-dark)] shadow-[var(--shadow-sm)]' : 'border-transparent text-[var(--text-muted)] hover:border-[var(--cream-dark)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-secondary)]'}`}
+            className={`relative flex min-w-[92px] flex-1 flex-col items-center gap-1 rounded-[var(--radius-md)] border px-3 py-2.5 text-center transition-all duration-150 lg:min-w-0 ${isActive ? 'border-[var(--blush)] bg-[var(--blush-light)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)] transition-shadow duration-200' : 'border-transparent hover:border-[var(--cream-dark)] hover:bg-[var(--bg-card-hover)]'}`}
           >
             <span style={{ display: 'flex', alignItems: 'center' }}>
               {tab.icon}
             </span>
-            <span className={`text-[11px] uppercase tracking-[0.06em] ${isActive ? 'font-bold' : 'font-semibold'}`}>
+            <span
+              className={`${isActive ? typo.tabLabelActive : typo.tabLabel} ${isActive ? 'text-[var(--blush-dark)]' : 'text-[var(--text-muted)]'}`}
+            >
               {tab.label}
             </span>
             {isActive && (

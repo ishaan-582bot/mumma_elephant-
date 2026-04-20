@@ -6,7 +6,9 @@ import EmptyState from '../ui/EmptyState';
 import BottomSheet from '../ui/BottomSheet';
 import Toast from '../ui/Toast';
 import HoldToDeleteButton from '../ui/HoldToDeleteButton';
+import TabContent from '../ui/TabContent';
 import type { Tip, TipTag } from '@/lib/data';
+import { typo } from '@/lib/typography';
 
 const TAG_CLASSES: Record<TipTag, string> = {
   'Nutrition': 'tag-nutrition',
@@ -50,7 +52,8 @@ export default function MyTips({ tips }: MyTipsProps) {
   }
 
   return (
-    <div className="fade-in-up" style={{ padding: '16px', maxWidth: 600, margin: '0 auto' }}>
+    <div className="fade-in-up">
+      <TabContent>
       <Toast 
         message={toast.message} 
         show={toast.show} 
@@ -59,18 +62,14 @@ export default function MyTips({ tips }: MyTipsProps) {
       />
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+        <span className={typo.subheading}>
           {tips.length} tips shared
         </span>
         <button
+          type="button"
+          className="flex items-center gap-1.5 rounded-[var(--radius-md)] border-none bg-[linear-gradient(135deg,var(--blush),var(--blush-dark))] px-4 py-2 text-sm font-semibold text-white"
           onClick={() => setShowNewTip(true)}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '8px 16px', borderRadius: 'var(--radius-md)',
-            background: 'linear-gradient(135deg, var(--blush), var(--blush-dark))',
-            border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-            fontWeight: 700, color: 'white', fontSize: '0.85rem',
-          }}
+          style={{ cursor: 'pointer', fontFamily: 'inherit' }}
         >
           <Plus size={16} /> New Tip
         </button>
@@ -88,26 +87,18 @@ export default function MyTips({ tips }: MyTipsProps) {
             style={{
               background: 'var(--bg-card)',
               borderRadius: 'var(--radius-lg)',
-              padding: '18px 20px',
-              boxShadow: 'var(--shadow-sm)',
+              padding: '20px',
+              boxShadow: 'var(--shadow-md)',
               cursor: 'pointer',
               transition: 'box-shadow 0.2s ease',
             }}
-            onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-            onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
+            onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
           >
             {/* Text excerpt */}
-            <p style={{
-              fontSize: '0.9rem',
-              fontWeight: 500,
-              color: 'var(--text-primary)',
-              lineHeight: 1.5,
-              display: '-webkit-box',
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              marginBottom: 12,
-            }}>
+            <p
+              className={`mb-3 line-clamp-3 ${typo.body}`}
+            >
               {tip.text}
             </p>
 
@@ -116,12 +107,9 @@ export default function MyTips({ tips }: MyTipsProps) {
               {tip.tags.map((tag) => (
                 <span
                   key={tag}
-                  className={TAG_CLASSES[tag]}
+                  className={`${TAG_CLASSES[tag]} px-2.5 py-0.5 text-xs font-semibold`}
                   style={{
-                    padding: '3px 10px',
                     borderRadius: 'var(--radius-full)',
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
                   }}
                 >
                   {tag}
@@ -130,12 +118,23 @@ export default function MyTips({ tips }: MyTipsProps) {
             </div>
 
             {/* Relevance bar */}
-            <div style={{ marginBottom: 10 }}>
+            <div
+              style={{
+                marginBottom: 10,
+                padding: '8px 10px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-card)',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'box-shadow 0.2s ease',
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
+            >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                <span className={`${typo.caption} font-semibold text-[var(--text-secondary)]`}>
                   {tip.helpfulPercent > 0 ? `${tip.helpfulPercent}% found this helpful` : 'Be the first to rate this'}
                 </span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <span className={typo.caption}>
                   👍 {tip.upvotes} · 👎 {tip.downvotes}
                 </span>
               </div>
@@ -157,8 +156,8 @@ export default function MyTips({ tips }: MyTipsProps) {
 
             {/* Footer */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{tip.date}</span>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span className={typo.caption}>{tip.date}</span>
+              <span className={`flex items-center gap-1 ${typo.caption}`}>
                 <Eye size={12} /> {tip.views} views
               </span>
             </div>
@@ -174,14 +173,13 @@ export default function MyTips({ tips }: MyTipsProps) {
       >
         {expandedTip && (
           <div>
-            <p style={{ fontSize: '0.95rem', lineHeight: 1.7, color: 'var(--text-primary)', marginBottom: 16 }}>
+            <p className={`mb-4 ${typo.body}`}>
               {expandedTip.text}
             </p>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
               {expandedTip.tags.map((tag) => (
-                <span key={tag} className={TAG_CLASSES[tag]} style={{
-                  padding: '4px 12px', borderRadius: 'var(--radius-full)',
-                  fontSize: '0.78rem', fontWeight: 700,
+                <span key={tag} className={`${TAG_CLASSES[tag]} px-3 py-1 text-xs font-semibold`} style={{
+                  borderRadius: 'var(--radius-full)',
                 }}>
                   {tag}
                 </span>
@@ -195,7 +193,7 @@ export default function MyTips({ tips }: MyTipsProps) {
               padding: '14px 16px',
               marginBottom: 16,
             }}>
-              <div style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: 8, color: 'var(--text-primary)' }}>
+              <div className={`mb-2 ${typo.subheading}`}>
                 Helpfulness
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -205,7 +203,7 @@ export default function MyTips({ tips }: MyTipsProps) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--terracotta)' }}>
                   <ThumbsDown size={16} /> <span style={{ fontWeight: 700 }}>{expandedTip.downvotes}</span>
                 </div>
-                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginLeft: 'auto' }}>
+                <span className={`ml-auto ${typo.subheading}`}>
                   {expandedTip.helpfulPercent}% helpful
                 </span>
               </div>
@@ -213,28 +211,17 @@ export default function MyTips({ tips }: MyTipsProps) {
 
             {/* CTAs */}
             <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-              <button style={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                padding: '12px', borderRadius: 'var(--radius-md)',
-                background: 'var(--sage-light)', border: 'none',
-                fontWeight: 700, fontSize: '0.85rem', color: '#4A6B3A',
-                cursor: 'pointer', fontFamily: 'inherit',
-              }}>
+              <button type="button" className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius-md)] border-none bg-[var(--sage-light)] py-3 text-sm font-semibold text-[#4A6B3A]" style={{ fontFamily: 'inherit' }}>
                 <ThumbsUp size={16} /> Helpful
               </button>
-              <button style={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                padding: '12px', borderRadius: 'var(--radius-md)',
-                background: 'var(--cream-dark)', border: 'none',
-                fontWeight: 700, fontSize: '0.85rem', color: 'var(--text-secondary)',
-                cursor: 'pointer', fontFamily: 'inherit',
-              }}>
+              <button type="button" className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius-md)] border-none bg-[var(--cream-dark)] py-3 text-sm font-semibold text-[var(--text-secondary)]" style={{ fontFamily: 'inherit' }}
+              >
                 <Share2 size={16} /> Share
               </button>
             </div>
 
             <div style={{ borderTop: '1px solid var(--cream-dark)', paddingTop: 16 }}>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 12, textAlign: 'center' }}>
+              <p className={`mb-3 text-center ${typo.caption}`}>
                 Destructive Action
               </p>
               <HoldToDeleteButton 
@@ -261,37 +248,27 @@ export default function MyTips({ tips }: MyTipsProps) {
               value={newTipText}
               onChange={(e) => { if (e.target.value.length <= 500) setNewTipText(e.target.value); }}
               placeholder="Share your wisdom with other mums... 🌸"
-              style={{
-                width: '100%', minHeight: 120, padding: '14px',
-                borderRadius: 'var(--radius-md)',
-                border: '2px solid var(--cream-dark)',
-                fontSize: '0.9rem', fontFamily: 'inherit',
-                resize: 'vertical', background: 'var(--cream)',
-                color: 'var(--text-primary)',
-                outline: 'none',
-              }}
+              className="min-h-[120px] w-full resize-y rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-[var(--cream)] px-3.5 py-3.5 text-sm font-medium leading-relaxed text-[var(--text-primary)] outline-none"
+              style={{ fontFamily: 'inherit' }}
               onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--blush)'; }}
               onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--cream-dark)'; }}
             />
-            <span style={{
-              position: 'absolute', bottom: 8, right: 12,
-              fontSize: '0.75rem', fontWeight: 600,
-              color: newTipText.length > 450 ? 'var(--terracotta)' : 'var(--text-muted)',
-            }}>
+            <span className={`absolute bottom-2 right-3 text-xs font-semibold ${newTipText.length > 450 ? 'text-[var(--terracotta)]' : 'text-[var(--text-muted)]'}`}
+            >
               {newTipText.length}/500
             </span>
           </div>
 
           <div style={{ marginBottom: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-              <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+              <p className={`${typo.subheading}`}>
                 Tags (up to 3)
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)' }} title="Tags help other mums find your tip when they need it most.">
                 <Info size={14} />
               </div>
             </div>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.4 }}>
+            <p className={`mb-3 ${typo.caption}`}>
               Tags help other mums find your tip when they need it most. Choose up to 3 that best describe your advice.
             </p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -300,19 +277,11 @@ export default function MyTips({ tips }: MyTipsProps) {
                 return (
                   <button
                     key={tag}
+                    type="button"
                     onClick={() => toggleTag(tag)}
-                    className={selected ? TAG_CLASSES[tag] : ''}
+                    className={`cursor-pointer rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all duration-200 ${selected ? TAG_CLASSES[tag] : 'border-2 border-[var(--cream-dark)] bg-transparent text-[var(--text-muted)]'}`}
                     style={{
-                      padding: '6px 14px',
-                      borderRadius: 'var(--radius-full)',
-                      border: selected ? 'none' : '2px solid var(--cream-dark)',
-                      background: selected ? undefined : 'transparent',
-                      fontSize: '0.8rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
                       fontFamily: 'inherit',
-                      color: selected ? undefined : 'var(--text-muted)',
-                      transition: 'all 0.2s ease',
                     }}
                   >
                     {tag}
@@ -323,15 +292,13 @@ export default function MyTips({ tips }: MyTipsProps) {
           </div>
 
           <button
+            type="button"
             disabled={!newTipText.trim()}
+            className="w-full rounded-[var(--radius-md)] border-none py-3.5 text-base font-semibold disabled:cursor-not-allowed"
             style={{
-              width: '100%', padding: '14px',
-              borderRadius: 'var(--radius-md)',
               background: newTipText.trim()
                 ? 'linear-gradient(135deg, var(--blush), var(--blush-dark))'
                 : 'var(--cream-dark)',
-              border: 'none',
-              fontWeight: 700, fontSize: '0.95rem',
               color: newTipText.trim() ? 'white' : 'var(--text-muted)',
               cursor: newTipText.trim() ? 'pointer' : 'not-allowed',
               fontFamily: 'inherit',
@@ -341,6 +308,7 @@ export default function MyTips({ tips }: MyTipsProps) {
           </button>
         </div>
       </BottomSheet>
+      </TabContent>
     </div>
   );
 }

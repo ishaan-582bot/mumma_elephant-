@@ -12,6 +12,9 @@ import { type UserProfile, calculateProfileCompletion } from '@/lib/data';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import FormField from '../ui/FormField';
+import TabContent from '../ui/TabContent';
+import { typo } from '@/lib/typography';
+import FieldLabel from '@/components/ui/FieldLabel';
 
 interface PersonalInfoProps {
   user: UserProfile;
@@ -113,7 +116,8 @@ export default function PersonalInfo({
     'w-full rounded-[var(--radius-sm)] border border-[var(--cream-dark)] bg-white px-3.5 py-2.5 text-sm font-medium text-[var(--text-primary)] outline-none transition-all duration-150 focus:border-[var(--blush-dark)] focus:ring-2 focus:ring-[color-mix(in_oklab,var(--blush)_45%,white)]';
 
   return (
-    <div className="fade-in-up mx-auto w-full max-w-3xl px-1 py-2 sm:px-2">
+    <div className="fade-in-up">
+      <TabContent maxWidth="max-w-3xl">
       <ConfettiEffect trigger={showConfetti} />
       <Toast 
         message={toast.message} 
@@ -125,10 +129,10 @@ export default function PersonalInfo({
       {/* Progress Bar */}
       <Card className="mb-5" bodyClassName="px-5 py-4">
         <div className="mb-2.5 flex items-center justify-between">
-          <span className="text-sm font-semibold text-[var(--text-secondary)]">
+          <span className={typo.subheading}>
             Your profile is {user.profileCompletion}% complete 🌸
           </span>
-          <span className="text-xs font-bold text-[var(--blush-dark)]">
+          <span className="text-xs font-semibold text-[var(--blush-dark)]">
             {user.profileCompletion}%
           </span>
         </div>
@@ -180,7 +184,7 @@ export default function PersonalInfo({
             <Clock size={18} />
           </div>
           <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">Motherhood Stage</div>
+            <FieldLabel>Motherhood Stage</FieldLabel>
             {editing ? (
               <>
                 <select
@@ -190,7 +194,7 @@ export default function PersonalInfo({
                 >
                   {stages.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
-                <p className="mt-2 text-xs italic leading-5 text-[var(--text-muted)]">
+                <p className={`mt-2 italic ${typo.caption}`}>
                   This helps us personalize content and connect you with mums at similar stages
                 </p>
               </>
@@ -212,7 +216,10 @@ export default function PersonalInfo({
             transition={{ delay: i * 0.05 }}
             className="mb-2"
           >
-            <Card bodyClassName="px-5 py-3.5">
+            <Card
+              density="compact"
+              className="shadow-[var(--shadow-sm)] transition-shadow duration-200 hover:shadow-[var(--shadow-md)]"
+            >
               <div className="flex items-start gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--cream-dark)] text-[var(--text-muted)]">
                   {field.icon}
@@ -236,15 +243,15 @@ export default function PersonalInfo({
                     </FormField>
                   ) : (
                     <>
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">{field.label}</div>
-                      <div className="mt-1 text-[15px] font-semibold text-[var(--text-primary)]">
+                      <FieldLabel>{field.label}</FieldLabel>
+                      <div className={`mt-1 ${typo.fieldValue}`}>
                         {field.value || (
                           <span className="cursor-pointer italic text-[var(--blush-dark)]">
                             Add {field.label.toLowerCase()} +
                           </span>
                         )}
                         {field.masked && (
-                          <span className="ml-2 text-xs font-medium text-[var(--text-muted)]">🔒 Private</span>
+                          <span className={`ml-2 ${typo.caption}`}>🔒 Private</span>
                         )}
                       </div>
                     </>
@@ -269,9 +276,7 @@ export default function PersonalInfo({
           {user.verificationStatus === 'Verified' ? <ShieldCheck size={18} /> : <AlertCircle size={18} />}
         </div>
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">
-            ID Verification
-          </div>
+          <FieldLabel>ID Verification</FieldLabel>
           <Badge
             label={
               user.verificationStatus === 'Verified' ? 'Verified ✓' :
@@ -286,6 +291,7 @@ export default function PersonalInfo({
         </div>
       </div>
       </Card>
+      </TabContent>
     </div>
   );
 }

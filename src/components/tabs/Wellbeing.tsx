@@ -9,7 +9,9 @@ import {
 } from 'lucide-react';
 import Badge from '../ui/Badge';
 import Toast from '../ui/Toast';
+import TabContent from '../ui/TabContent';
 import { mockMoods, mockSelfCare } from '@/lib/data';
+import { typo } from '@/lib/typography';
 
 export default function Wellbeing() {
   const [enabled, setEnabled] = useState(true);
@@ -26,12 +28,14 @@ export default function Wellbeing() {
 
   if (!enabled) {
     return (
-      <div className="fade-in-up" style={{ padding: '40px 20px', textAlign: 'center' }}>
+      <div className="fade-in-up">
+        <TabContent>
+        <div style={{ textAlign: 'center' }}>
         <div style={{ width: 64, height: 64, borderRadius: 'var(--radius-full)', background: 'var(--cream)', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
           <ShieldCheck size={32} />
         </div>
-        <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)' }}>Wellbeing Suite is Private</h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 8, maxWidth: 300, margin: '8px auto 24px' }}>
+        <h2 className={typo.pageHeroBold}>Wellbeing Suite is Private</h2>
+        <p className={`mx-auto mt-2 max-w-xs ${typo.bodyMuted}`}>
           Your emotional data is never shared. You can enable this feature to track your mood and access resources.
         </p>
         <button 
@@ -44,12 +48,15 @@ export default function Wellbeing() {
         >
           Enable Wellbeing Features
         </button>
+        </div>
+        </TabContent>
       </div>
     );
   }
 
   return (
-    <div className="fade-in-up" style={{ padding: '20px 16px', maxWidth: 600, margin: '0 auto' }}>
+    <div className="fade-in-up">
+      <TabContent>
       <Toast 
         message={toast.message} 
         show={toast.show} 
@@ -59,20 +66,20 @@ export default function Wellbeing() {
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <h2 className={`flex items-center gap-2.5 ${typo.displayExtrabold}`}>
           How are you, Sarah? <Heart size={20} fill="var(--terracotta)" color="var(--terracotta)" />
         </h2>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: 4 }}>
+        <p className={`mt-1 ${typo.bodyMuted}`}>
           This is your private space. Only you can see this.
         </p>
       </div>
 
       {/* Mood Selector */}
       <div style={{ 
-        background: 'var(--bg-card)', borderRadius: 'var(--radius-xl)', padding: '24px 20px',
+        background: 'var(--bg-card)', borderRadius: 'var(--radius-xl)', padding: '24px',
         border: '1px solid var(--cream-dark)', boxShadow: 'var(--shadow-sm)', marginBottom: 24
       }}>
-        <p style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 20, textAlign: 'center' }}>
+        <p className={`mb-5 text-center ${typo.subheading}`}>
           How are you feeling right now?
         </p>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
@@ -92,30 +99,25 @@ export default function Wellbeing() {
                 transition: 'all 0.2s ease'
               }}
             >
-              <span style={{ fontSize: '1.5rem' }}>{m.emoji}</span>
-              <span style={{ fontSize: '0.65rem', fontWeight: 700, color: selectedMood === m.label ? 'white' : 'var(--text-muted)' }}>{m.label}</span>
+              <span className="text-2xl">{m.emoji}</span>
+              <span className={`text-xs font-semibold uppercase tracking-wider ${selectedMood === m.label ? 'text-white' : 'text-[var(--text-muted)]'}`}>{m.label}</span>
             </motion.button>
           ))}
         </div>
       </div>
 
       {/* Insights */}
-      <div style={{ 
-        background: 'linear-gradient(135deg, var(--mauve-light), var(--sky-blue-light))',
-        borderRadius: 'var(--radius-lg)', padding: '20px', marginBottom: 24,
-        display: 'flex', gap: 16, border: '1px solid rgba(138, 107, 138, 0.1)'
-      }}>
-        <AlertCircle size={24} color="var(--mauve)" style={{ flexShrink: 0 }} />
+      <div className="mb-6 flex gap-4 rounded-[var(--radius-lg)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--sage)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-md)] transition-shadow duration-200 hover:shadow-[var(--shadow-lg)]">
+        <AlertCircle size={24} color="var(--sage)" className="shrink-0" />
         <div>
-          <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>Wellbeing Insight</h4>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 4, lineHeight: 1.4 }}>
+          <h4 className={typo.heading}>Wellbeing Insight</h4>
+          <p className={`mt-1 ${typo.bodyMuted}`}>
             You&apos;ve reported feeling <strong>Overwhelmed</strong> twice this week. Remember, it&apos;s okay to ask for help. Would you like to check out the sleep group?
           </p>
-          <button style={{ 
-            marginTop: 12, fontSize: '0.75rem', fontWeight: 700, color: 'var(--mauve)',
-            background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 4
-          }}>
+          <button
+            type="button"
+            className="mt-3 flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-sm font-semibold text-[var(--sage-dark)]"
+          >
             Explore Support Groups <ArrowRight size={14} />
           </button>
         </div>
@@ -127,17 +129,16 @@ export default function Wellbeing() {
         marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center'
       }}>
         <div>
-          <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--terracotta)' }}>Need to talk?</h4>
-          <p style={{ fontSize: '0.75rem', color: 'var(--terracotta)', opacity: 0.8, marginTop: 2 }}>
+          <h4 className={`text-lg font-bold text-[var(--terracotta)]`}>Need to talk?</h4>
+          <p className="mt-0.5 text-xs font-medium leading-relaxed text-[var(--terracotta)] opacity-80">
             Immediate support for postpartum mental health.
           </p>
         </div>
-        <button style={{
-          padding: '10px 16px', borderRadius: 'var(--radius-full)',
-          background: 'var(--terracotta)', color: 'white', fontWeight: 700,
-          border: 'none', cursor: 'pointer', fontSize: '0.8rem',
-          display: 'flex', alignItems: 'center', gap: 8
-        }}>
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-full border-none bg-[var(--terracotta)] px-4 py-2.5 text-sm font-semibold text-white"
+          style={{ cursor: 'pointer' }}
+        >
           <Phone size={14} /> Talk to Someone
         </button>
       </div>
@@ -145,10 +146,10 @@ export default function Wellbeing() {
       {/* Self Care Goals */}
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <h3 className={`flex items-center gap-2 ${typo.heading}`}>
             <Sparkles size={18} color="var(--sage)" /> Today&apos;s Self-Care
           </h3>
-          <span style={{ fontSize: '0.7rem', color: 'var(--sage-dark)', fontWeight: 700 }}>
+          <span className="text-xs font-semibold text-[var(--sage-dark)]">
             <Zap size={12} fill="var(--sage)" style={{ display: 'inline', marginRight: 4 }} /> 5 Day Streak!
           </span>
         </div>
@@ -164,10 +165,7 @@ export default function Wellbeing() {
                 opacity: goal.completed ? 0.7 : 1
               }}
             >
-              <span style={{ 
-                fontSize: '0.85rem', color: 'var(--text-primary)', 
-                textDecoration: goal.completed ? 'line-through' : 'none' 
-              }}>{goal.label}</span>
+              <span className={`${typo.body} ${goal.completed ? 'line-through' : ''}`}>{goal.label}</span>
               {goal.completed ? (
                 <CheckCircle2 size={20} color="var(--sage)" />
               ) : (
@@ -181,12 +179,15 @@ export default function Wellbeing() {
       {/* Settings Link */}
       <div style={{ textAlign: 'center', marginTop: 32, padding: '16px', borderTop: '1px dashed var(--cream-dark)' }}>
         <button 
+          type="button"
           onClick={() => setEnabled(false)}
-          style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.75rem', textDecoration: 'underline', cursor: 'pointer' }}
+          className={`border-none bg-transparent underline ${typo.caption}`}
+          style={{ cursor: 'pointer' }}
         >
           Disable wellbeing check-ins in settings
         </button>
       </div>
+      </TabContent>
     </div>
   );
 }

@@ -21,19 +21,13 @@ const variantStyles: Record<string, { bg: string; color: string }> = {
 export default function Badge({ label, variant = 'blush', size = 'md' }: BadgeProps) {
   const style = variantStyles[variant];
   return (
-    <span style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 4,
-      background: style.bg,
-      color: style.color,
-      borderRadius: 'var(--radius-full)',
-      padding: size === 'sm' ? '3px 10px' : '5px 14px',
-      fontSize: size === 'sm' ? '0.75rem' : '0.8rem',
-      fontWeight: 700,
-      whiteSpace: 'nowrap',
-      letterSpacing: '0.02em',
-    }}>
+    <span
+      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full ${size === 'sm' ? 'px-2.5 py-0.5 text-xs font-semibold' : 'px-3.5 py-1 text-xs font-semibold'}`}
+      style={{
+        background: style.bg,
+        color: style.color,
+      }}
+    >
       {label}
     </span>
   );

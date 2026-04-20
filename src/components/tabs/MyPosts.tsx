@@ -4,10 +4,29 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Grid3X3, LayoutList, Plus, Lock, Globe, X, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
 import EmptyState from '../ui/EmptyState';
 import BottomSheet from '../ui/BottomSheet';
+import TabContent from '../ui/TabContent';
 import type { Post } from '@/lib/data';
+import { typo } from '@/lib/typography';
 
 interface MyPostsProps {
   posts: Post[];
+}
+
+const PLACEHOLDER_EMOJIS = ['🌸', '🛁', '🌿', '🎀', '✨', '💪'] as const;
+
+function PostGridPlaceholder({ index, emojiSize }: { index: number; emojiSize: number }) {
+  const emoji = PLACEHOLDER_EMOJIS[index % 6];
+  return (
+    <div className="relative flex h-full w-full items-center justify-center">
+      <span style={{ fontSize: emojiSize, lineHeight: 1 }}>{emoji}</span>
+      <Camera
+        size={24}
+        className="pointer-events-none absolute bottom-1 right-1 opacity-30 text-[var(--text-primary)]"
+        strokeWidth={1.75}
+        aria-hidden
+      />
+    </div>
+  );
 }
 
 export default function MyPosts({ posts }: MyPostsProps) {
@@ -27,8 +46,8 @@ export default function MyPosts({ posts }: MyPostsProps) {
   if (posts.length === 0) {
     return (
       <EmptyState
-        icon="📸"
-        title="Capture the beautiful chaos, mum 🌸"
+        icon={<Camera size={48} color="var(--blush-dark)" strokeWidth={1.5} />}
+        title="Capture the beautiful chaos, mum"
         subtitle="Your journey is unique and worth holding onto. Add photos to create a private timeline of your motherhood story."
         hint="Documenting moments helps you reflect on your beautiful journey and see how far you've come."
         action={{ label: 'Upload Photo', onClick: () => {} }}
@@ -37,10 +56,11 @@ export default function MyPosts({ posts }: MyPostsProps) {
   }
 
   return (
-    <div className="fade-in-up" style={{ padding: '16px', maxWidth: 600, margin: '0 auto' }}>
+    <div className="fade-in-up">
+      <TabContent>
       {/* View toggle */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+        <span className={typo.subheading}>
           {posts.length} moments
         </span>
         <div style={{ display: 'flex', gap: 4, background: 'var(--cream-dark)', borderRadius: 'var(--radius-sm)', padding: 3 }}>
@@ -128,29 +148,31 @@ export default function MyPosts({ posts }: MyPostsProps) {
               style={{
                 background: 'var(--bg-card)',
                 borderRadius: 'var(--radius-lg)',
-                boxShadow: 'var(--shadow-sm)',
+                boxShadow: 'var(--shadow-md)',
                 overflow: 'hidden',
                 cursor: 'pointer',
+                transition: 'box-shadow 0.2s ease',
               }}
+              onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
             >
               <div style={{
                 height: 200,
                 background: postColors[i % postColors.length],
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 48,
               }}>
-                {['🌸', '🛁', '🌿', '🎀', '✨', '💪'][i % 6]}
+                <PostGridPlaceholder index={i} emojiSize={48} />
               </div>
-              <div style={{ padding: '14px 16px' }}>
+              <div style={{ padding: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', flex: 1 }}>
+                  <p className={`flex-1 ${typo.body}`}>
                     {post.caption}
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, marginLeft: 8 }}>
                     {post.privacy === 'private' ? <Lock size={13} color="var(--text-muted)" /> : <Globe size={13} color="var(--sage-dark)" />}
                   </div>
                 </div>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 6 }}>{post.createdAt}</p>
+                <p className={`mt-1.5 ${typo.caption}`}>{post.createdAt}</p>
               </div>
             </motion.div>
           ))}
@@ -254,27 +276,14 @@ export default function MyPosts({ posts }: MyPostsProps) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 72,
               }}
             >
-              {['🌸', '🛁', '🌿', '🎀', '✨', '💪'][selectedPost % 6]}
+              <PostGridPlaceholder index={selectedPost} emojiSize={72} />
             </motion.div>
-            <p style={{
-              color: 'white',
-              fontSize: '1rem',
-              fontWeight: 600,
-              marginTop: 20,
-              textAlign: 'center',
-              padding: '0 24px',
-              maxWidth: 400,
-            }}>
+            <p className="mx-auto mt-5 max-w-md px-6 text-center text-base font-medium leading-relaxed text-white">
               {posts[selectedPost].caption}
             </p>
-            <p style={{
-              color: 'rgba(255,255,255,0.5)',
-              fontSize: '0.8rem',
-              marginTop: 8,
-            }}>
+            <p className="mt-2 text-xs font-medium text-white/50">
               {posts[selectedPost].createdAt}
             </p>
           </motion.div>
@@ -290,28 +299,19 @@ export default function MyPosts({ posts }: MyPostsProps) {
         {['Edit Post', 'Delete Post', 'Change Privacy', 'Share'].map((opt) => (
           <button
             key={opt}
+            type="button"
             onClick={() => setContextMenu(null)}
+            className="w-full cursor-pointer border-none border-b border-[var(--cream-dark)] bg-transparent py-3.5 text-left text-sm font-semibold"
             style={{
-              width: '100%',
-              padding: '14px 0',
-              borderBottom: '1px solid var(--cream-dark)',
-              background: 'transparent',
-              border: 'none',
-              borderBottomWidth: 1,
-              borderBottomStyle: 'solid',
-              borderBottomColor: 'var(--cream-dark)',
-              fontSize: '0.95rem',
-              fontWeight: 600,
               color: opt === 'Delete Post' ? 'var(--terracotta)' : 'var(--text-primary)',
-              cursor: 'pointer',
               fontFamily: 'inherit',
-              textAlign: 'left',
             }}
           >
             {opt}
           </button>
         ))}
       </BottomSheet>
+      </TabContent>
     </div>
   );
 }

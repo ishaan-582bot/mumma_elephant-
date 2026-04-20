@@ -11,6 +11,9 @@ import Toast from '../ui/Toast';
 import { 
   mockConnections, mockBadges, mockGratitude, mockCommunityTimeline 
 } from '@/lib/data';
+import { typo } from '@/lib/typography';
+import { FIELD_LABEL_CLASSNAME } from '@/components/ui/FieldLabel';
+import TabContent from '@/components/ui/TabContent';
 
 export default function Community() {
   const [toast, setToast] = useState({ show: false, message: '', type: 'default' as any });
@@ -24,7 +27,8 @@ export default function Community() {
   };
 
   return (
-    <div className="fade-in-up" style={{ padding: '20px 16px', maxWidth: 600, margin: '0 auto' }}>
+    <div className="fade-in-up">
+      <TabContent>
       <Toast 
         message={toast.message} 
         show={toast.show} 
@@ -33,25 +37,13 @@ export default function Community() {
       />
 
       {/* Hero Header */}
-      <div style={{ 
-        background: 'linear-gradient(135deg, var(--blush-light), var(--mauve-light))',
-        borderRadius: 'var(--radius-lg)',
-        padding: '24px 20px',
-        marginBottom: 20,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
-      }}>
-        <div style={{ 
-          width: 56, height: 56, borderRadius: 'var(--radius-full)', 
-          background: 'white', display: 'flex', 
-          alignItems: 'center', justifyContent: 'center', color: 'var(--mauve)' 
-        }}>
+      <div className="mb-5 flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--blush)] bg-[var(--bg-card)] p-6 shadow-[var(--shadow-md)] transition-shadow duration-200 hover:shadow-[var(--shadow-lg)]">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius-full)] bg-[var(--cream)] text-[var(--mauve)]">
           <Users size={32} />
         </div>
         <div>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-primary)' }}>My Support Circle</h2>
-          <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+          <h2 className={typo.pageHeroBold}>My Support Circle</h2>
+          <p className={`mt-0.5 ${typo.bodyMuted}`}>
             You haven&apos;t helped just 1 child grow, you&apos;ve helped 154 mums too. 🌸
           </p>
         </div>
@@ -59,7 +51,7 @@ export default function Community() {
 
       {/* Connection Grid */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
           <Heart size={18} color="var(--terracotta)" /> Trusted Connections
         </h3>
         <div style={{ 
@@ -69,12 +61,13 @@ export default function Community() {
           {mockConnections.map((conn: any) => (
             <motion.div
               key={conn.id}
-              whileHover={{ y: -4 }}
+              whileHover={{ y: -4, boxShadow: 'var(--shadow-lg)' }}
               style={{
                 scrollSnapAlign: 'start', flexShrink: 0, width: 140,
                 background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)',
-                padding: '16px 12px', textAlign: 'center', boxShadow: 'var(--shadow-sm)',
-                border: '1px solid var(--cream-dark)'
+                padding: '16px 12px', textAlign: 'center', boxShadow: 'var(--shadow-md)',
+                border: '1px solid var(--cream-dark)',
+                transition: 'box-shadow 0.2s ease',
               }}
             >
               <div style={{ 
@@ -85,14 +78,15 @@ export default function Community() {
               }}>
                 {conn.avatar ? <img src={conn.avatar} alt={conn.name} /> : '👤'}
               </div>
-              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>{conn.name}</div>
-              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: 12 }}>{conn.role}</div>
+              <div className={typo.fieldValue}>{conn.name}</div>
+              <div className={`mb-3 ${typo.caption}`}>{conn.role}</div>
               <button 
                 onClick={() => sendHug(conn.name)}
+                className={FIELD_LABEL_CLASSNAME}
                 style={{
                   width: '100%', padding: '6px', borderRadius: 'var(--radius-sm)',
                   background: 'var(--blush-light)', border: 'none',
-                  color: 'var(--terracotta)', fontSize: '0.7rem', fontWeight: 700,
+                  color: 'var(--terracotta)',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4
                 }}
               >
@@ -105,7 +99,7 @@ export default function Community() {
 
       {/* Gratitude Board */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
           <MessageSquareHeart size={18} color="var(--mauve)" /> Gratitude Board
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -114,12 +108,12 @@ export default function Community() {
               background: 'white', borderRadius: 'var(--radius-lg)', padding: '16px',
               border: '1px dashed var(--mauve-light)', position: 'relative'
             }}>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontStyle: 'italic', lineHeight: 1.5 }}>
+              <p className={`italic ${typo.body}`}>
                 {msg.text}
               </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--mauve-dark)' }}>— {msg.from}</span>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{msg.date}</span>
+              <div className="mt-3 flex items-center justify-between">
+                <span className={`font-semibold text-[var(--mauve-dark)] ${typo.caption}`}>— {msg.from}</span>
+                <span className={typo.caption}>{msg.date}</span>
               </div>
             </div>
           ))}
@@ -128,19 +122,25 @@ export default function Community() {
 
       {/* Badges */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
           <Award size={18} color="var(--sky-blue)" /> Community Badges
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {mockBadges.map((badge: any) => (
-            <div key={badge.id} style={{
-              background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '16px',
-              textAlign: 'center', border: `1px solid var(--cream-dark)`,
-              boxShadow: 'var(--shadow-sm)'
-            }}>
+            <div
+              key={badge.id}
+              style={{
+                background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '16px',
+                textAlign: 'center', border: `1px solid var(--cream-dark)`,
+                boxShadow: 'var(--shadow-md)',
+                transition: 'box-shadow 0.2s ease',
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+            >
               <div style={{ fontSize: 32, marginBottom: 8 }}>{badge.icon}</div>
-              <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>{badge.label}</div>
-              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 4 }}>{badge.desc}</div>
+              <div className={typo.fieldValue}>{badge.label}</div>
+              <div className={`mt-1 ${typo.caption}`}>{badge.desc}</div>
             </div>
           ))}
         </div>
@@ -148,7 +148,7 @@ export default function Community() {
 
       {/* Timeline */}
       <div style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
           <History size={18} color="var(--sage-dark)" /> Your Journey
         </h3>
         <div style={{ padding: '4px 0 20px 20px', borderLeft: '2px solid var(--cream-dark)', marginLeft: 10 }}>
@@ -158,35 +158,31 @@ export default function Community() {
                 position: 'absolute', left: -27, top: 4, width: 12, height: 12, 
                 borderRadius: 'var(--radius-full)', background: 'var(--sage)', border: '2px solid white' 
               }} />
-              <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{item.action}</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 2 }}>{item.date}</div>
+              <div className={typo.body}>{item.action}</div>
+              <div className={`mt-0.5 ${typo.caption}`}>{item.date}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Influence Card */}
-      <motion.div 
+      <motion.div
         whileHover={{ scale: 1.02 }}
-        style={{ 
-          background: 'linear-gradient(135deg, var(--sky-blue), var(--sky-blue-dark))',
-          borderRadius: 'var(--radius-xl)', padding: '24px', textAlign: 'center', color: 'white',
-          boxShadow: 'var(--shadow-lg)'
-        }}
+        className="rounded-[var(--radius-xl)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--blush)] bg-[var(--bg-card)] p-6 text-center shadow-[var(--shadow-md)]"
       >
-        <Smile size={48} style={{ opacity: 0.5, marginBottom: 12 }} />
-        <h4 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Your Wisdom Matters</h4>
-        <p style={{ fontSize: '0.85rem', opacity: 0.9, marginTop: 8, lineHeight: 1.5 }}>
+        <Smile size={48} className="mx-auto mb-3 text-[var(--sky-blue)] opacity-60" />
+        <h4 className={typo.pageHeroBold}>Your Wisdom Matters</h4>
+        <p className={`mt-2 ${typo.body}`}>
           You&apos;ve touched the lives of <strong>154 mothers</strong> across 4 support groups this year. Keep sharing, mum!
         </p>
-        <button style={{
-          marginTop: 20, padding: '10px 24px', borderRadius: 'var(--radius-full)',
-          background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)',
-          color: 'white', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer'
-        }}>
+        <button
+          type="button"
+          className="mt-5 cursor-pointer rounded-full border border-[var(--cream-dark)] bg-[var(--blush-light)] px-6 py-2.5 text-sm font-semibold text-[var(--terracotta)] transition-colors hover:bg-[var(--cream)]"
+        >
           Invite a Friend
         </button>
       </motion.div>
+      </TabContent>
     </div>
   );
 }
