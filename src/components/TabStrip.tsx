@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Image, Lightbulb, Baby, Lock, Shield, Users, Sparkles, History } from 'lucide-react';
+import { User, Image as ImageIcon, Lightbulb, Baby, Lock, Shield, Users, Sparkles, History } from 'lucide-react';
 
 export type TabId = 'personal' | 'posts' | 'tips' | 'children' | 'vault' | 'privacy' | 'community' | 'wellbeing' | 'journey';
 
@@ -13,7 +13,7 @@ interface Tab {
 
 const tabs: Tab[] = [
   { id: 'personal', label: 'Personal', icon: <User size={18} /> },
-  { id: 'posts', label: 'My Posts', icon: <Image size={18} /> },
+  { id: 'posts', label: 'My Posts', icon: <ImageIcon size={18} /> },
   { id: 'tips', label: 'My Tips', icon: <Lightbulb size={18} /> },
   { id: 'children', label: 'Children', icon: <Baby size={18} /> },
   { id: 'vault', label: 'Safe Vault', icon: <Lock size={18} /> },
@@ -51,18 +51,8 @@ export default function TabStrip({ activeTab, onChange }: TabStripProps) {
       <div 
         ref={scrollContainerRef}
         onScroll={checkScroll}
-        style={{
-      display: 'flex',
-      borderBottom: '2px solid var(--cream-dark)',
-      background: 'var(--bg-card)',
-          overflowX: 'auto',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          paddingTop: 4,
-          scrollbarWidth: 'none', // hide scrollbar for Firefox
-        }}
-        className="hide-scrollbar" // ensure custom CSS hides it too
+        style={{ scrollbarWidth: 'none' }}
+        className="hide-scrollbar flex overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--cream-dark)] bg-[var(--bg-card)] p-1.5 lg:grid lg:grid-cols-3 lg:gap-1.5 lg:overflow-x-visible"
       >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
@@ -72,46 +62,18 @@ export default function TabStrip({ activeTab, onChange }: TabStripProps) {
             onClick={() => onChange(tab.id)}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            style={{
-              flex: '1 0 auto',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 4,
-              padding: '12px 14px 10px',
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              color: isActive ? 'var(--blush-dark)' : 'var(--text-muted)',
-              position: 'relative',
-              transition: 'color 0.2s ease',
-              fontFamily: 'inherit',
-              whiteSpace: 'nowrap',
-              minWidth: 70,
-            }}
+            className={`relative flex min-w-[92px] flex-1 flex-col items-center gap-1 rounded-[var(--radius-md)] border px-3 py-2.5 text-center transition-all duration-150 lg:min-w-0 ${isActive ? 'border-[var(--blush)] bg-[var(--blush-light)] text-[var(--blush-dark)] shadow-[var(--shadow-sm)]' : 'border-transparent text-[var(--text-muted)] hover:border-[var(--cream-dark)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-secondary)]'}`}
           >
             <span style={{ display: 'flex', alignItems: 'center' }}>
               {tab.icon}
             </span>
-            <span style={{
-              fontSize: '0.7rem',
-              fontWeight: isActive ? 700 : 600,
-              letterSpacing: '0.02em',
-            }}>
+            <span className={`text-[11px] uppercase tracking-[0.06em] ${isActive ? 'font-bold' : 'font-semibold'}`}>
               {tab.label}
             </span>
             {isActive && (
               <motion.div
                 layoutId="tab-underline"
-                style={{
-                  position: 'absolute',
-                  bottom: -2,
-                  left: 8,
-                  right: 8,
-                  height: 3,
-                  borderRadius: 'var(--radius-full)',
-                  background: 'linear-gradient(90deg, var(--blush), var(--blush-dark))',
-                }}
+                className="absolute bottom-0 left-3 right-3 h-[3px] rounded-[var(--radius-full)] bg-[linear-gradient(90deg,var(--blush),var(--blush-dark))]"
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             )}
@@ -126,16 +88,7 @@ export default function TabStrip({ activeTab, onChange }: TabStripProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: 40,
-              background: 'linear-gradient(to right, transparent, var(--bg-card))',
-              pointerEvents: 'none',
-              zIndex: 101,
-            }}
+            className="pointer-events-none absolute bottom-0 right-0 top-0 z-[101] w-10 bg-[linear-gradient(to_right,transparent,var(--bg-card))] lg:hidden"
           />
         )}
       </AnimatePresence>

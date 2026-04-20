@@ -3,12 +3,15 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, Briefcase, MapPin, Mail, Phone, Globe, ShieldCheck,
-  Clock, AlertCircle, Plus, Check, X
+  Clock, AlertCircle, Check, X
 } from 'lucide-react';
 import Badge from '../ui/Badge';
 import ConfettiEffect from '../ui/ConfettiEffect';
 import Toast from '../ui/Toast';
 import { type UserProfile, calculateProfileCompletion } from '@/lib/data';
+import Card from '../ui/Card';
+import Button from '../ui/Button';
+import FormField from '../ui/FormField';
 
 interface PersonalInfoProps {
   user: UserProfile;
@@ -16,6 +19,8 @@ interface PersonalInfoProps {
   initialEditMode?: boolean;
   onEditConsumed?: () => void;
 }
+
+type EditableFieldKey = 'name' | 'occupation' | 'country' | 'location' | 'email' | 'phone';
 
 export default function PersonalInfo({ 
   user, 
@@ -83,7 +88,15 @@ export default function PersonalInfo({
     setErrors({});
   };
 
-  const fields = [
+  const fields: Array<{
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+    key: EditableFieldKey;
+    optional?: boolean;
+    masked?: boolean;
+    helpText?: string;
+  }> = [
     { icon: <User size={18} />, label: 'Name', value: user.name, key: 'name' },
     { icon: <Briefcase size={18} />, label: 'Occupation', value: user.occupation, key: 'occupation', optional: true },
     { icon: <Globe size={18} />, label: 'Country', value: `${user.countryFlag} ${user.country}`, key: 'country' },
@@ -96,8 +109,11 @@ export default function PersonalInfo({
     'Trying to Conceive', 'Pregnant', 'New Mum', 'Toddler Mum', 'Experienced Mum'
   ];
 
+  const inputClassName =
+    'w-full rounded-[var(--radius-sm)] border border-[var(--cream-dark)] bg-white px-3.5 py-2.5 text-sm font-medium text-[var(--text-primary)] outline-none transition-all duration-150 focus:border-[var(--blush-dark)] focus:ring-2 focus:ring-[color-mix(in_oklab,var(--blush)_45%,white)]';
+
   return (
-    <div className="fade-in-up" style={{ padding: '20px 16px', maxWidth: 600, margin: '0 auto' }}>
+    <div className="fade-in-up mx-auto w-full max-w-3xl px-1 py-2 sm:px-2">
       <ConfettiEffect trigger={showConfetti} />
       <Toast 
         message={toast.message} 
@@ -107,119 +123,74 @@ export default function PersonalInfo({
       />
 
       {/* Progress Bar */}
-      <div style={{
-        background: 'var(--bg-card)',
-        borderRadius: 'var(--radius-lg)',
-        padding: '16px 20px',
-        marginBottom: 20,
-        boxShadow: 'var(--shadow-sm)',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+      <Card className="mb-5" bodyClassName="px-5 py-4">
+        <div className="mb-2.5 flex items-center justify-between">
+          <span className="text-sm font-semibold text-[var(--text-secondary)]">
             Your profile is {user.profileCompletion}% complete 🌸
           </span>
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--blush-dark)' }}>
+          <span className="text-xs font-bold text-[var(--blush-dark)]">
             {user.profileCompletion}%
           </span>
         </div>
-        <div style={{
-          height: 8,
-          background: 'var(--cream-dark)',
-          borderRadius: 'var(--radius-full)',
-          overflow: 'hidden',
-        }}>
+        <div className="h-2 overflow-hidden rounded-[var(--radius-full)] bg-[var(--cream-dark)]">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${user.profileCompletion}%` }}
             transition={{ duration: 1, ease: 'easeOut' }}
-            style={{
-              height: '100%',
-              background: 'linear-gradient(90deg, var(--blush), var(--blush-dark))',
-              borderRadius: 'var(--radius-full)',
-            }}
+            className="h-full rounded-[var(--radius-full)] bg-[linear-gradient(90deg,var(--blush),var(--blush-dark))]"
           />
         </div>
-      </div>
+      </Card>
 
       {/* Edit toggles */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+      <div className="mb-3 flex justify-end">
         {editing ? (
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => { setEditing(false); setEditData(user); }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 4, padding: '8px 16px',
-                borderRadius: 'var(--radius-md)', border: '2px solid var(--cream-dark)',
-                background: 'transparent', cursor: 'pointer', fontFamily: 'inherit',
-                fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.85rem',
-              }}
             >
               <X size={16} /> Cancel
-            </button>
-            <button
+            </Button>
+            <Button
+              size="sm"
               onClick={handleSave}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 4, padding: '8px 16px',
-                borderRadius: 'var(--radius-md)', border: 'none',
-                background: 'linear-gradient(135deg, var(--sage), var(--sage-dark))',
-                cursor: 'pointer', fontFamily: 'inherit',
-                fontWeight: 700, color: 'white', fontSize: '0.85rem',
-              }}
+              className="bg-[linear-gradient(135deg,var(--sage),var(--sage-dark))] hover:bg-[linear-gradient(135deg,var(--sage-dark),var(--sage-dark))]"
             >
               <Check size={16} /> Save
-            </button>
+            </Button>
           </div>
         ) : (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setEditing(true)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px',
-              borderRadius: 'var(--radius-md)', border: '2px solid var(--blush)',
-              background: 'transparent', cursor: 'pointer', fontFamily: 'inherit',
-              fontWeight: 600, color: 'var(--blush-dark)', fontSize: '0.85rem',
-            }}
           >
             Edit Info
-          </button>
+          </Button>
         )}
       </div>
 
       {/* Motherhood Stage */}
-      <div style={{
-        background: 'var(--bg-card)',
-        borderRadius: 'var(--radius-lg)',
-        padding: '16px 20px',
-        marginBottom: 12,
-        boxShadow: 'var(--shadow-sm)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 'var(--radius-sm)',
-            background: 'var(--blush-light)', display: 'flex',
-            alignItems: 'center', justifyContent: 'center', color: 'var(--blush-dark)',
-          }}>
+      <Card className="mb-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--blush-light)] text-[var(--blush-dark)]">
             <Clock size={18} />
           </div>
-          <div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Motherhood Stage</div>
+          <div className="min-w-0">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">Motherhood Stage</div>
             {editing ? (
               <>
                 <select
                   value={editData.motherhoodStage}
                   onChange={(e) => setEditData({ ...editData, motherhoodStage: e.target.value as UserProfile['motherhoodStage'] })}
-                  style={{
-                    fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)',
-                    border: '2px solid var(--blush)', borderRadius: 'var(--radius-sm)',
-                    padding: '4px 8px', fontFamily: 'inherit', background: 'var(--cream)',
-                    marginTop: 4, cursor: 'pointer', width: '100%'
-                  }}
+                  className={`${inputClassName} mt-1.5`}
                 >
                   {stages.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8, fontStyle: 'italic', lineHeight: 1.3 }}>
+                <p className="mt-2 text-xs italic leading-5 text-[var(--text-muted)]">
                   This helps us personalize content and connect you with mums at similar stages
                 </p>
               </>
@@ -229,6 +200,7 @@ export default function PersonalInfo({
           </div>
         </div>
       </div>
+      </Card>
 
       {/* Fields */}
       <AnimatePresence mode="wait">
@@ -238,98 +210,66 @@ export default function PersonalInfo({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            style={{
-              background: 'var(--bg-card)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '14px 20px',
-              marginBottom: 8,
-              boxShadow: 'var(--shadow-sm)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-            }}
+            className="mb-2"
           >
-            <div style={{
-              width: 36, height: 36, borderRadius: 'var(--radius-sm)',
-              background: 'var(--cream-dark)', display: 'flex',
-              alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)',
-              flexShrink: 0,
-            }}>
-              {field.icon}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {field.label}
+            <Card bodyClassName="px-5 py-3.5">
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--cream-dark)] text-[var(--text-muted)]">
+                  {field.icon}
+                </div>
+                <div className="min-w-0 flex-1">
+                  {editing && !field.masked ? (
+                    <FormField
+                      label={field.label}
+                      htmlFor={`profile-${field.key}`}
+                      error={errors[field.key]}
+                      hint={!errors[field.key] ? field.helpText : undefined}
+                    >
+                      <input
+                        id={`profile-${field.key}`}
+                        type="text"
+                        value={editData[field.key] || ''}
+                        onChange={(e) => setEditData({ ...editData, [field.key]: e.target.value })}
+                        placeholder={field.optional ? `Add ${field.label.toLowerCase()} +` : ''}
+                        className={inputClassName}
+                      />
+                    </FormField>
+                  ) : (
+                    <>
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">{field.label}</div>
+                      <div className="mt-1 text-[15px] font-semibold text-[var(--text-primary)]">
+                        {field.value || (
+                          <span className="cursor-pointer italic text-[var(--blush-dark)]">
+                            Add {field.label.toLowerCase()} +
+                          </span>
+                        )}
+                        {field.masked && (
+                          <span className="ml-2 text-xs font-medium text-[var(--text-muted)]">🔒 Private</span>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
-              {editing && !field.masked ? (
-                <div style={{ width: '100%' }}>
-                  <input
-                    type="text"
-                    value={(editData as any)[field.key] || ''}
-                    onChange={(e) => setEditData({ ...editData, [field.key]: e.target.value })}
-                    placeholder={field.optional ? `Add ${field.label.toLowerCase()} +` : ''}
-                    style={{
-                      width: '100%', fontSize: '0.95rem', fontWeight: 600,
-                      color: 'var(--text-primary)', border: 'none',
-                      borderBottom: `2px solid ${errors[field.key] ? 'var(--terracotta)' : 'var(--blush-light)'}`,
-                      padding: '6px 0',
-                      outline: 'none', background: 'transparent', fontFamily: 'inherit',
-                    }}
-                  />
-                  {errors[field.key] && (
-                    <div style={{ color: '#E05D5D', fontSize: '0.75rem', marginTop: 4, fontWeight: 600 }}>
-                      {errors[field.key]}
-                    </div>
-                  )}
-                  {field.helpText && !errors[field.key] && (
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 6, fontStyle: 'italic', lineHeight: 1.3 }}>
-                      {field.helpText}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div style={{
-                  fontSize: '0.95rem',
-                  fontWeight: 600,
-                  color: field.value ? 'var(--text-primary)' : 'var(--text-muted)',
-                  marginTop: 2,
-                }}>
-                  {field.value || (
-                    <span style={{ fontStyle: 'italic', color: 'var(--blush-dark)', cursor: editing ? 'text' : 'pointer' }}>
-                      Add {field.label.toLowerCase()} +
-                    </span>
-                  )}
-                  {field.masked && (
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginLeft: 8 }}>🔒 Private</span>
-                  )}
-                </div>
-              )}
-            </div>
+            </Card>
           </motion.div>
         ))}
       </AnimatePresence>
 
       {/* Verification Status */}
-      <div style={{
-        background: 'var(--bg-card)',
-        borderRadius: 'var(--radius-lg)',
-        padding: '16px 20px',
-        marginTop: 12,
-        boxShadow: 'var(--shadow-sm)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-      }}>
-        <div style={{
-          width: 36, height: 36, borderRadius: 'var(--radius-sm)',
-          background: user.verificationStatus === 'Verified' ? '#D4E8D0' : 'var(--cream-dark)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: user.verificationStatus === 'Verified' ? '#2A6B2A' : 'var(--text-muted)',
-        }}>
+      <Card className="mt-3" bodyClassName="px-5 py-4">
+        <div className="flex items-center gap-3">
+        <div
+          className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)]"
+          style={{
+            background: user.verificationStatus === 'Verified' ? '#D4E8D0' : 'var(--cream-dark)',
+            color: user.verificationStatus === 'Verified' ? '#2A6B2A' : 'var(--text-muted)',
+          }}
+        >
           {user.verificationStatus === 'Verified' ? <ShieldCheck size={18} /> : <AlertCircle size={18} />}
         </div>
         <div>
-          <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">
             ID Verification
           </div>
           <Badge
@@ -345,6 +285,7 @@ export default function PersonalInfo({
           />
         </div>
       </div>
+      </Card>
     </div>
   );
 }
