@@ -35,25 +35,16 @@ export default function BackToTop() {
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
           onClick={scrollToTop}
           aria-label="Back to top"
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.9 }}
-          style={{
-            position: 'fixed',
-            bottom: 24,
-            left: 'calc(50% - 220px)', // Positioned to the left of the main 480px container
-            width: 44,
-            height: 44,
-            borderRadius: 'var(--radius-full)',
-            background: 'var(--mauve)',
-            color: 'white',
-            border: 'none',
-            boxShadow: 'var(--shadow-lg)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 45, // Just below FABs if any
-          }}
+          /*
+           * z-index layering:
+           * 40 = BackToTop (this button)
+           * 50 = FABs (MyPosts.tsx, SafeVault.tsx upload buttons)
+           * 10000 = Toast notifications
+           * BackToTop sits below FABs so it never obscures primary actions.
+           */
+          className="fixed bottom-6 right-6 z-[40] flex h-11 w-11 cursor-pointer items-center justify-center rounded-[var(--radius-full)] border-none bg-[var(--mauve)] text-white shadow-[var(--shadow-lg)] lg:bottom-8 lg:right-[calc((100vw-min(100vw,1152px))/2+24px)]"
         >
           <ChevronUp size={24} />
         </motion.button>

@@ -105,9 +105,9 @@ export default function MyPosts({ posts }: MyPostsProps) {
           {posts.map((post, i) => (
             <motion.div
               key={post.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.05 }}
+              initial={{ opacity: 0, scale: 0.9, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: i * 0.04, ease: 'easeOut' }}
               onClick={() => setSelectedPost(i)}
               onContextMenu={(e) => { e.preventDefault(); setContextMenu(post.id); }}
               style={{
@@ -141,9 +141,9 @@ export default function MyPosts({ posts }: MyPostsProps) {
           {posts.map((post, i) => (
             <motion.div
               key={post.id}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
+              transition={{ delay: i * 0.05, ease: 'easeOut' }}
               onClick={() => setSelectedPost(i)}
               style={{
                 background: 'var(--bg-card)',

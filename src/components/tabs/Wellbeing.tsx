@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Heart, Phone, Moon, Sun, 
   Smile, Frown, Meh, Zap, 
@@ -8,15 +8,16 @@ import {
   AlertCircle, Sparkles
 } from 'lucide-react';
 import Badge from '../ui/Badge';
-import Toast from '../ui/Toast';
+import { useToast } from '../ui/ToastContext';
 import TabContent from '../ui/TabContent';
+import SectionHero from '../ui/SectionHero';
 import { mockMoods, mockSelfCare } from '@/lib/data';
 import { typo } from '@/lib/typography';
 
 export default function Wellbeing() {
   const [enabled, setEnabled] = useState(true);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [toast, setToast] = useState({ show: false, message: '', type: 'default' as any });
+  const { showToast } = useToast();
 
   const moods = [
     { emoji: '✨', label: 'Radiant', color: 'var(--sage)' },
@@ -57,22 +58,14 @@ export default function Wellbeing() {
   return (
     <div className="fade-in-up">
       <TabContent>
-      <Toast 
-        message={toast.message} 
-        show={toast.show} 
-        type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })} 
-      />
 
       {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <h2 className={`flex items-center gap-2.5 ${typo.displayExtrabold}`}>
-          How are you, Sarah? <Heart size={20} fill="var(--terracotta)" color="var(--terracotta)" />
-        </h2>
-        <p className={`mt-1 ${typo.bodyMuted}`}>
-          This is your private space. Only you can see this.
-        </p>
-      </div>
+      <SectionHero
+        icon={<Heart size={32} />}
+        title="Wellbeing Suite"
+        subtitle="How are you, Sarah? This is your private space. Only you can see this."
+        accentColor="var(--terracotta)"
+      />
 
       {/* Mood Selector */}
       <div style={{ 
@@ -89,7 +82,7 @@ export default function Wellbeing() {
               whileTap={{ scale: 0.9 }}
               onClick={() => {
                 setSelectedMood(m.label);
-                setToast({ show: true, message: `Checked in as ${m.label}. You're doing great, mum! 🌸`, type: 'success' });
+                showToast(`Checked in as ${m.label}. You're doing great, mum! 🌸`, 'success');
               }}
               style={{
                 flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,

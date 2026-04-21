@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import { 
   History, Clock, Camera, Mail, 
   ArrowRight, Heart, Star, 
-  ChevronRight, CalendarDays as CalendarIcon, Sparkles, Plus, Lock,
+  CalendarDays as CalendarIcon, Sparkles, Plus, Lock,
   Calendar, Lightbulb, Baby,
 } from 'lucide-react';
 import Badge from '../ui/Badge';
-import Toast from '../ui/Toast';
+import { useToast } from '../ui/ToastContext';
 import {
   mockJourneyEvents,
   mockHistoricalMemories,
@@ -18,6 +18,7 @@ import {
 } from '@/lib/data';
 import { typo } from '@/lib/typography';
 import TabContent from '@/components/ui/TabContent';
+import SectionHero from '@/components/ui/SectionHero';
 
 function JourneyTimelineIcon({ kind }: { kind: JourneyEventIconKind }) {
   const iconColor = 'var(--mauve)';
@@ -32,28 +33,17 @@ function JourneyTimelineIcon({ kind }: { kind: JourneyEventIconKind }) {
 }
 
 export default function Journey() {
-  const [toast, setToast] = useState({ show: false, message: '', type: 'default' as any });
-
+  const { showToast } = useToast();
   return (
     <div className="fade-in-up">
       <TabContent>
-      <Toast 
-        message={toast.message} 
-        show={toast.show} 
-        type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })} 
-      />
-
       {/* Hero recap */}
-      <div className="mb-6 rounded-[var(--radius-lg)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--lavender)] bg-[var(--bg-card)] p-6 text-center shadow-[var(--shadow-md)] transition-shadow duration-200 hover:shadow-[var(--shadow-lg)]">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[var(--radius-full)] bg-[var(--cream)] text-[var(--sky-blue)] shadow-[var(--shadow-sm)]">
-          <History size={32} />
-        </div>
-        <h2 className={typo.pageHeroBold}>Your Motherhood Story</h2>
-        <p className={`mt-1 ${typo.bodyMuted}`}>
-          10 months of growth, 154 lives touched, and 1 beautiful journey.
-        </p>
-      </div>
+      <SectionHero
+        icon={<History size={32} />}
+        title="Your Motherhood Story"
+        subtitle="10 months of growth, 154 lives touched, and 1 beautiful journey."
+        accentColor="var(--lavender)"
+      />
 
       {/* This Day Last Year */}
       <div style={{ marginBottom: 30 }}>
@@ -100,8 +90,13 @@ export default function Journey() {
           <Star size={18} color="var(--mauve)" /> Key Moments
         </h3>
         <div style={{ paddingLeft: 20, borderLeft: '2px dashed var(--cream-dark)', marginLeft: 10 }}>
-          {mockJourneyEvents.map((evt: any) => (
-            <div key={evt.id} style={{ position: 'relative', marginBottom: 24 }}>
+          {mockJourneyEvents.map((evt: any, i: number) => (
+            <motion.div key={evt.id} 
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, ease: 'easeOut' }}
+              style={{ position: 'relative', marginBottom: 24 }}
+            >
               <div style={{ 
                 position: 'absolute', left: -26, top: 4, width: 12, height: 12, 
                 borderRadius: 'var(--radius-full)', background: 'white', border: '3px solid var(--mauve)' 
@@ -115,7 +110,7 @@ export default function Journey() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -163,7 +158,7 @@ export default function Journey() {
           <button 
             type="button"
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border-none bg-[var(--sky-blue-light)] py-3 text-sm font-semibold text-[var(--sky-blue-dark)]"
-            onClick={() => setToast({ show: true, message: 'Your letter has been safely stored for the future.', type: 'success' })}
+            onClick={() => showToast('Your letter has been safely stored for the future.', 'success')}
             style={{ cursor: 'pointer' }}
           >
             <Plus size={16} /> Write a New Letter

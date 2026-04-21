@@ -111,16 +111,7 @@ body {
   pointer-events: none;
 }
 
-/* Bounce animation */
-@keyframes gentle-bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-.bounce-toggle {
-  animation: gentle-bounce 0.3s ease-in-out;
-}
-
+/* Scrollbar styling */
 /* Fade in animation */
 @keyframes fade-in-up {
   0% { opacity: 0; transform: translateY(12px); }
@@ -137,15 +128,6 @@ body {
 .tag-mental-health { background: var(--lavender-light); color: #5A3A7A; }
 .tag-breastfeeding { background: var(--peach-light); color: #7A5A3A; }
 .tag-postpartum { background: var(--rose); color: #7A3A4A; }
-
-/* Progress bar */
-@keyframes progress-fill {
-  from { width: 0%; }
-}
-
-.progress-fill {
-  animation: progress-fill 1s ease-out forwards;
-}
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {

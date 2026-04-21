@@ -2,6 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
+import Button from './Button';
 
 interface EmptyStateProps {
   icon: React.ReactNode;
@@ -10,22 +11,25 @@ interface EmptyStateProps {
   action?: { label: string; onClick: () => void };
   secondaryAction?: { label: string; onClick: () => void };
   hint?: string;
+  hintIcon?: React.ReactNode;
 }
 
-export default function EmptyState({ icon, title, subtitle, action, secondaryAction, hint }: EmptyStateProps) {
+export default function EmptyState({ icon, title, subtitle, action, secondaryAction, hint, hintIcon }: EmptyStateProps) {
   return (
-    <div className="fade-in-up" style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '48px 24px',
-      textAlign: 'center',
-      gap: 16,
-    }}>
-      <motion.div 
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+    <motion.div
+      className="fade-in-up"
+      whileHover={{ scale: 1.01 }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 24px',
+        textAlign: 'center',
+        gap: 20,
+      }}
+    >
+      <div
         style={{
           width: 120,
           height: 120,
@@ -36,84 +40,52 @@ export default function EmptyState({ icon, title, subtitle, action, secondaryAct
           justifyContent: 'center',
           fontSize: 48,
           boxShadow: 'var(--shadow-glow-blush)',
-          marginBottom: 8,
         }}
       >
         {icon}
-      </motion.div>
+      </div>
       <h3 style={{
         fontSize: '1.15rem',
         fontWeight: 700,
         color: 'var(--text-primary)',
         lineHeight: 1.4,
-        maxWidth: 280,
+        maxWidth: 320,
       }}>
         {title}
       </h3>
       <p style={{
         fontSize: '0.9rem',
         color: 'var(--text-muted)',
-        maxWidth: 260,
+        maxWidth: 300,
         lineHeight: 1.5,
       }}>
         {subtitle}
       </p>
-      <div style={{ display: 'flex', gap: 12, marginTop: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
         {action && (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={action.onClick}
-            style={{
-              background: 'linear-gradient(135deg, var(--blush), var(--blush-dark))',
-              color: 'var(--text-primary)',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
-              padding: '12px 28px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              fontSize: '0.95rem',
-              fontFamily: 'inherit',
-              boxShadow: 'var(--shadow-sm)',
-            }}
-          >
+          <Button variant="primary" onClick={action.onClick}>
             {action.label}
-          </motion.button>
+          </Button>
         )}
         {secondaryAction && (
-          <motion.button
-            whileHover={{ scale: 1.05, borderColor: 'var(--blush)' }}
-            whileTap={{ scale: 0.95 }}
-            onClick={secondaryAction.onClick}
-            style={{
-              background: 'transparent',
-              color: 'var(--text-secondary)',
-              border: '2px solid var(--cream-dark)',
-              borderRadius: 'var(--radius-md)',
-              padding: '12px 28px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              fontSize: '0.95rem',
-              fontFamily: 'inherit',
-            }}
-          >
+          <Button variant="secondary" onClick={secondaryAction.onClick}>
             {secondaryAction.label}
-          </motion.button>
+          </Button>
         )}
       </div>
       
       {hint && (
         <div style={{
-          marginTop: 24,
+          marginTop: 4,
           padding: '12px 16px',
           background: 'var(--cream)',
           borderRadius: 'var(--radius-lg)',
           display: 'flex',
           alignItems: 'center',
           gap: 12,
-          maxWidth: 280,
+          maxWidth: 320,
         }}>
-          <Heart size={16} color="var(--blush-dark)" style={{ flexShrink: 0 }} />
+          {hintIcon || <Heart size={16} color="var(--blush-dark)" style={{ flexShrink: 0 }} />}
           <p style={{
             fontSize: '0.8rem',
             color: 'var(--text-muted)',
@@ -124,6 +96,6 @@ export default function EmptyState({ icon, title, subtitle, action, secondaryAct
           </p>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

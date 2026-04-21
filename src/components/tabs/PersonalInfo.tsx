@@ -6,9 +6,10 @@ import {
   Clock, AlertCircle, Check, X
 } from 'lucide-react';
 import Badge from '../ui/Badge';
-import ConfettiEffect from '../ui/ConfettiEffect';
-import Toast from '../ui/Toast';
+import { useConfetti } from '../ui/ConfettiContext';
+import { useToast } from '../ui/ToastContext';
 import { type UserProfile, calculateProfileCompletion } from '@/lib/data';
+import { inputClassName } from '@/lib/utils';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import FormField from '../ui/FormField';
@@ -34,12 +35,29 @@ export default function PersonalInfo({
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState(user);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [toast, setToast] = useState({ 
-    show: false, 
-    message: '', 
-    type: 'default' as 'success' | 'warning' | 'info' | 'error' | 'default' 
-  });
+  const { showToast } = useToast();
+  const { triggerConfetti } = useConfetti();
+
+  const [completionDiff, setCompletionDiff] = useState<number | null>(null);
+  const [isFlashing, setIsFlashing] = useState(false);
+  const prevCompletion = React.useRef(user.profileCompletion);
+
+  React.useEffect(() => {
+    if (user.profileCompletion > prevCompletion.current) {
+      const diff = user.profileCompletion - prevCompletion.current;
+      setCompletionDiff(diff);
+      setIsFlashing(true);
+      
+      const flashTimer = setTimeout(() => setIsFlashing(false), 600);
+      const textTimer = setTimeout(() => setCompletionDiff(null), 2000);
+      
+      return () => {
+        clearTimeout(flashTimer);
+        clearTimeout(textTimer);
+      };
+    }
+    prevCompletion.current = user.profileCompletion;
+  }, [user.profileCompletion]);
 
   // Handle external edit requests from header
   React.useEffect(() => {
@@ -79,12 +97,8 @@ export default function PersonalInfo({
     };
 
     if (updatedData.motherhoodStage !== user.motherhoodStage) {
-      setShowConfetti(true);
-      setToast({ 
-        show: true, 
-        message: `Congratulations on your new journey as ${updatedData.motherhoodStage}! 🎉`,
-        type: 'success'
-      });
+      triggerConfetti();
+      showToast(`Congratulations on your new journey as ${updatedData.motherhoodStage}! 🎉`, 'success');
     }
     onUpdate(updatedData);
     setEditing(false);
@@ -112,19 +126,12 @@ export default function PersonalInfo({
     'Trying to Conceive', 'Pregnant', 'New Mum', 'Toddler Mum', 'Experienced Mum'
   ];
 
-  const inputClassName =
-    'w-full rounded-[var(--radius-sm)] border border-[var(--cream-dark)] bg-white px-3.5 py-2.5 text-sm font-medium text-[var(--text-primary)] outline-none transition-all duration-150 focus:border-[var(--blush-dark)] focus:ring-2 focus:ring-[color-mix(in_oklab,var(--blush)_45%,white)]';
+  // inputClassName is imported from @/lib/utils
 
   return (
     <div className="fade-in-up">
       <TabContent maxWidth="max-w-3xl">
-      <ConfettiEffect trigger={showConfetti} />
-      <Toast 
-        message={toast.message} 
-        show={toast.show} 
-        type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })} 
-      />
+      <div className="lg:max-w-2xl">
 
       {/* Progress Bar */}
       <Card className="mb-5" bodyClassName="px-5 py-4">
@@ -139,10 +146,32 @@ export default function PersonalInfo({
         <div className="h-2 overflow-hidden rounded-[var(--radius-full)] bg-[var(--cream-dark)]">
           <motion.div
             initial={{ width: 0 }}
-            animate={{ width: `${user.profileCompletion}%` }}
-            transition={{ duration: 1, ease: 'easeOut' }}
-            className="h-full rounded-[var(--radius-full)] bg-[linear-gradient(90deg,var(--blush),var(--blush-dark))]"
+            animate={{ 
+              width: `${user.profileCompletion}%`,
+              background: isFlashing 
+                ? ['linear-gradient(90deg,var(--blush),var(--blush-dark))', 'var(--sage)', 'linear-gradient(90deg,var(--blush),var(--blush-dark))']
+                : 'linear-gradient(90deg,var(--blush),var(--blush-dark))'
+            }}
+            transition={{ duration: isFlashing ? 0.6 : 1, ease: 'easeOut' }}
+            className="h-full rounded-[var(--radius-full)]"
           />
+        </div>
+        
+        {/* Floating Popup Badge */}
+        <div className="relative">
+          <AnimatePresence>
+            {completionDiff && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                animate={{ opacity: 1, y: -20, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.4 }}
+                className="absolute right-0 top-0 mt-[-24px] rounded-[var(--radius-md)] bg-[var(--sage)] px-2 py-1 text-xs font-bold text-white shadow-[var(--shadow-sm)]"
+              >
+                +{completionDiff}%
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </Card>
 
@@ -291,6 +320,7 @@ export default function PersonalInfo({
         </div>
       </div>
       </Card>
+      </div>
       </TabContent>
     </div>
   );

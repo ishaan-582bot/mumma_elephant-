@@ -9,9 +9,11 @@ import PinPad from '../ui/PinPad';
 import EmptyState from '../ui/EmptyState';
 import Badge from '../ui/Badge';
 import BottomSheet from '../ui/BottomSheet';
-import Toast from '../ui/Toast';
+import { useToast } from '../ui/ToastContext';
 import HoldToDeleteButton from '../ui/HoldToDeleteButton';
+import Accordion from '../ui/Accordion';
 import TabContent from '../ui/TabContent';
+import Card from '../ui/Card';
 import type { VaultDocument } from '@/lib/data';
 import { motherCategories, childCategories } from '@/lib/data';
 import { typo } from '@/lib/typography';
@@ -29,11 +31,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
   const [showUpload, setShowUpload] = useState(false);
   const [showDelete, setShowDelete] = useState<string | null>(null);
   const [previewDoc, setPreviewDoc] = useState<VaultDocument | null>(null);
-  const [toast, setToast] = useState({ 
-    show: false, 
-    message: '', 
-    type: 'default' as 'success' | 'warning' | 'info' | 'error' | 'default' 
-  });
+  const { showToast } = useToast();
   const [lastActivity, setLastActivity] = useState(Date.now());
 
   // Check for existing PIN on mount
@@ -67,11 +65,11 @@ export default function SafeVault({ documents }: SafeVaultProps) {
       const storedPin = localStorage.getItem('mumma_vault_pin');
       if (pin === storedPin) {
         setIsLocked(false);
-        setToast({ show: true, message: 'Vault unlocked.', type: 'success' });
+        showToast('Upload successful! Document added to your vault.', 'success');
         setLastActivity(Date.now());
       } else {
         setPinError('Incorrect PIN, please try again');
-        setToast({ show: true, message: 'Access denied: Incorrect PIN', type: 'error' });
+        showToast('Access denied: Incorrect PIN', 'error');
       }
     }
   };
@@ -80,17 +78,17 @@ export default function SafeVault({ documents }: SafeVaultProps) {
     if (pin.length < 4) return;
     if (!setupPin) {
       setSetupPin(pin);
-      setToast({ show: true, message: 'Now, confirm your PIN', type: 'info' });
+      showToast('Now, confirm your PIN', 'info');
     } else {
       if (pin === setupPin) {
         localStorage.setItem('mumma_vault_pin', pin);
         setIsSetupMode(false);
         setIsLocked(false);
-        setToast({ show: true, message: 'Vault PIN secured.', type: 'success' });
+        showToast('Document deleted permanently.', 'success');
       } else {
         setPinError('PINs do not match. Start again.');
         setSetupPin(null);
-        setToast({ show: true, message: 'Setup failed: PINs do not match', type: 'warning' });
+        showToast('Setup failed: PINs do not match', 'warning');
       }
     }
   };
@@ -147,15 +145,12 @@ export default function SafeVault({ documents }: SafeVaultProps) {
   return (
     <div className="fade-in-up" onClick={handleActivity}>
       <TabContent>
-      <Toast 
-        message={toast.message} 
-        show={toast.show} 
-        type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })} 
-      />
 
       {/* Welcome header */}
-      <div className="mb-4 flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--mauve)] bg-[var(--bg-card)] px-5 py-4 shadow-[var(--shadow-md)] transition-shadow duration-200 hover:shadow-[var(--shadow-lg)]">
+      <Card 
+        className="mb-4 transition-shadow duration-200 border-l-4 border-l-[var(--mauve)]"
+        bodyClassName="px-5 py-4 flex items-center gap-3"
+      >
         <Unlock size={24} className="shrink-0 text-[var(--mauve)]" strokeWidth={2} aria-hidden />
         <div className="min-w-0 flex-1">
           <span className="text-sm font-semibold text-[var(--text-primary)]">
@@ -167,142 +162,83 @@ export default function SafeVault({ documents }: SafeVaultProps) {
         </div>
         <button
           type="button"
-          onClick={() => setIsLocked(true)}
+          onClick={() => {
+            setIsLocked(true);
+            showToast(
+              'Upload cancelled',
+              'default',
+              5000,
+              {
+                label: 'Retry',
+                onClick: () => setShowUpload(true)
+              }
+            );
+          }}
           className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-full)] border-none bg-[var(--cream)] text-[var(--text-secondary)] transition-colors hover:bg-[var(--cream-dark)]"
           aria-label="Lock vault"
         >
           <Lock size={16} />
         </button>
-      </div>
+      </Card>
 
+      {/* Tabs */}
       {documents.length === 0 ? (
         <EmptyState
           icon={<FileText size={48} color="var(--mauve)" strokeWidth={1.5} />}
           title="Your vault is ready"
-          subtitle="Add your first document to keep it safe."
-          action={{ label: "Add My Document", onClick: () => setShowUpload(true) }}
-          secondaryAction={{ label: "Add Child's Document", onClick: () => setShowUpload(true) }}
+          subtitle="Add your first document to keep it safe 🔐. You can store maternity records, vaccination cards, lab reports, and more. Everything is encrypted and only visible to you."
+          action={{ label: "Upload First Document", onClick: () => setShowUpload(true) }}
+          hint="Bank-level encryption"
+          hintIcon={<Lock size={16} color="var(--mauve)" strokeWidth={2} style={{ flexShrink: 0 }} />}
         />
       ) : (
         <>
           {/* Mother's Documents */}
           <div style={{ marginBottom: 12 }}>
-            <button
-              onClick={() => setExpandedSection(expandedSection === 'mother' ? null : 'mother')}
-              style={{
-                width: '100%',
-                background: 'var(--bg-card)',
-                borderRadius: expandedSection === 'mother' ? 'var(--radius-lg) var(--radius-lg) 0 0' : 'var(--radius-lg)',
-                padding: '14px 16px',
-                border: 'none',
-                boxShadow: 'var(--shadow-md)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'box-shadow 0.2s ease',
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+            <Accordion
+              title="👩 Mother's Documents"
+              badge={<Badge label={`${motherDocs.length}`} variant="mauve" size="sm" />}
+              isOpen={expandedSection === 'mother'}
+              onToggle={() => setExpandedSection(expandedSection === 'mother' ? null : 'mother')}
             >
-              <span className={`flex items-center gap-2.5 ${typo.heading}`}>
-                👩 Mother&apos;s Documents
-                <Badge label={`${motherDocs.length}`} variant="mauve" size="sm" />
-              </span>
-              {expandedSection === 'mother' ? <ChevronUp size={16} color="var(--text-muted)" /> : <ChevronDown size={16} color="var(--text-muted)" />}
-            </button>
-
-            <AnimatePresence>
-              {expandedSection === 'mother' && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  style={{
-                    overflow: 'hidden',
-                    background: 'var(--bg-card)',
-                    borderRadius: '0 0 var(--radius-lg) var(--radius-lg)',
-                    boxShadow: 'var(--shadow-md)',
-                    transition: 'box-shadow 0.2s ease',
-                  }}
-                  onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-                >
-                  <div style={{ padding: '0 16px 16px' }}>
-                    {motherDocs.length === 0 ? (
-                      <p className={`py-3 italic ${typo.bodyMuted}`}>
-                        No documents yet. Add one so it&apos;s always within reach 📋
-                      </p>
-                    ) : (
-                      motherDocs.map((doc) => (
-                        <DocumentCard key={doc.id} doc={doc} onPreview={setPreviewDoc} onDelete={setShowDelete} />
-                      ))
-                    )}
-                  </div>
-                </motion.div>
+              {motherDocs.length === 0 ? (
+                <div className="pt-2">
+                  <p className={`pb-2 italic ${typo.bodyMuted}`}>
+                    No documents yet. Add one so it's always within reach 📋
+                  </p>
+                </div>
+              ) : (
+                <div className="pt-4">
+                  {motherDocs.map((doc, i) => (
+                    <DocumentCard key={doc.id} doc={doc} index={i} onPreview={setPreviewDoc} onDelete={setShowDelete} />
+                  ))}
+                </div>
               )}
-            </AnimatePresence>
+            </Accordion>
           </div>
 
           {/* Child's Documents */}
           <div style={{ marginBottom: 12 }}>
-            <button
-              onClick={() => setExpandedSection(expandedSection === 'child' ? null : 'child')}
-              style={{
-                width: '100%',
-                background: 'var(--bg-card)',
-                borderRadius: expandedSection === 'child' ? 'var(--radius-lg) var(--radius-lg) 0 0' : 'var(--radius-lg)',
-                padding: '14px 16px',
-                border: 'none',
-                boxShadow: 'var(--shadow-md)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'box-shadow 0.2s ease',
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+            <Accordion
+              title="👶 Child's Documents"
+              badge={<Badge label={`${childDocs.length}`} variant="blush" size="sm" />}
+              isOpen={expandedSection === 'child'}
+              onToggle={() => setExpandedSection(expandedSection === 'child' ? null : 'child')}
             >
-              <span className={`flex items-center gap-2.5 ${typo.heading}`}>
-                👶 Child&apos;s Documents
-                <Badge label={`${childDocs.length}`} variant="blush" size="sm" />
-              </span>
-              {expandedSection === 'child' ? <ChevronUp size={16} color="var(--text-muted)" /> : <ChevronDown size={16} color="var(--text-muted)" />}
-            </button>
-
-            <AnimatePresence>
-              {expandedSection === 'child' && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  style={{
-                    overflow: 'hidden',
-                    background: 'var(--bg-card)',
-                    borderRadius: '0 0 var(--radius-lg) var(--radius-lg)',
-                    boxShadow: 'var(--shadow-md)',
-                    transition: 'box-shadow 0.2s ease',
-                  }}
-                  onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-                >
-                  <div style={{ padding: '0 16px 16px' }}>
-                    {childDocs.length === 0 ? (
-                      <p className={`py-3 italic ${typo.bodyMuted}`}>
-                        No documents yet. Add one so it&apos;s always within reach 📋
-                      </p>
-                    ) : (
-                      childDocs.map((doc) => (
-                        <DocumentCard key={doc.id} doc={doc} onPreview={setPreviewDoc} onDelete={setShowDelete} />
-                      ))
-                    )}
-                  </div>
-                </motion.div>
+              {childDocs.length === 0 ? (
+                <div className="pt-2">
+                  <p className={`pb-2 italic ${typo.bodyMuted}`}>
+                    No documents yet. Add one so it's always within reach 📋
+                  </p>
+                </div>
+              ) : (
+                <div className="pt-4">
+                  {childDocs.map((doc, i) => (
+                    <DocumentCard key={doc.id} doc={doc} index={i} onPreview={setPreviewDoc} onDelete={setShowDelete} />
+                  ))}
+                </div>
               )}
-            </AnimatePresence>
+            </Accordion>
           </div>
         </>
       )}
@@ -345,14 +281,12 @@ export default function SafeVault({ documents }: SafeVaultProps) {
               {motherCategories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => { setShowUpload(false); setToast({ show: true, message: `Ready to upload to "${cat}" 📁`, type: 'info' }); }}
-                  className="rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-3.5 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150"
+                  onClick={() => { setShowUpload(false); showToast(`Ready to upload to "${cat}" 📁`, 'info'); }}
+                  className="rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-3.5 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150 hover:border-[var(--mauve)] hover:bg-[var(--mauve-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--blush)]"
                   style={{
                     cursor: 'pointer',
                     fontFamily: 'inherit',
                   }}
-                  onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--mauve)'; e.currentTarget.style.background = 'var(--mauve-light)'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--cream-dark)'; e.currentTarget.style.background = 'transparent'; }}
                 >
                   {cat}
                 </button>
@@ -365,14 +299,12 @@ export default function SafeVault({ documents }: SafeVaultProps) {
               {childCategories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => { setShowUpload(false); setToast({ show: true, message: `Ready to upload to "${cat}" 📁`, type: 'info' }); }}
-                  className="rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-3.5 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150"
+                  onClick={() => { setShowUpload(false); showToast(`Ready to upload to "${cat}" 📁`, 'info'); }}
+                  className="rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-3.5 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150 hover:border-[var(--blush)] hover:bg-[var(--blush-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--blush)]"
                   style={{
                     cursor: 'pointer',
                     fontFamily: 'inherit',
                   }}
-                  onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--blush)'; e.currentTarget.style.background = 'var(--blush-light)'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--cream-dark)'; e.currentTarget.style.background = 'transparent'; }}
                 >
                   {cat}
                 </button>
@@ -389,7 +321,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
             Are you sure you want to delete this?
           </p>
           <p className={`mb-5 ${typo.caption}`}>
-            It will be kept for 30 days before permanent deletion.
+            This cannot be undone. Hold the button to confirm.
           </p>
           <div style={{ display: 'flex', gap: 12 }}>
             <button
@@ -401,7 +333,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
               Keep It
             </button>
             <HoldToDeleteButton 
-              onConfirm={() => { setShowDelete(null); setToast({ show: true, message: 'Document moved to trash. Undo?', type: 'warning' }); }} 
+              onConfirm={() => { setShowDelete(null); showToast('Document moved to trash. Undo?', 'warning'); }} 
               label="Hold to Delete"
             />
           </div>
@@ -470,17 +402,22 @@ export default function SafeVault({ documents }: SafeVaultProps) {
 // Document Card sub-component
 function DocumentCard({
   doc,
+  index = 0,
   onPreview,
   onDelete,
 }: {
   doc: VaultDocument;
+  index?: number;
   onPreview: (doc: VaultDocument) => void;
   onDelete: (id: string) => void;
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05, ease: 'easeOut' }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -491,7 +428,7 @@ function DocumentCard({
         background: 'var(--bg-card)',
         boxShadow: 'var(--shadow-sm)',
         cursor: 'pointer',
-        transition: 'box-shadow 0.2s ease',
+        transition: 'all 0.15s ease',
       }}
       onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
       onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}

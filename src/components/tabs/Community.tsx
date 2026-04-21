@@ -1,97 +1,77 @@
 'use client';
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Users, Heart, Award, History, 
-  MessageCircle, ArrowRight, Share2, Star, 
+  MessageCircle, ArrowRight, Star, 
   MessageSquareHeart, Smile
 } from 'lucide-react';
 import Badge from '../ui/Badge';
-import Toast from '../ui/Toast';
+import { useToast } from '../ui/ToastContext';
 import { 
   mockConnections, mockBadges, mockGratitude, mockCommunityTimeline 
 } from '@/lib/data';
 import { typo } from '@/lib/typography';
-import { FIELD_LABEL_CLASSNAME } from '@/components/ui/FieldLabel';
+import Card from '@/components/ui/Card';
 import TabContent from '@/components/ui/TabContent';
+import SectionHero from '@/components/ui/SectionHero';
 
 export default function Community() {
-  const [toast, setToast] = useState({ show: false, message: '', type: 'default' as any });
+  const { showToast } = useToast();
 
   const sendHug = (name: string) => {
-    setToast({ 
-      show: true, 
-      message: `A heart-warming hug sent to ${name}! ❤️✨`, 
-      type: 'success' 
-    });
+    showToast(`A heart-warming hug sent to ${name}! ❤️✨`, 'success');
   };
 
   return (
     <div className="fade-in-up">
       <TabContent>
-      <Toast 
-        message={toast.message} 
-        show={toast.show} 
-        type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })} 
-      />
 
       {/* Hero Header */}
-      <div className="mb-5 flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--blush)] bg-[var(--bg-card)] p-6 shadow-[var(--shadow-md)] transition-shadow duration-200 hover:shadow-[var(--shadow-lg)]">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius-full)] bg-[var(--cream)] text-[var(--mauve)]">
-          <Users size={32} />
-        </div>
-        <div>
-          <h2 className={typo.pageHeroBold}>My Support Circle</h2>
-          <p className={`mt-0.5 ${typo.bodyMuted}`}>
-            You haven&apos;t helped just 1 child grow, you&apos;ve helped 154 mums too. 🌸
-          </p>
-        </div>
-      </div>
+      <SectionHero
+        icon={<Users size={32} />}
+        title="My Support Circle"
+        subtitle="You haven't helped just 1 child grow, you've helped 154 mums too. 🌸"
+        accentColor="var(--blush)"
+      />
 
       {/* Connection Grid */}
       <div style={{ marginBottom: 24 }}>
         <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
           <Heart size={18} color="var(--terracotta)" /> Trusted Connections
         </h3>
-        <div style={{ 
-          display: 'flex', gap: 12, overflowX: 'auto', padding: '4px 0 16px',
-          scrollSnapType: 'x mandatory'
-        }}>
-          {mockConnections.map((conn: any) => (
+        <div className="hide-scrollbar flex gap-4 overflow-x-auto pb-4" style={{ scrollSnapType: 'x mandatory' }}>
+          {mockConnections.map((conn: any, i: number) => (
             <motion.div
               key={conn.id}
-              whileHover={{ y: -4, boxShadow: 'var(--shadow-lg)' }}
-              style={{
-                scrollSnapAlign: 'start', flexShrink: 0, width: 140,
-                background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)',
-                padding: '16px 12px', textAlign: 'center', boxShadow: 'var(--shadow-md)',
-                border: '1px solid var(--cream-dark)',
-                transition: 'box-shadow 0.2s ease',
-              }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05, ease: 'easeOut' }}
+              whileTap={{ scale: 0.98 }}
+              className="min-w-[140px] transition-all duration-150 hover:-translate-y-1"
+              style={{ scrollSnapAlign: 'start' }}
             >
-              <div style={{ 
-                width: 48, height: 48, borderRadius: 'var(--radius-full)', 
-                background: 'var(--cream)', margin: '0 auto 10px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 20
-              }}>
-                {conn.avatar ? <img src={conn.avatar} alt={conn.name} /> : '👤'}
-              </div>
-              <div className={typo.fieldValue}>{conn.name}</div>
-              <div className={`mb-3 ${typo.caption}`}>{conn.role}</div>
-              <button 
-                onClick={() => sendHug(conn.name)}
-                className={FIELD_LABEL_CLASSNAME}
-                style={{
-                  width: '100%', padding: '6px', borderRadius: 'var(--radius-sm)',
-                  background: 'var(--blush-light)', border: 'none',
-                  color: 'var(--terracotta)',
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4
-                }}
+              <Card 
+                bodyClassName="px-3 py-4 flex flex-col items-center text-center"
               >
-                <Heart size={12} fill="var(--terracotta)" /> Send Hug
-              </button>
+                <div style={{ 
+                  width: 48, height: 48, borderRadius: 'var(--radius-full)', 
+                  background: 'var(--cream)', marginBottom: 10,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 20
+                }}>
+                  {conn.avatar ? <img src={conn.avatar} alt={conn.name} className="h-full w-full rounded-full object-cover" /> : '👤'}
+                </div>
+                <div className={typo.fieldValue}>{conn.name}</div>
+                <div className={`mb-3 ${typo.caption}`}>{conn.role}</div>
+                <button 
+                  onClick={() => sendHug(conn.name)}
+                  className="w-full cursor-pointer rounded-[var(--radius-sm)] border-none bg-[var(--blush-light)] py-1.5 text-xs font-bold text-[var(--terracotta)] transition-all duration-150 hover:bg-[var(--blush)] hover:text-white active:scale-[0.98]"
+                  style={{ fontFamily: 'inherit' }}
+                >
+                  <Heart size={12} className="mr-1 inline-block" fill="currentColor" /> Send Hug
+                </button>
+              </Card>
             </motion.div>
           ))}
         </div>
@@ -103,8 +83,12 @@ export default function Community() {
           <MessageSquareHeart size={18} color="var(--mauve)" /> Gratitude Board
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {mockGratitude.map((msg: any) => (
-            <div key={msg.id} style={{
+          {mockGratitude.map((msg: any, i: number) => (
+            <motion.div key={msg.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05, ease: 'easeOut' }}
+              style={{
               background: 'white', borderRadius: 'var(--radius-lg)', padding: '16px',
               border: '1px dashed var(--mauve-light)', position: 'relative'
             }}>
@@ -115,7 +99,7 @@ export default function Community() {
                 <span className={`font-semibold text-[var(--mauve-dark)] ${typo.caption}`}>— {msg.from}</span>
                 <span className={typo.caption}>{msg.date}</span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -126,22 +110,25 @@ export default function Community() {
           <Award size={18} color="var(--sky-blue)" /> Community Badges
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {mockBadges.map((badge: any) => (
-            <div
+          {mockBadges.map((badge: any, i: number) => (
+            <motion.div
               key={badge.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05, ease: 'easeOut' }}
+              whileHover={{ scale: 1.02, boxShadow: 'var(--shadow-lg)' }}
+              whileTap={{ scale: 0.98 }}
               style={{
                 background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '16px',
                 textAlign: 'center', border: `1px solid var(--cream-dark)`,
                 boxShadow: 'var(--shadow-md)',
-                transition: 'box-shadow 0.2s ease',
+                transition: 'all 0.15s ease',
               }}
-              onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
             >
               <div style={{ fontSize: 32, marginBottom: 8 }}>{badge.icon}</div>
               <div className={typo.fieldValue}>{badge.label}</div>
               <div className={`mt-1 ${typo.caption}`}>{badge.desc}</div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -165,7 +152,11 @@ export default function Community() {
         </div>
       </div>
 
-      {/* Influence Card */}
+      {/* 
+        Influence Card 
+        NOTE: Deviates from Card.tsx structure to allow specific left-border gradient styling
+        that Card.tsx doesn't natively support without complex class merging.
+      */}
       <motion.div
         whileHover={{ scale: 1.02 }}
         className="rounded-[var(--radius-xl)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--blush)] bg-[var(--bg-card)] p-6 text-center shadow-[var(--shadow-md)]"
@@ -177,7 +168,7 @@ export default function Community() {
         </p>
         <button
           type="button"
-          className="mt-5 cursor-pointer rounded-full border border-[var(--cream-dark)] bg-[var(--blush-light)] px-6 py-2.5 text-sm font-semibold text-[var(--terracotta)] transition-colors hover:bg-[var(--cream)]"
+          className="mt-5 cursor-pointer rounded-full border border-[var(--cream-dark)] bg-[var(--blush-light)] px-6 py-2.5 text-sm font-semibold text-[var(--terracotta)] transition-all duration-150 hover:border-[var(--blush)] hover:bg-[var(--blush)] hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--blush)]"
         >
           Invite a Friend
         </button>

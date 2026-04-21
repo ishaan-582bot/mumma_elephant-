@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Edit3, ShieldCheck, Briefcase, Camera, Image as ImageIcon, Lightbulb, Baby, MapPin, User } from 'lucide-react';
 import Image from 'next/image';
 import Badge from './ui/Badge';
-import Toast from './ui/Toast';
+import { useToast } from './ui/ToastContext';
 import type { UserProfile } from '@/lib/data';
 import type { TabId } from './TabStrip';
 import Card from './ui/Card';
@@ -20,8 +20,20 @@ interface ProfileHeaderProps {
 export default function ProfileHeader({ user, onEdit, onNavigate, onAvatarChange }: ProfileHeaderProps) {
   const [avatarHover, setAvatarHover] = useState(false);
   const [currentAvatar, setCurrentAvatar] = useState(user.avatar);
-  const [toast, setToast] = useState({ show: false, message: '', type: 'default' as 'success' | 'warning' | 'info' | 'error' | 'default' });
+  const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [pulse, setPulse] = useState(false);
+  const prevCompletion = useRef(user.profileCompletion);
+
+  React.useEffect(() => {
+    if (user.profileCompletion > prevCompletion.current) {
+      setPulse(true);
+      const timer = setTimeout(() => setPulse(false), 1000);
+      return () => clearTimeout(timer);
+    }
+    prevCompletion.current = user.profileCompletion;
+  }, [user.profileCompletion]);
 
   const stageLabel = `${user.motherhoodStage} · ${user.motherhoodMonths} months`;
 
@@ -41,7 +53,7 @@ export default function ProfileHeader({ user, onEdit, onNavigate, onAvatarChange
         const result = uploadEvent.target?.result as string;
         setCurrentAvatar(result);
         onAvatarChange?.(result);
-        setToast({ show: true, message: 'Looking good, mum! Avatar updated.', type: 'success' });
+        showToast('Looking good, mum! Avatar updated.', 'success');
       };
       reader.readAsDataURL(file);
     }
@@ -54,12 +66,6 @@ export default function ProfileHeader({ user, onEdit, onNavigate, onAvatarChange
       transition={{ duration: 0.4 }}
       className="rounded-[var(--radius-xl)] border border-[var(--cream-dark)] bg-[linear-gradient(180deg,var(--blush-light)_0%,var(--cream)_100%)] p-6 shadow-[var(--shadow-md)]"
     >
-      <Toast 
-        message={toast.message} 
-        show={toast.show} 
-        type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })} 
-      />
       
       {/* Hidden File Input */}
       <input
@@ -170,11 +176,17 @@ export default function ProfileHeader({ user, onEdit, onNavigate, onAvatarChange
           ))}
         </div>
 
-        <Card
-          className="w-full bg-white/70"
-          bodyClassName="px-4 py-3"
+        <motion.div
+          animate={{ boxShadow: pulse ? '0 0 15px 2px var(--sage)' : '0 1px 2px 0 rgba(0,0,0,0.05)' }}
+          transition={{ duration: pulse ? 0.3 : 0.8 }}
+          style={{ borderRadius: 'var(--radius-lg)' }}
+          className="w-full"
         >
-          <div className={`flex items-center justify-between ${typo.subheading}`}>
+          <Card
+            className="w-full bg-white/70"
+            bodyClassName="px-4 py-3"
+          >
+            <div className={`flex items-center justify-between ${typo.subheading}`}>
             <span>Profile complete</span>
             <span className="font-semibold text-[var(--blush-dark)]">{user.profileCompletion}%</span>
           </div>
@@ -187,6 +199,7 @@ export default function ProfileHeader({ user, onEdit, onNavigate, onAvatarChange
             />
           </div>
         </Card>
+        </motion.div>
       </div>
     </motion.section>
   );

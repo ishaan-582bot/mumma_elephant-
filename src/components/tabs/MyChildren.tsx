@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Plus, Lock, Unlock, ChevronDown, ChevronUp, CalendarDays,
   Ruler, Syringe, Star, AlertTriangle, FileText, Baby,
@@ -9,13 +9,16 @@ import {
 } from 'lucide-react';
 import Badge from '../ui/Badge';
 import EmptyState from '../ui/EmptyState';
-import ConfettiEffect from '../ui/ConfettiEffect';
-import Toast from '../ui/Toast';
 import GrowthChart from '../ui/GrowthChart';
+import { useToast } from '../ui/ToastContext';
+import { useConfetti } from '../ui/ConfettiContext';
 import type { Child } from '@/lib/data';
 import { typo } from '@/lib/typography';
 import FieldLabel from '@/components/ui/FieldLabel';
 import TabContent from '@/components/ui/TabContent';
+import Card from '@/components/ui/Card';
+import Toggle from '@/components/ui/Toggle';
+import Accordion from '@/components/ui/Accordion';
 
 interface MyChildrenProps {
   childrenList: Child[];
@@ -36,13 +39,8 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
     childrenData.length > 0 ? childrenData[0].id : null
   );
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [toast, setToast] = useState<{
-    show: boolean;
-    message: string;
-    type?: 'success' | 'warning' | 'info' | 'error' | 'default';
-    action?: { label: string; onClick: () => void };
-  }>({ show: false, message: '', type: 'default' });
+  const { showToast } = useToast();
+  const { triggerConfetti } = useConfetti();
   const [publicFields, setPublicFields] = useState<Record<string, string[]>>(() => {
     const init: Record<string, string[]> = {};
     childrenData.forEach((c) => { init[c.id] = [...c.publicFields]; });
@@ -60,28 +58,23 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
       if (current.includes(field)) {
         return { ...prev, [childId]: current.filter((f) => f !== field) };
       } else {
-        setToast({
-          show: true,
-          message: `${field} is now public`,
-          type: 'success',
-          action: {
+        showToast(
+          `${field} is now public`,
+          'success',
+          5000,
+          {
             label: 'Undo',
             onClick: () => toggleFieldPrivacy(childId, field)
           }
-        });
+        );
         return { ...prev, [childId]: [...current, field] };
       }
     });
   };
 
   const handleMilestoneToggle = (milestoneId: string) => {
-    setShowConfetti(true);
-    setToast({
-      show: true,
-      message: 'Milestone captured!',
-      type: 'success'
-    });
-    setTimeout(() => setShowConfetti(false), 2000);
+    triggerConfetti();
+    showToast('Milestone captured!', 'success');
   };
 
   if (childrenData.length === 0) {
@@ -111,14 +104,6 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
   return (
     <div className="fade-in-up">
       <TabContent>
-      <ConfettiEffect trigger={showConfetti} />
-      <Toast
-        message={toast.message}
-        show={toast.show}
-        type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })}
-        action={toast.action}
-      />
 
       {/* Child Carousel */}
       <div style={{
@@ -127,17 +112,17 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
         overflowX: 'auto',
         padding: '4px 0 16px',
         scrollSnapType: 'x mandatory',
+        scrollbarWidth: 'none',
       }}>
         {childrenData.map((c) => (
           <motion.div
             key={c.id}
-            whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => setSelectedChild(c.id)}
+            className="min-w-[80px] sm:min-w-[100px] hover:scale-[1.03] transition-transform"
             style={{
               scrollSnapAlign: 'start',
               flexShrink: 0,
-              width: 90,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -180,12 +165,12 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
         ))}
         {/* Add Child Card */}
         <motion.div
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
+          className="min-w-[80px] sm:min-w-[100px]"
           style={{
             scrollSnapAlign: 'start',
             flexShrink: 0,
-            width: 90,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -202,6 +187,7 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
             alignItems: 'center',
             justifyContent: 'center',
             color: 'var(--mauve)',
+            transition: 'all 0.15s ease',
           }}>
             <Plus size={24} />
           </div>
@@ -218,20 +204,9 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div style={{
-            background: 'var(--bg-card)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '12px 18px',
-            marginBottom: 16,
-            boxShadow: 'var(--shadow-md)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            border: '1px solid var(--cream-dark)',
-            transition: 'box-shadow 0.2s ease',
-          }}
-          onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-          onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+          <Card 
+            className="mb-4"
+            bodyClassName="px-[18px] py-[12px] flex items-center gap-3 w-full"
           >
             <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--mauve-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ShieldCheck size={16} color="var(--mauve)" />
@@ -239,7 +214,7 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
             <span className={`${typo.bodyMuted} font-semibold`}>
               {publicCount} items are currently <span className="text-[var(--sage-dark)]">visible to your connections</span>. {privateCount} items are private.
             </span>
-          </div>
+          </Card>
 
           {/* Basic Info Cards */}
           {[
@@ -250,23 +225,19 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
           ].filter(f => f.value).map((field, i) => {
             const isPublic = publicFields[child.id]?.includes(field.field);
             return (
-              <div
+              <motion.div
                 key={field.field}
-                style={{
-                  background: 'var(--bg-card)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '12px 16px',
-                  marginBottom: 8,
-                  boxShadow: 'var(--shadow-sm)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  transition: 'box-shadow 0.2s ease',
-                }}
-                onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-                onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04, ease: 'easeOut' }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <div>
+                <Card 
+                  className="mb-2 w-full"
+                  bodyClassName="px-4 py-3 flex items-center justify-between w-full"
+                >
+                  <div>
                   <FieldLabel>{field.label}</FieldLabel>
                   <div className={`mt-0.5 ${typo.fieldValue}`}>
                     {field.value}
@@ -279,37 +250,13 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                 </div>
                 
                 {/* Modern Toggle Switch */}
-                <div 
-                  onClick={() => toggleFieldPrivacy(child.id, field.field)}
-                  style={{
-                    width: 44,
-                    height: 24,
-                    borderRadius: 'var(--radius-full)',
-                    background: isPublic ? 'var(--sage)' : 'var(--cream-dark)',
-                    padding: 2,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: isPublic ? 'flex-end' : 'flex-start',
-                    transition: 'background-color 0.2s ease',
-                  }}
-                  role="switch"
-                  aria-checked={isPublic}
-                  aria-label={`Share ${field.label} with connections`}
-                >
-                  <motion.div 
-                    layout
-                    style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: 'var(--radius-full)',
-                      background: 'white',
-                      boxShadow: 'var(--shadow-sm)',
-                    }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  />
-                </div>
-              </div>
+                <Toggle
+                  checked={isPublic}
+                  onChange={() => toggleFieldPrivacy(child.id, field.field)}
+                  ariaLabel={`Share ${field.label} with connections`}
+                />
+                </Card>
+              </motion.div>
             );
           })}
 
@@ -319,54 +266,19 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
               <HeartPulse size={18} color="var(--terracotta)" /> Health & Development
             </h3>
 
-            {sections.map((section) => (
-              <div key={section.id} style={{ marginBottom: 8 }}>
-                <button
-                  onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
-                  style={{
-                    width: '100%',
-                    background: 'var(--bg-card)',
-                    borderRadius: expandedSection === section.id
-                      ? 'var(--radius-lg) var(--radius-lg) 0 0'
-                      : 'var(--radius-lg)',
-                    padding: '14px 16px',
-                    border: 'none',
-                    boxShadow: 'var(--shadow-md)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    transition: 'box-shadow 0.2s ease',
-                  }}
-                  onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+            {sections.map((section, i) => (
+              <motion.div 
+                key={section.id} 
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04, ease: 'easeOut' }}
+              >
+                <Accordion
+                  title={<>{section.icon} {section.label}</>}
+                  isOpen={expandedSection === section.id}
+                  onToggle={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
                 >
-                  <span className={`flex items-center gap-2.5 ${typo.subheading} text-[var(--text-primary)]`}>
-                    {section.icon} {section.label}
-                  </span>
-                  {expandedSection === section.id ? <ChevronUp size={16} color="var(--text-muted)" /> : <ChevronDown size={16} color="var(--text-muted)" />}
-                </button>
-
-                <AnimatePresence>
-                  {expandedSection === section.id && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
-                      style={{
-                        overflow: 'hidden',
-                        background: 'var(--bg-card)',
-                        borderRadius: '0 0 var(--radius-lg) var(--radius-lg)',
-                        boxShadow: 'var(--shadow-md)',
-                        transition: 'box-shadow 0.2s ease',
-                      }}
-                      onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-                      onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-                    >
-                      <div style={{ padding: '0 16px 16px' }}>
-                        {/* Growth */}
+                  {/* Growth */}
                         {section.id === 'growth' && (
                           <div>
                             <div style={{ 
@@ -390,8 +302,8 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                               <GrowthChart data={child.height} color="var(--sky-blue)" unit="cm" label="Height Progress" />
                               
                               <button 
-                                onClick={() => setToast({ show: true, message: 'Olivia\'s health history has been prepared for export.', type: 'info' })}
-                                className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-[var(--bg-card)] py-3 text-sm font-semibold text-[var(--text-secondary)]"
+                                onClick={() => showToast("Olivia's health history has been prepared for export.", 'info')}
+                                className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-[var(--bg-card)] py-3 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150 hover:border-[var(--sage)] hover:bg-[var(--sage-light)] hover:text-[var(--sage-dark)]"
                                 style={{
                                   fontFamily: 'inherit',
                                 }}
@@ -463,12 +375,9 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                               }}>
                                 <motion.button
                                   whileTap={{ scale: 0.8 }}
-                                  onClick={() => { 
+                                  onClick={() => {
                                     if (!m.achieved) {
                                       handleMilestoneToggle(m.id);
-                                      setShowConfetti(true);
-                                      setTimeout(() => setShowConfetti(false), 3000);
-                                      setToast({ show: true, message: `Amazing! Olivia reached a new milestone: ${m.label}.`, type: 'success' });
                                     }
                                   }}
                                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm text-white"
@@ -529,11 +438,8 @@ export default function MyChildren({ childrenList: childrenData }: MyChildrenPro
                             </p>
                           </div>
                         )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                </Accordion>
+              </motion.div>
             ))}
           </div>
         </motion.div>

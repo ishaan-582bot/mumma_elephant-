@@ -1,23 +1,27 @@
 'use client';
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Shield, Eye, EyeOff, Lock, Globe, 
   ArrowRight, Download, Trash2, ShieldCheck, 
   History, Settings2, ShieldAlert
 } from 'lucide-react';
 import Badge from '../ui/Badge';
-import Toast from '../ui/Toast';
+import Button from '../ui/Button';
+import HoldToDeleteButton from '../ui/HoldToDeleteButton';
+import { useToast } from '../ui/ToastContext';
 import BottomSheet from '../ui/BottomSheet';
 import TabContent from '../ui/TabContent';
+import SectionHero from '../ui/SectionHero';
 import { mockPrivacyLogs } from '@/lib/data';
 import { typo } from '@/lib/typography';
 import FieldLabel from '@/components/ui/FieldLabel';
+import Card from '@/components/ui/Card';
 
 export default function PrivacySafety() {
   const [activePreset, setActivePreset] = useState<'Maximum' | 'Community' | 'Open' | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: '', type: 'default' as any });
+  const { showToast } = useToast();
 
   const stats = [
     { label: 'Private Items', value: 12, icon: <Lock size={16} />, color: 'var(--mauve)' },
@@ -32,57 +36,41 @@ export default function PrivacySafety() {
       Community: 'Community Sharing applied: Moments shared with mums 🌸',
       Open: 'Open Book applied: Profile visible to community ✨'
     };
-    setToast({ show: true, message: messages[preset], type: 'success' });
+    showToast(messages[preset], 'success');
   };
 
   return (
     <div className="fade-in-up">
       <TabContent>
-      <Toast 
-        message={toast.message} 
-        show={toast.show} 
-        type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })} 
-      />
 
       {/* Hero Header */}
-      <div className="mb-5 flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--sky-blue)] bg-[var(--bg-card)] p-6 shadow-[var(--shadow-md)] transition-shadow duration-200 hover:shadow-[var(--shadow-lg)]">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius-full)] bg-[var(--cream)] text-[var(--sky-blue)]">
-          <Shield size={32} />
-        </div>
-        <div>
-          <h2 className={typo.pageHeroBold}>Privacy & Safety</h2>
-          <p className={`mt-0.5 ${typo.bodyMuted}`}>
-            You are in total control of your data, mum.
-          </p>
-        </div>
-      </div>
+      <SectionHero
+        icon={<Shield size={32} />}
+        title="Privacy & Safety"
+        subtitle="You are in total control of your data, mum."
+        accentColor="var(--sky-blue)"
+      />
 
       {/* Visual Dashboard */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
-        {stats.map((stat) => (
-          <div
+        {stats.map((stat, i) => (
+          <motion.div
             key={stat.label}
-            style={{
-            background: 'var(--bg-card)',
-            borderRadius: 'var(--radius-md)',
-            padding: '12px 16px',
-            textAlign: 'center',
-            boxShadow: 'var(--shadow-md)',
-            border: `1px solid var(--cream-dark)`,
-            transition: 'box-shadow 0.2s ease',
-            }}
-            onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-            onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06, ease: 'easeOut' }}
+            className="hover:scale-[1.02] transition-transform duration-150 h-full"
           >
-            <div style={{ color: stat.color, marginBottom: 6, display: 'flex', justifyContent: 'center' }}>
+            <Card bodyClassName="px-3 py-4 text-center h-full">
+              <div style={{ color: stat.color, marginBottom: 6, display: 'flex', justifyContent: 'center' }}>
               {stat.icon}
             </div>
             <div className="text-xl font-bold text-[var(--text-primary)]">{stat.value}</div>
             <div className="mt-1">
               <FieldLabel>{stat.label}</FieldLabel>
             </div>
-          </div>
+            </Card>
+          </motion.div>
         ))}
       </div>
 
@@ -96,34 +84,28 @@ export default function PrivacySafety() {
             { id: 'Maximum', label: 'Maximum Privacy', desc: 'Hide everything from everyone but you.', icon: <Lock size={18} /> },
             { id: 'Community', label: 'Community Sharing', desc: 'Share posts with mums, keep info private.', icon: <ShieldCheck size={18} /> },
             { id: 'Open', label: 'Open Book', desc: 'Most content visible to the community.', icon: <Globe size={18} /> },
-          ].map((preset) => (
-            <button
+          ].map((preset, i) => (
+            <motion.button
               key={preset.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.06, ease: 'easeOut' }}
               onClick={() => applyPreset(preset.id as any)}
-              style={{
-                width: '100%',
-                padding: '20px',
-                borderRadius: 'var(--radius-md)',
-                background: activePreset === preset.id ? 'var(--blush-light)' : 'var(--bg-card)',
-                border: activePreset === preset.id ? '2px solid var(--blush)' : '2px solid var(--cream-dark)',
-                textAlign: 'left',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                transition: 'all 0.2s ease',
-              }}
+              className="w-full text-left outline-none"
             >
-              <div style={{ color: activePreset === preset.id ? 'var(--blush-dark)' : 'var(--text-muted)' }}>
-                {preset.icon}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div className={`${typo.subheading} text-[var(--text-primary)]`}>{preset.label}</div>
-                <div className={`mt-0.5 ${typo.caption}`}>{preset.desc}</div>
-              </div>
-              <ArrowRight size={16} color="var(--cream-dark)" />
-            </button>
+              <Card 
+                title={preset.label}
+                description={preset.desc}
+                className="transition-all duration-150"
+                bodyClassName="px-5 py-5 flex items-center gap-3"
+              >
+                  <div style={{ color: activePreset === preset.id ? 'var(--blush-dark)' : 'var(--text-muted)' }}>
+                    {preset.icon}
+                  </div>
+                  <div className="flex-1"></div>
+                  <ArrowRight size={16} color="var(--cream-dark)" />
+              </Card>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -144,7 +126,7 @@ export default function PrivacySafety() {
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <button
-            onClick={() => setToast({ show: true, message: 'We are preparing your data package. Check your email soon! 📥', type: 'info' })}
+            onClick={() => showToast('We are preparing your data package. Check your email soon! 📥', 'info')}
             style={{
               padding: '16px',
               borderRadius: 'var(--radius-md)',
@@ -153,7 +135,13 @@ export default function PrivacySafety() {
               textAlign: 'center',
               cursor: 'pointer',
               fontFamily: 'inherit',
+              transition: 'all 0.15s ease',
+              outline: 'none',
             }}
+            onFocus={(e) => { e.currentTarget.style.boxShadow = '0 0 0 2px var(--blush)'; }}
+            onBlur={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+            onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--sage)'; e.currentTarget.style.background = 'var(--sage-light)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--cream-dark)'; e.currentTarget.style.background = 'var(--bg-card)'; }}
           >
             <Download size={20} color="var(--sage)" style={{ marginBottom: 8 }} />
             <div className={`${typo.subheading} text-[var(--text-primary)]`}>Download Data</div>
@@ -168,7 +156,13 @@ export default function PrivacySafety() {
               textAlign: 'center',
               cursor: 'pointer',
               fontFamily: 'inherit',
+              transition: 'all 0.15s ease',
+              outline: 'none',
             }}
+            onFocus={(e) => { e.currentTarget.style.boxShadow = '0 0 0 2px var(--blush)'; }}
+            onBlur={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+            onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--terracotta)'; e.currentTarget.style.background = 'var(--terracotta-light)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--cream-dark)'; e.currentTarget.style.background = 'var(--bg-card)'; }}
           >
             <Trash2 size={20} color="var(--terracotta)" style={{ marginBottom: 8 }} />
             <div className={`${typo.subheading} text-[var(--text-primary)]`}>Delete Account</div>
@@ -181,16 +175,15 @@ export default function PrivacySafety() {
         <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
           <History size={18} color="var(--sky-blue)" /> Recent Privacy Changes
         </h3>
-        <div
+        <motion.div
+          whileHover={{ boxShadow: 'var(--shadow-lg)' }}
           style={{ 
           background: 'var(--bg-card)', 
           borderRadius: 'var(--radius-lg)', 
           padding: '8px 4px',
           boxShadow: 'var(--shadow-md)',
-          transition: 'box-shadow 0.2s ease',
+          transition: 'all 0.15s ease',
           }}
-          onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-          onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
         >
           {mockPrivacyLogs.map((log: any) => (
             <div key={log.id} style={{
@@ -207,7 +200,7 @@ export default function PrivacySafety() {
               <div className={`shrink-0 font-semibold ${typo.caption}`}>{log.date}</div>
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
 
       {/* Delete Confirmation */}
@@ -237,17 +230,16 @@ export default function PrivacySafety() {
             >
               Keep My Account
             </button>
-            <button
-              onClick={() => { setShowDeleteConfirm(false); setToast({ show: true, message: 'Account scheduled for deletion. We\'ll miss you, mum. 🐘💔', type: 'error' }); }}
-              style={{
-                flex: 1, padding: '14px', borderRadius: 'var(--radius-md)',
-                background: 'var(--terracotta)', border: 'none',
-                fontWeight: 700, color: 'white', cursor: 'pointer',
-                fontFamily: 'inherit',
-              }}
-            >
-              Delete Permanently
-            </button>
+            <div style={{ flex: 1 }}>
+              <HoldToDeleteButton
+                label="Hold to Delete Account"
+                confirmLabel="Deleting..."
+                onConfirm={() => {
+                  setShowDeleteConfirm(false);
+                  showToast('Account successfully queued for deletion. You have 30 days to cancel.', 'warning', 6000);
+                }}
+              />
+            </div>
           </div>
         </div>
       </BottomSheet>

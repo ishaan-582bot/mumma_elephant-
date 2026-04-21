@@ -1,10 +1,10 @@
 'use client';
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Plus, Eye, ThumbsUp, ThumbsDown, MoreHorizontal, X, Share2, Trash2, Info } from 'lucide-react';
 import EmptyState from '../ui/EmptyState';
 import BottomSheet from '../ui/BottomSheet';
-import Toast from '../ui/Toast';
+import { useToast } from '../ui/ToastContext';
 import HoldToDeleteButton from '../ui/HoldToDeleteButton';
 import TabContent from '../ui/TabContent';
 import type { Tip, TipTag } from '@/lib/data';
@@ -27,7 +27,7 @@ export default function MyTips({ tips }: MyTipsProps) {
   const [showNewTip, setShowNewTip] = useState(false);
   const [newTipText, setNewTipText] = useState('');
   const [newTipTags, setNewTipTags] = useState<TipTag[]>([]);
-  const [toast, setToast] = useState({ show: false, message: '', type: 'default' as any });
+  const { showToast } = useToast();
 
   const allTags: TipTag[] = ['Nutrition', 'Sleep', 'Mental Health', 'Breastfeeding', 'Postpartum'];
 
@@ -54,12 +54,6 @@ export default function MyTips({ tips }: MyTipsProps) {
   return (
     <div className="fade-in-up">
       <TabContent>
-      <Toast 
-        message={toast.message} 
-        show={toast.show} 
-        type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })} 
-      />
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <span className={typo.subheading}>
@@ -227,7 +221,7 @@ export default function MyTips({ tips }: MyTipsProps) {
               <HoldToDeleteButton 
                 onConfirm={() => {
                   setExpandedTip(null);
-                  setToast({ show: true, message: 'Your tip has been removed 🌿', type: 'info' });
+                  showToast('Your tip has been removed 🌿', 'info');
                 }}
                 label="Hold to Delete Tip"
               />
