@@ -101,41 +101,26 @@ export default function SafeVault({ documents }: SafeVaultProps) {
     return (
       <div className="fade-in-up">
         <TabContent>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          minHeight: 400,
-        }}>
-        {/* Padlock Illustration */}
-        <div style={{
-          width: 100,
-          height: 100,
-          borderRadius: 'var(--radius-full)',
-          background: 'linear-gradient(135deg, var(--mauve-light), var(--lavender-light))',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 24,
-          boxShadow: '0 0 30px rgba(201, 169, 199, 0.4)',
-        }}>
-          <Lock size={40} color="var(--mauve)" strokeWidth={1.75} />
-        </div>
+          <div className="flex flex-col items-center min-h-[400px]">
+            {/* Padlock Illustration */}
+            <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[var(--mauve-light)] to-[var(--lavender-light)] shadow-[0_0_30px_rgba(201,169,199,0.4)]">
+              <Lock size={40} className="text-[var(--mauve)]" strokeWidth={1.75} />
+            </div>
 
-        <h2 className={`mb-2 text-center ${typo.pageHeroBold}`}>
-          {isSetupMode ? (setupPin ? 'Confirm your PIN' : 'Create your Vault PIN') : 'Your Safe Vault'}
-        </h2>
-        <p className={`mx-auto mb-6 max-w-xs text-center ${typo.bodyMuted}`}>
-          {isSetupMode 
-            ? 'Set a 4-digit PIN to keep your documents safe and private.' 
-            : 'Enter your PIN to access your documents. Everything here stays private and secure.'}
-        </p>
+            <h2 className={`${typo.pageHeroBold} mb-2 text-center`}>
+              {isSetupMode ? (setupPin ? 'Confirm your PIN' : 'Create your Vault PIN') : 'Your Safe Vault'}
+            </h2>
+            <p className={`${typo.bodyMuted} mx-auto mb-8 max-w-xs text-center`}>
+              {isSetupMode 
+                ? 'Set a 4-digit PIN to keep your documents safe and private.' 
+                : 'Enter your PIN to access your documents. Everything here stays private and secure.'}
+            </p>
 
-        <PinPad
-          onComplete={handlePinSubmit}
-          error={pinError}
-        />
-        </div>
+            <PinPad
+              onComplete={handlePinSubmit}
+              error={pinError}
+            />
+          </div>
         </TabContent>
       </div>
     );
@@ -189,12 +174,12 @@ export default function SafeVault({ documents }: SafeVaultProps) {
           subtitle="Add your first document to keep it safe 🔐. You can store maternity records, vaccination cards, lab reports, and more. Everything is encrypted and only visible to you."
           action={{ label: "Upload First Document", onClick: () => setShowUpload(true) }}
           hint="Bank-level encryption"
-          hintIcon={<Lock size={16} color="var(--mauve)" strokeWidth={2} style={{ flexShrink: 0 }} />}
+          hintIcon={<Lock size={16} color="var(--mauve)" strokeWidth={2} className="shrink-0" />}
         />
       ) : (
         <>
           {/* Mother's Documents */}
-          <div style={{ marginBottom: 12 }}>
+          <div className="mb-3">
             <Accordion
               title="👩 Mother's Documents"
               badge={<Badge label={`${motherDocs.length}`} variant="mauve" size="sm" />}
@@ -218,7 +203,7 @@ export default function SafeVault({ documents }: SafeVaultProps) {
           </div>
 
           {/* Child's Documents */}
-          <div style={{ marginBottom: 12 }}>
+          <div className="mb-3">
             <Accordion
               title="👶 Child's Documents"
               badge={<Badge label={`${childDocs.length}`} variant="blush" size="sm" />}
@@ -243,28 +228,11 @@ export default function SafeVault({ documents }: SafeVaultProps) {
         </>
       )}
 
-      {/* Upload FAB */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setShowUpload(true)}
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-          width: 56,
-          height: 56,
-          borderRadius: 'var(--radius-full)',
-          background: 'linear-gradient(135deg, var(--mauve), var(--lavender))',
-          border: 'none',
-          boxShadow: 'var(--shadow-lg)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          color: 'white',
-          zIndex: 50,
-        }}
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-none bg-gradient-to-br from-[var(--mauve)] to-[var(--lavender)] text-white shadow-[var(--shadow-lg)]"
       >
         <Upload size={22} />
       </motion.button>
@@ -275,18 +243,14 @@ export default function SafeVault({ documents }: SafeVaultProps) {
           <p className={`mb-4 ${typo.bodyMuted}`}>
             Choose a category, then pick your file 🌸
           </p>
-          <div style={{ marginBottom: 16 }}>
-            <p className={`mb-2 ${typo.subheading} text-[var(--text-primary)]`}>Mother&apos;s Documents</p>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div className="mb-4">
+            <p className={`${typo.subheading} mb-2 text-[var(--text-primary)]`}>Mother&apos;s Documents</p>
+            <div className="flex flex-wrap gap-2">
               {motherCategories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => { setShowUpload(false); showToast(`Ready to upload to "${cat}" 📁`, 'info'); }}
-                  className="rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-3.5 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150 hover:border-[var(--mauve)] hover:bg-[var(--mauve-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--blush)]"
-                  style={{
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
+                  className="rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-3.5 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150 hover:border-[var(--mauve)] hover:bg-[var(--mauve-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--blush)] active:scale-95"
                 >
                   {cat}
                 </button>
@@ -294,17 +258,13 @@ export default function SafeVault({ documents }: SafeVaultProps) {
             </div>
           </div>
           <div>
-            <p className={`mb-2 ${typo.subheading} text-[var(--text-primary)]`}>Child&apos;s Documents</p>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <p className={`${typo.subheading} mb-2 text-[var(--text-primary)]`}>Child&apos;s Documents</p>
+            <div className="flex flex-wrap gap-2">
               {childCategories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => { setShowUpload(false); showToast(`Ready to upload to "${cat}" 📁`, 'info'); }}
-                  className="rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-3.5 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150 hover:border-[var(--blush)] hover:bg-[var(--blush-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--blush)]"
-                  style={{
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                  }}
+                  className="rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-3.5 py-2 text-sm font-semibold text-[var(--text-secondary)] transition-all duration-150 hover:border-[var(--blush)] hover:bg-[var(--blush-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--blush)] active:scale-95"
                 >
                   {cat}
                 </button>
@@ -316,19 +276,18 @@ export default function SafeVault({ documents }: SafeVaultProps) {
 
       {/* Delete Confirmation */}
       <BottomSheet isOpen={showDelete !== null} onClose={() => setShowDelete(null)} title="Delete Document">
-        <div style={{ textAlign: 'center', padding: '8px 0' }}>
-          <p className={`mb-2 ${typo.subheading} text-[var(--text-primary)]`}>
+        <div className="px-1 py-4 text-center">
+          <p className={`${typo.subheading} mb-2 text-[var(--text-primary)]`}>
             Are you sure you want to delete this?
           </p>
-          <p className={`mb-5 ${typo.caption}`}>
+          <p className={`${typo.caption} mb-6`}>
             This cannot be undone. Hold the button to confirm.
           </p>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={() => setShowDelete(null)}
-              className="flex-1 cursor-pointer rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent py-3 text-sm font-semibold text-[var(--text-secondary)]"
-              style={{ fontFamily: 'inherit' }}
+              className="flex-1 cursor-pointer rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent py-3 text-sm font-semibold text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-card-hover)]"
             >
               Keep It
             </button>
@@ -347,45 +306,31 @@ export default function SafeVault({ documents }: SafeVaultProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{
-              position: 'fixed', inset: 0,
-              background: 'rgba(30, 20, 15, 0.92)',
-              zIndex: 5000,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 24,
-            }}
+            className="fixed inset-0 z-[5000] flex flex-col items-center justify-center bg-black/90 p-6"
             onClick={() => setPreviewDoc(null)}
           >
-            <div style={{
-              width: '90vw',
-              maxWidth: 400,
-              background: 'var(--bg-card)',
-              borderRadius: 'var(--radius-xl)',
-              padding: 32,
-              textAlign: 'center',
-            }} onClick={(e) => e.stopPropagation()}>
-              <div style={{ fontSize: 64, marginBottom: 16 }}>
+            <div 
+              className="w-[90vw] max-w-[400px] rounded-[var(--radius-xl)] bg-[var(--bg-card)] p-8 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-4 text-[64px]">
                 {previewDoc.type === 'pdf' ? '📄' : '🖼️'}
               </div>
-              <h3 className={`mb-2 text-lg font-medium text-[var(--text-primary)]`}>
+              <h3 className={`${typo.heading} mb-2 text-lg`}>
                 {previewDoc.name}
               </h3>
               <Badge label={previewDoc.category} variant="mauve" />
-              <div className={`mt-3 ${typo.caption}`}>
-                {previewDoc.size} · {previewDoc.date}
+              <div className={`${typo.caption} mt-4`}>
+                {previewDoc.size} • {previewDoc.date}
               </div>
-              <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'center' }}>
-                <button type="button" className="flex cursor-pointer items-center gap-1.5 rounded-[var(--radius-md)] border-none bg-[var(--sage-light)] px-5 py-2.5 text-sm font-semibold text-[#4A6B3A]" style={{ fontFamily: 'inherit' }}>
+              <div className="mt-6 flex justify-center gap-3">
+                <button type="button" className="flex cursor-pointer items-center gap-2 rounded-[var(--radius-md)] border-none bg-[var(--sage-light)] px-5 py-2.5 text-sm font-semibold text-[#4A6B3A] transition-all hover:bg-[var(--sage)] hover:text-white">
                   <Download size={16} /> Download
                 </button>
                 <button
                   type="button"
                   onClick={() => setPreviewDoc(null)}
-                  className="cursor-pointer rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)]"
-                  style={{ fontFamily: 'inherit' }}
+                  className="cursor-pointer rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-transparent px-5 py-2.5 text-sm font-semibold text-[var(--text-secondary)] transition-all hover:border-[var(--mauve)] hover:text-[var(--mauve-dark)]"
                 >
                   Close
                 </button>
@@ -416,39 +361,23 @@ function DocumentCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, ease: 'easeOut' }}
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ scale: 1.02, boxShadow: 'var(--shadow-md)' }}
       whileTap={{ scale: 0.98 }}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        padding: '12px 16px',
-        border: '1px solid var(--cream-dark)',
-        borderRadius: 'var(--radius-lg)',
-        background: 'var(--bg-card)',
-        boxShadow: 'var(--shadow-sm)',
-        cursor: 'pointer',
-        transition: 'all 0.15s ease',
-      }}
-      onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-      onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
+      className="flex cursor-pointer items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--cream-dark)] bg-[var(--bg-card)] px-4 py-3 shadow-[var(--shadow-sm)] transition-all duration-150"
       onClick={() => onPreview(doc)}
     >
-      <div style={{
-        width: 40, height: 40, borderRadius: 'var(--radius-sm)',
-        background: doc.type === 'pdf' ? 'var(--terracotta-light)' : 'var(--sky-blue-light)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
-      }}>
-        {doc.type === 'pdf' ? <FileText size={18} color="#7A4A3A" /> : <Image size={18} color="#3A5A7A" />}
+      <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-sm)] ${
+        doc.type === 'pdf' ? 'bg-[var(--terracotta-light)]' : 'bg-[var(--sky-blue-light)]'
+      }`}>
+        {doc.type === 'pdf' ? <FileText size={18} className="text-[#7A4A3A]" /> : <Image size={18} className="text-[#3A5A7A]" />}
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="min-w-0 flex-1">
         <div className={`truncate ${typo.body}`}>
           {doc.name}
         </div>
-        <div className="mt-0.5 flex items-center gap-2">
+        <div className="mt-0.5 flex items-center gap-1.5">
           <span className={typo.caption}>{doc.category}</span>
-          <span className={typo.caption}>·</span>
+          <span className={typo.caption}>•</span>
           <span className={typo.caption}>{doc.size}</span>
           {doc.isOffline && (
             <span className={`flex items-center gap-0.5 font-semibold text-[var(--sage-dark)] ${typo.caption}`}>
@@ -459,12 +388,8 @@ function DocumentCard({
       </div>
       <button
         onClick={(e) => { e.stopPropagation(); onDelete(doc.id); }}
-        style={{
-          width: 32, height: 32, borderRadius: '50%',
-          background: 'transparent', border: 'none',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', color: 'var(--text-muted)',
-        }}
+        className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[var(--text-muted)] transition-colors hover:bg-[var(--terracotta-light)] hover:text-[var(--terracotta)]"
+        aria-label="Delete document"
       >
         <Trash2 size={14} />
       </button>

@@ -8,6 +8,7 @@ interface CardProps {
   className?: string;
   bodyClassName?: string;
   density?: 'comfortable' | 'compact' | 'spacious';
+  elevation?: 'resting' | 'elevated' | 'featured';
 }
 
 export default function Card({
@@ -17,6 +18,7 @@ export default function Card({
   className = '',
   bodyClassName = '',
   density = 'comfortable',
+  elevation = 'elevated',
 }: CardProps) {
   const densityClass =
     density === 'compact'
@@ -25,9 +27,16 @@ export default function Card({
         ? 'p-6'
         : 'p-5';
 
+  const shadowClass = 
+    elevation === 'resting' 
+      ? 'shadow-[var(--shadow-sm)]' 
+      : elevation === 'featured' 
+        ? 'shadow-[var(--shadow-lg)]' 
+        : 'shadow-[var(--shadow-md)]';
+
   return (
     <section
-      className={`overflow-hidden rounded-[var(--radius-lg)] border border-[var(--cream-dark)] bg-[var(--bg-card)] shadow-[var(--shadow-md)] transition-shadow duration-200 hover:shadow-[var(--shadow-lg)] ${className}`}
+      className={`overflow-hidden rounded-[var(--radius-lg)] border border-[var(--cream-dark)] bg-[var(--bg-card)] ${shadowClass} transition-shadow duration-200 hover:shadow-[var(--shadow-lg)] ${className}`}
     >
       {(title || description) && (
         <header className={`border-b border-[var(--cream-dark)] ${densityClass}`}>

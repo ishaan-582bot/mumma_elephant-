@@ -24,30 +24,20 @@ export const SkeletonBox = ({ width, height, borderRadius = '12px', style }: any
 );
 
 export const ProfileHeaderSkeleton = () => (
-  <div style={{
-    background: 'linear-gradient(180deg, var(--bg-card) 0%, var(--bg-primary) 100%)',
-    padding: '32px 24px 24px',
-    borderBottomLeftRadius: 'var(--radius-3xl)',
-    borderBottomRightRadius: 'var(--radius-3xl)',
-    boxShadow: 'var(--shadow-sm)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '16px',
-  }}>
-    <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+  <div className="flex flex-col items-center gap-4 rounded-b-[var(--radius-3xl)] bg-gradient-to-b from-[var(--bg-card)] to-[var(--bg-primary)] px-6 py-8 shadow-[var(--shadow-sm)]">
+    <div className="flex w-full justify-between">
       <SkeletonBox width="64px" height="24px" borderRadius="16px" />
       <SkeletonBox width="36px" height="36px" borderRadius="50%" />
     </div>
     
     <SkeletonBox width="100px" height="100px" borderRadius="50%" />
     
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+    <div className="flex flex-col items-center gap-2">
       <SkeletonBox width="180px" height="28px" />
       <SkeletonBox width="120px" height="20px" />
     </div>
     
-    <div style={{ display: 'flex', gap: '16px', marginTop: '12px' }}>
+    <div className="mt-3 flex gap-4">
       <SkeletonBox width="80px" height="60px" borderRadius="16px" />
       <SkeletonBox width="80px" height="60px" borderRadius="16px" />
       <SkeletonBox width="80px" height="60px" borderRadius="16px" />
@@ -56,7 +46,7 @@ export const ProfileHeaderSkeleton = () => (
 );
 
 export const ContentSkeleton = () => (
-  <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+  <div className="flex flex-col gap-5 p-6">
     <SkeletonBox width="100%" height="60px" borderRadius="16px" />
     <SkeletonBox width="100%" height="150px" borderRadius="16px" />
     <SkeletonBox width="100%" height="80px" borderRadius="16px" />
@@ -67,9 +57,9 @@ export const ContentSkeleton = () => (
 
 /** Field row: 36px icon circle on left, two text lines on right */
 const FieldRowSkeleton = () => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0' }}>
+  <div className="flex items-center gap-3 py-2.5">
     <SkeletonBox width="36px" height="36px" borderRadius="var(--radius-sm)" />
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+    <div className="flex flex-1 flex-col gap-1.5">
       <SkeletonBox width="30%" height="12px" borderRadius="6px" />
       <SkeletonBox width="60%" height="14px" borderRadius="6px" />
     </div>
@@ -78,10 +68,10 @@ const FieldRowSkeleton = () => (
 
 /** PersonalInfo: progress bar + 6 field rows */
 export const PersonalInfoSkeleton = () => (
-  <div style={{ padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+  <div className="flex flex-col gap-3 px-4 py-6">
     {/* Progress bar card */}
-    <div style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '16px 20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+    <div className="rounded-[var(--radius-lg)] bg-[var(--bg-card)] px-5 py-4">
+      <div className="mb-2.5 flex justify-between">
         <SkeletonBox width="55%" height="14px" borderRadius="6px" />
         <SkeletonBox width="32px" height="14px" borderRadius="6px" />
       </div>
@@ -89,7 +79,7 @@ export const PersonalInfoSkeleton = () => (
     </div>
     {/* Field rows */}
     {Array.from({ length: 6 }).map((_, i) => (
-      <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '8px 16px' }}>
+      <div key={i} className="rounded-[var(--radius-lg)] bg-[var(--bg-card)] px-4 py-2">
         <FieldRowSkeleton />
       </div>
     ))}
@@ -98,11 +88,11 @@ export const PersonalInfoSkeleton = () => (
 
 /** MyChildren: 3 avatar circles + 4 info rows + 5 accordion headers */
 export const MyChildrenSkeleton = () => (
-  <div style={{ padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+  <div className="flex flex-col gap-4 px-4 py-6">
     {/* Child avatars row */}
-    <div style={{ display: 'flex', gap: 12, padding: '4px 0' }}>
+    <div className="flex gap-3 py-1">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+        <div key={i} className="flex flex-col items-center gap-1.5">
           <SkeletonBox width="64px" height="64px" borderRadius="50%" />
           <SkeletonBox width="48px" height="10px" borderRadius="6px" />
         </div>
@@ -110,9 +100,9 @@ export const MyChildrenSkeleton = () => (
     </div>
     {/* Info field rows */}
     {Array.from({ length: 4 }).map((_, i) => (
-      <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '12px 16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div key={i} className="rounded-[var(--radius-lg)] bg-[var(--bg-card)] p-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-1.5">
             <SkeletonBox width="60px" height="10px" borderRadius="6px" />
             <SkeletonBox width="120px" height="14px" borderRadius="6px" />
           </div>
@@ -129,16 +119,16 @@ export const MyChildrenSkeleton = () => (
 
 /** SafeVault: hero block + 2 accordions + 3 document rows */
 export const SafeVaultSkeleton = () => (
-  <div style={{ padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+  <div className="flex flex-col gap-3 px-4 py-6">
     {/* Gradient hero block */}
     <SkeletonBox width="100%" height="80px" borderRadius="var(--radius-lg)" />
     {/* Accordion headers */}
     <SkeletonBox width="100%" height="52px" borderRadius="var(--radius-lg)" />
     {/* Document rows */}
     {Array.from({ length: 3 }).map((_, i) => (
-      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '12px 16px' }}>
+      <div key={i} className="flex items-center gap-3 rounded-[var(--radius-lg)] bg-[var(--bg-card)] px-4 py-3">
         <SkeletonBox width="40px" height="40px" borderRadius="var(--radius-sm)" />
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div className="flex flex-1 flex-col gap-1.5">
           <SkeletonBox width="65%" height="14px" borderRadius="6px" />
           <SkeletonBox width="40%" height="10px" borderRadius="6px" />
         </div>
@@ -152,14 +142,14 @@ export const SafeVaultSkeleton = () => (
 
 /** MyPosts: toggle bar + 6 grid squares (3-column) */
 export const MyPostsSkeleton = () => (
-  <div style={{ padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+  <div className="flex flex-col gap-4 px-4 py-6">
     {/* Toggle bar */}
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="flex items-center justify-between">
       <SkeletonBox width="80px" height="16px" borderRadius="6px" />
       <SkeletonBox width="72px" height="32px" borderRadius="var(--radius-sm)" />
     </div>
     {/* Grid */}
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+    <div className="grid grid-cols-3 gap-1 overflow-hidden rounded-[var(--radius-md)]">
       {Array.from({ length: 6 }).map((_, i) => (
         <SkeletonBox key={i} width="100%" height="0" borderRadius="0" style={{ paddingBottom: '100%' }} />
       ))}
@@ -169,25 +159,27 @@ export const MyPostsSkeleton = () => (
 
 /** MyTips: header row + 3 tip cards */
 export const MyTipsSkeleton = () => (
-  <div style={{ padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+  <div className="flex flex-col gap-3 px-4 py-6">
     {/* Header row */}
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="flex items-center justify-between">
       <SkeletonBox width="100px" height="18px" borderRadius="6px" />
       <SkeletonBox width="64px" height="28px" borderRadius="var(--radius-sm)" />
     </div>
     {/* Tip cards */}
     {Array.from({ length: 3 }).map((_, i) => (
-      <div key={i} style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div key={i} className="flex flex-col gap-2.5 rounded-[var(--radius-lg)] bg-[var(--bg-card)] p-4 transition-shadow hover:shadow-sm">
         <SkeletonBox width="90%" height="14px" borderRadius="6px" />
         <SkeletonBox width="70%" height="12px" borderRadius="6px" />
         <SkeletonBox width="50%" height="12px" borderRadius="6px" />
         {/* Tag row */}
-        <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+        <div className="mt-1 flex gap-1.5">
           <SkeletonBox width="48px" height="20px" borderRadius="var(--radius-full)" />
           <SkeletonBox width="56px" height="20px" borderRadius="var(--radius-full)" />
         </div>
         {/* Bar */}
-        <SkeletonBox width="100%" height="6px" borderRadius="var(--radius-full)" />
+        <div className="mt-2">
+          <SkeletonBox width="100%" height="6px" borderRadius="var(--radius-full)" />
+        </div>
       </div>
     ))}
   </div>

@@ -34,49 +34,36 @@ export default function PinPad({ length = 4, onComplete, title, subtitle, error 
   const buttons = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 24,
-      padding: '32px 24px',
-    }}>
+    <div className="flex flex-col items-center gap-6 px-6 py-8">
       {title && (
-        <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-primary)', textAlign: 'center' }}>
+        <h2 className="text-center text-xl font-bold text-[var(--text-primary)]">
           {title}
         </h2>
       )}
       {subtitle && (
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', textAlign: 'center', maxWidth: 260 }}>
+        <p className="max-w-[260px] text-center text-sm text-[var(--text-muted)]">
           {subtitle}
         </p>
       )}
       
       {/* PIN Dots */}
-      <div style={{ display: 'flex', gap: 16, margin: '8px 0' }}>
+      <div className="my-2 flex gap-4">
         {Array.from({ length }).map((_, i) => (
           <div
             key={i}
-            className={`pin-dot ${i < pin.length ? 'filled' : ''}`}
-            style={error ? { borderColor: 'var(--terracotta)' } : undefined}
+            className={`pin-dot ${i < pin.length ? 'filled' : ''} ${error ? 'border-[var(--terracotta)]' : ''}`}
           />
         ))}
       </div>
 
       {error && (
-        <p style={{ fontSize: '0.85rem', color: 'var(--terracotta)', fontWeight: 600 }}>
+        <p className="text-sm font-semibold text-[var(--terracotta)]">
           {error}
         </p>
       )}
 
       {/* Number Pad */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: 12,
-        maxWidth: 280,
-        width: '100%',
-      }}>
+      <div className="grid w-full max-w-[280px] grid-cols-3 gap-3">
         {buttons.map((btn, i) => {
           if (btn === '') return <div key={i} />;
           if (btn === 'del') {
@@ -85,19 +72,7 @@ export default function PinPad({ length = 4, onComplete, title, subtitle, error 
                 key={i}
                 onClick={handleDelete}
                 whileTap={{ scale: 0.9, color: 'var(--terracotta)' }}
-                style={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: 'var(--radius-full)',
-                  border: 'none',
-                  background: 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: 'var(--text-secondary)',
-                  justifySelf: 'center',
-                }}
+                className="flex h-[72px] w-[72px] cursor-pointer items-center justify-center justify-self-center rounded-[var(--radius-full)] border-none bg-transparent text-[var(--text-secondary)]"
               >
                 <Delete size={24} />
               </motion.button>
@@ -112,20 +87,7 @@ export default function PinPad({ length = 4, onComplete, title, subtitle, error 
                 backgroundColor: 'var(--blush-light)',
                 borderColor: 'var(--blush)'
               }}
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: '50%',
-                border: '2px solid var(--cream-dark)',
-                background: 'var(--bg-card)',
-                fontSize: '1.5rem',
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                transition: 'background-color 0.1s ease, border-color 0.1s ease',
-                justifySelf: 'center',
-              }}
+              className="h-[72px] w-[72px] cursor-pointer justify-self-center rounded-full border-2 border-[var(--cream-dark)] bg-[var(--bg-card)] text-2xl font-bold text-[var(--text-primary)] transition-all duration-100"
             >
               {btn}
             </motion.button>

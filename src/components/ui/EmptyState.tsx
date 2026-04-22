@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import Button from './Button';
+import { typo } from '@/lib/typography';
 
 interface EmptyStateProps {
   icon: React.ReactNode;
@@ -17,51 +18,21 @@ interface EmptyStateProps {
 export default function EmptyState({ icon, title, subtitle, action, secondaryAction, hint, hintIcon }: EmptyStateProps) {
   return (
     <motion.div
-      className="fade-in-up"
+      className="fade-in-up flex flex-col items-center justify-center p-12 text-center gap-5"
       whileHover={{ scale: 1.01 }}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px 24px',
-        textAlign: 'center',
-        gap: 20,
-      }}
     >
       <div
-        style={{
-          width: 120,
-          height: 120,
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, var(--blush-light), var(--cream))',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 48,
-          boxShadow: 'var(--shadow-glow-blush)',
-        }}
+        className="w-[120px] h-[120px] rounded-[var(--radius-full)] bg-gradient-to-br from-[var(--blush-light)] to-[var(--cream)] flex items-center justify-center text-[48px] shadow-[var(--shadow-glow-blush)]"
       >
         {icon}
       </div>
-      <h3 style={{
-        fontSize: '1.15rem',
-        fontWeight: 700,
-        color: 'var(--text-primary)',
-        lineHeight: 1.4,
-        maxWidth: 320,
-      }}>
+      <h3 className={`${typo.heading} max-w-[320px] leading-relaxed`}>
         {title}
       </h3>
-      <p style={{
-        fontSize: '0.9rem',
-        color: 'var(--text-muted)',
-        maxWidth: 300,
-        lineHeight: 1.5,
-      }}>
+      <p className={`${typo.bodyMuted} max-w-[300px] leading-relaxed`}>
         {subtitle}
       </p>
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div className="flex flex-wrap items-center justify-center gap-3">
         {action && (
           <Button variant="primary" onClick={action.onClick}>
             {action.label}
@@ -75,23 +46,9 @@ export default function EmptyState({ icon, title, subtitle, action, secondaryAct
       </div>
       
       {hint && (
-        <div style={{
-          marginTop: 4,
-          padding: '12px 16px',
-          background: 'var(--cream)',
-          borderRadius: 'var(--radius-lg)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          maxWidth: 320,
-        }}>
-          {hintIcon || <Heart size={16} color="var(--blush-dark)" style={{ flexShrink: 0 }} />}
-          <p style={{
-            fontSize: '0.8rem',
-            color: 'var(--text-muted)',
-            lineHeight: 1.4,
-            textAlign: 'left',
-          }}>
+        <div className="mt-1 px-4 py-3 bg-[var(--cream)] rounded-[var(--radius-lg)] flex items-center gap-3 max-w-[320px]">
+          {hintIcon || <Heart size={16} color="var(--blush-dark)" className="shrink-0" />}
+          <p className={`${typo.caption} text-left leading-relaxed`}>
             {hint}
           </p>
         </div>

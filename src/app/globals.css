@@ -36,7 +36,15 @@
   --bg-card-hover: #FFF0E8;
   --bg-overlay: rgba(74, 55, 40, 0.4);
 
-  /* Radii */
+  /* 
+   * Radius Guidelines:
+   * --radius-sm: 10px (Badges, small pills)
+   * --radius-md: 16px (Interactive elements: Buttons, Inputs, Tab items)
+   * --radius-lg: 20px (Content blocks: Cards, Standard grid items)
+   * --radius-xl: 24px (Large sections: Banner blocks, Hero headers)
+   * --radius-3xl: 28px (Shell/Outer: Bottom sheets, Profile container)
+   * --radius-full: 9999px (Circular: Avatars, FABs)
+   */
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 20px;

@@ -4,7 +4,7 @@
  */
 export const typo = {
   /** 800 extrabold — ProfileHeader user name + Wellbeing main prompt only */
-  displayExtrabold: 'text-2xl font-extrabold tracking-tight text-[var(--text-primary)]',
+  displayExtrabold: 'text-3xl font-extrabold tracking-tight text-[var(--text-primary)]',
 
   /** 700 bold — hero page titles (Journey, Community, Privacy, SafeVault lock, Wellbeing disabled) */
   pageHeroBold: 'text-2xl font-bold tracking-tight text-[var(--text-primary)]',

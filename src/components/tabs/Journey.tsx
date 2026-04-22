@@ -17,8 +17,9 @@ import {
   type JourneyEventIconKind,
 } from '@/lib/data';
 import { typo } from '@/lib/typography';
-import TabContent from '@/components/ui/TabContent';
+import TabContent, { tabViewVariants } from '@/components/ui/TabContent';
 import SectionHero from '@/components/ui/SectionHero';
+import Card from '@/components/ui/Card';
 
 function JourneyTimelineIcon({ kind }: { kind: JourneyEventIconKind }) {
   const iconColor = 'var(--mauve)';
@@ -38,74 +39,77 @@ export default function Journey() {
     <div className="fade-in-up">
       <TabContent>
       {/* Hero recap */}
-      <SectionHero
-        icon={<History size={32} />}
-        title="Your Motherhood Story"
-        subtitle="10 months of growth, 154 lives touched, and 1 beautiful journey."
-        accentColor="var(--lavender)"
-      />
+      <motion.div variants={tabViewVariants.item}>
+        <SectionHero
+          featured={true}
+          icon={<History size={32} />}
+          title="Your Motherhood Story"
+          subtitle="10 months of growth, 154 lives touched, and 1 beautiful journey."
+          accentColor="var(--lavender)"
+        />
+      </motion.div>
 
       {/* This Day Last Year */}
-      <div style={{ marginBottom: 30 }}>
-        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
-          <Clock size={18} color="var(--terracotta)" /> This Day Last Year
+      <motion.div variants={tabViewVariants.item} className="mb-8">
+        <h3 className={`${typo.heading} mb-3 flex items-center gap-2`}>
+          <Clock size={18} className="text-[var(--terracotta)]" /> This Day Last Year
         </h3>
         {mockHistoricalMemories.map((mem) => (
           <motion.div
             key={mem.id}
-            whileHover={{ y: -4 }}
-            style={{
-              background: 'white', borderRadius: 'var(--radius-lg)', overflow: 'hidden',
-              boxShadow: 'var(--shadow-md)', border: '1px solid var(--cream-dark)',
-              position: 'relative'
-            }}
+            whileHover={{ y: -6, scale: 1.01 }}
+            className="transition-all duration-300"
           >
-            <div className={`relative flex h-44 items-center justify-center bg-[var(--cream)] italic ${typo.caption}`}>
-              <Camera size={40} style={{ opacity: 0.2 }} />
-              <div style={{ 
-                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                background: 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.4))',
-                zIndex: 1
-              }} />
-              <span className="absolute bottom-3 left-4 z-[2] text-xs font-bold text-white">{mem.date}</span>
-            </div>
-            <div style={{ padding: '16px' }}>
-              <p className={typo.body}>
-                &quot;{mem.caption}&quot;
-              </p>
-              <div style={{ marginTop: 12, display: 'flex', gap: 6 }}>
-                <Badge label="Nursery Prep" variant="cream" size="sm" />
-                <Badge label="Pregnancy Days" variant="sage" size="sm" />
+            <Card 
+              elevation="featured" 
+              className="group relative h-full overflow-hidden border-2 border-[var(--blush-light)]" 
+              bodyClassName="p-0 bg-gradient-to-br from-[var(--cream)] to-white"
+            >
+              <div className="absolute top-3 right-3 z-[3] rounded-full bg-white/80 p-1.5 text-[var(--terracotta)] shadow-sm backdrop-blur-sm">
+                <Sparkles size={14} />
               </div>
-            </div>
-            {/* Nostalgic Overlay */}
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', background: 'rgba(215, 189, 215, 0.05)' }} />
+              <div className={`relative flex h-48 items-center justify-center bg-[var(--cream-dark)] italic ${typo.caption}`}>
+                <Camera size={40} className="opacity-10" />
+                <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <span className="absolute bottom-4 left-5 z-[2] flex items-center gap-1.5 text-xs font-bold text-white">
+                  <Calendar size={12} /> {mem.date}
+                </span>
+              </div>
+              <div className="p-6">
+                <p className={`${typo.body} leading-relaxed italic text-[var(--text-primary)]/90`}>
+                  &quot;{mem.caption}&quot;
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <Badge label="Nursery Prep" variant="cream" size="sm" />
+                  <Badge label="Pregnancy Days" variant="sage" size="sm" />
+                </div>
+              </div>
+              {/* Nostalgic Overlay */}
+              <div className="pointer-events-none absolute inset-0 bg-[var(--terracotta)]/5 opacity-40 group-hover:opacity-20 transition-opacity" />
+            </Card>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Timeline */}
-      <div style={{ marginBottom: 30 }}>
-        <h3 className={`mb-5 flex items-center gap-2 ${typo.heading}`}>
-          <Star size={18} color="var(--mauve)" /> Key Moments
+      <motion.div variants={tabViewVariants.item} className="mb-8">
+        <h3 className={`${typo.heading} mb-5 flex items-center gap-2`}>
+          <Star size={18} className="text-[var(--mauve)]" /> Key Moments
         </h3>
-        <div style={{ paddingLeft: 20, borderLeft: '2px dashed var(--cream-dark)', marginLeft: 10 }}>
+        <div className="ml-2.5 border-l-2 border-dashed border-[var(--cream-dark)] pl-5">
           {mockJourneyEvents.map((evt: any, i: number) => (
             <motion.div key={evt.id} 
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.08, ease: 'easeOut' }}
-              style={{ position: 'relative', marginBottom: 24 }}
+              className="relative mb-6"
             >
-              <div style={{ 
-                position: 'absolute', left: -26, top: 4, width: 12, height: 12, 
-                borderRadius: 'var(--radius-full)', background: 'white', border: '3px solid var(--mauve)' 
-              }} />
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div className="absolute -left-[27px] top-1.5 h-3 w-3 rounded-full border-[3px] border-[var(--mauve)] bg-white shadow-sm" />
+              <div className="flex items-center gap-3">
                 <JourneyTimelineIcon kind={evt.icon} />
                 <div>
                   <div className={`${typo.subheading} text-[var(--text-primary)]`}>{evt.title}</div>
-                  <div className={`mt-0.5 ${typo.caption}`}>
+                  <div className={`${typo.caption} mt-0.5`}>
                     {new Date(evt.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </div>
                 </div>
@@ -113,58 +117,59 @@ export default function Journey() {
             </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Then vs Now */}
-      <div style={{ marginBottom: 30 }}>
-        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
-          <Sparkles size={18} color="var(--sage)" /> Then vs Now
+      <motion.div variants={tabViewVariants.item} className="mb-8">
+        <h3 className={`${typo.heading} mb-3 flex items-center gap-2`}>
+          <Sparkles size={18} className="text-[var(--sage)]" /> Then vs Now
         </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '12px', border: '1px solid var(--cream-dark)', textAlign: 'center' }}>
-            <div style={{ height: 100, background: 'var(--cream)', borderRadius: 'var(--radius-md)', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-               <Camera size={24} style={{ opacity: 0.1 }} />
+        <div className="grid grid-cols-2 gap-3">
+          <Card elevation="resting" bodyClassName="p-3 text-center">
+            <div className="mb-2.5 flex h-[100px] items-center justify-center rounded-[var(--radius-md)] bg-[var(--cream)] shadow-inner">
+               <Camera size={24} className="opacity-10" />
             </div>
-            <div className={`${typo.fieldValue}`}>{mockGrowthComparison.then.date}</div>
-            <div className={`mt-0.5 ${typo.caption}`}>{mockGrowthComparison.then.weight}kg • {mockGrowthComparison.then.height}cm</div>
-          </div>
-          <div style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '12px', border: '1px solid var(--sage-light)', textAlign: 'center' }}>
-            <div style={{ height: 100, background: 'var(--sage-light)', borderRadius: 'var(--radius-md)', marginBottom: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-               <Camera size={24} style={{ opacity: 0.1 }} />
+            <div className={typo.fieldValue}>{mockGrowthComparison.then.date}</div>
+            <div className={`${typo.caption} mt-0.5`}>{mockGrowthComparison.then.weight}kg • {mockGrowthComparison.then.height}cm</div>
+          </Card>
+          <Card elevation="elevated" bodyClassName="p-3 text-center border-2 border-[var(--sage-light)] overflow-hidden">
+            <div className="mb-2.5 flex h-[100px] items-center justify-center rounded-[var(--radius-md)] bg-[var(--sage-light)] shadow-inner">
+               <Camera size={24} className="opacity-10" />
             </div>
-            <div className={`${typo.fieldValue}`}>{mockGrowthComparison.now.date}</div>
-            <div className={`mt-0.5 ${typo.caption}`}>{mockGrowthComparison.now.weight}kg • {mockGrowthComparison.now.height}cm</div>
-          </div>
+            <div className={typo.fieldValue}>{mockGrowthComparison.now.date}</div>
+            <div className={`${typo.caption} mt-0.5`}>{mockGrowthComparison.now.weight}kg • {mockGrowthComparison.now.height}cm</div>
+          </Card>
         </div>
-      </div>
+      </motion.div>
 
       {/* Legacy Letters */}
-      <div style={{ marginBottom: 30 }}>
-        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
-          <Mail size={18} color="var(--sky-blue)" /> Letters to Future You
+      <motion.div variants={tabViewVariants.item} className="mb-8">
+        <h3 className={`${typo.heading} mb-3 flex items-center gap-2`}>
+          <Mail size={18} className="text-[var(--sky-blue)]" /> Letters to Future You
         </h3>
-        <div style={{ background: 'white', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--sky-blue-light)', padding: '16px' }}>
-          {mockLegacyLetters.map((letter: any) => (
-            <div key={letter.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <div>
-                <div className={typo.fieldValue}>To {letter.to}</div>
-                <div className={`mt-0.5 ${typo.caption}`}>
-                  Unlocks on {new Date(letter.unlockDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+        <Card elevation="featured" bodyClassName="p-5">
+          <div className="flex flex-col gap-4">
+            {mockLegacyLetters.map((letter: any) => (
+              <div key={letter.id} className="flex items-center justify-between border-b border-dashed border-[var(--cream-dark)] pb-3 last:border-none last:pb-0">
+                <div>
+                  <div className={typo.fieldValue}>To {letter.to}</div>
+                  <div className={`${typo.caption} mt-0.5`}>
+                    Unlocks on {new Date(letter.unlockDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </div>
                 </div>
+                <div className="text-[var(--sky-blue)] opacity-40"><Lock size={20} /></div>
               </div>
-              <div style={{ color: 'var(--sky-blue)', opacity: 0.4 }}><Lock size={20} /></div>
-            </div>
-          ))}
+            ))}
+          </div>
           <button 
             type="button"
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border-none bg-[var(--sky-blue-light)] py-3 text-sm font-semibold text-[var(--sky-blue-dark)]"
+            className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--radius-md)] border-none bg-gradient-to-r from-[var(--sky-blue-light)] to-[var(--sky-blue)] py-3.5 text-sm font-bold text-white transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
             onClick={() => showToast('Your letter has been safely stored for the future.', 'success')}
-            style={{ cursor: 'pointer' }}
           >
             <Plus size={16} /> Write a New Letter
           </button>
-        </div>
-      </div>
+        </Card>
+      </motion.div>
       </TabContent>
     </div>
   );

@@ -33,11 +33,10 @@ export default function TabStrip({ activeTab, onChange }: TabStripProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div className="relative">
       <div 
         ref={scrollContainerRef}
-        style={{ scrollbarWidth: 'none' }}
-        className="hide-scrollbar flex gap-2 overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--cream-dark)] bg-[var(--bg-card)] p-1.5 lg:grid lg:grid-cols-5 lg:gap-2 lg:overflow-x-visible xl:grid-cols-9"
+        className="hide-scrollbar flex gap-2 overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--cream-dark)] bg-[var(--bg-card)] p-1.5 transition-all duration-300 lg:grid lg:grid-cols-5 lg:gap-2 lg:overflow-x-visible xl:grid-cols-9"
       >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;

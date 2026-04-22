@@ -3,17 +3,15 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Users, Heart, Award, History, 
-  MessageCircle, ArrowRight, Star, 
-  MessageSquareHeart, Smile
+  ArrowRight, MessageSquareHeart, Smile
 } from 'lucide-react';
-import Badge from '../ui/Badge';
 import { useToast } from '../ui/ToastContext';
 import { 
   mockConnections, mockBadges, mockGratitude, mockCommunityTimeline 
 } from '@/lib/data';
 import { typo } from '@/lib/typography';
 import Card from '@/components/ui/Card';
-import TabContent from '@/components/ui/TabContent';
+import TabContent, { tabViewVariants } from '@/components/ui/TabContent';
 import SectionHero from '@/components/ui/SectionHero';
 
 export default function Community() {
@@ -28,46 +26,39 @@ export default function Community() {
       <TabContent>
 
       {/* Hero Header */}
-      <SectionHero
-        icon={<Users size={32} />}
-        title="My Support Circle"
-        subtitle="You haven't helped just 1 child grow, you've helped 154 mums too. 🌸"
-        accentColor="var(--blush)"
-      />
+      <motion.div variants={tabViewVariants.item}>
+        <SectionHero
+          icon={<Users size={32} />}
+          title="My Support Circle"
+          subtitle="You haven't helped just 1 child grow, you've helped 154 mums too. 🌸"
+          accentColor="var(--blush)"
+        />
+      </motion.div>
 
       {/* Connection Grid */}
-      <div style={{ marginBottom: 24 }}>
-        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
-          <Heart size={18} color="var(--terracotta)" /> Trusted Connections
+      <motion.div variants={tabViewVariants.item} className="mb-8">
+        <h3 className={`${typo.heading} mb-3 flex items-center gap-2`}>
+          <Heart size={18} className="text-[var(--terracotta)]" /> Trusted Connections
         </h3>
-        <div className="hide-scrollbar flex gap-4 overflow-x-auto pb-4" style={{ scrollSnapType: 'x mandatory' }}>
-          {mockConnections.map((conn: any, i: number) => (
+        <div className="hide-scrollbar flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+          {mockConnections.map((conn: any) => (
             <motion.div
               key={conn.id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05, ease: 'easeOut' }}
               whileTap={{ scale: 0.98 }}
-              className="min-w-[140px] transition-all duration-150 hover:-translate-y-1"
-              style={{ scrollSnapAlign: 'start' }}
+              className="min-w-[140px] snap-start transition-all duration-150 hover:-translate-y-1"
             >
               <Card 
+                elevation="resting"
                 bodyClassName="px-3 py-4 flex flex-col items-center text-center"
               >
-                <div style={{ 
-                  width: 48, height: 48, borderRadius: 'var(--radius-full)', 
-                  background: 'var(--cream)', marginBottom: 10,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 20
-                }}>
-                  {conn.avatar ? <img src={conn.avatar} alt={conn.name} className="h-full w-full rounded-full object-cover" /> : '👤'}
+                <div className="mb-2.5 flex h-12 w-12 items-center justify-center rounded-[var(--radius-full)] bg-[var(--cream)] text-xl shadow-inner overflow-hidden">
+                  {conn.avatar ? <img src={conn.avatar} alt={conn.name} className="h-full w-full object-cover" /> : '👤'}
                 </div>
                 <div className={typo.fieldValue}>{conn.name}</div>
                 <div className={`mb-3 ${typo.caption}`}>{conn.role}</div>
                 <button 
                   onClick={() => sendHug(conn.name)}
                   className="w-full cursor-pointer rounded-[var(--radius-sm)] border-none bg-[var(--blush-light)] py-1.5 text-xs font-bold text-[var(--terracotta)] transition-all duration-150 hover:bg-[var(--blush)] hover:text-white active:scale-[0.98]"
-                  style={{ fontFamily: 'inherit' }}
                 >
                   <Heart size={12} className="mr-1 inline-block" fill="currentColor" /> Send Hug
                 </button>
@@ -75,92 +66,74 @@ export default function Community() {
             </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Gratitude Board */}
-      <div style={{ marginBottom: 24 }}>
-        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
-          <MessageSquareHeart size={18} color="var(--mauve)" /> Gratitude Board
+      <motion.div variants={tabViewVariants.item} className="mb-8">
+        <h3 className={`${typo.heading} mb-3 flex items-center gap-2`}>
+          <MessageSquareHeart size={18} className="text-[var(--mauve)]" /> Gratitude Board
         </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {mockGratitude.map((msg: any, i: number) => (
-            <motion.div key={msg.id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05, ease: 'easeOut' }}
-              style={{
-              background: 'white', borderRadius: 'var(--radius-lg)', padding: '16px',
-              border: '1px dashed var(--mauve-light)', position: 'relative'
-            }}>
-              <p className={`italic ${typo.body}`}>
-                {msg.text}
-              </p>
-              <div className="mt-3 flex items-center justify-between">
-                <span className={`font-semibold text-[var(--mauve-dark)] ${typo.caption}`}>— {msg.from}</span>
-                <span className={typo.caption}>{msg.date}</span>
-              </div>
-            </motion.div>
+        <div className="flex flex-col gap-3">
+          {mockGratitude.map((msg: any) => (
+            <div key={msg.id}>
+              <Card elevation="featured" bodyClassName="p-4 bg-gradient-to-br from-white to-[var(--bg-card-hover)]">
+                <p className={`italic ${typo.body}`}>
+                  &quot;{msg.text}&quot;
+                </p>
+                <div className="mt-3 flex items-center justify-between">
+                  <span className={`font-semibold text-[var(--mauve-dark)] ${typo.caption}`}>— {msg.from}</span>
+                  <span className={typo.caption}>{msg.date}</span>
+                </div>
+              </Card>
+            </div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Badges */}
-      <div style={{ marginBottom: 24 }}>
-        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
-          <Award size={18} color="var(--sky-blue)" /> Community Badges
+      <motion.div variants={tabViewVariants.item} className="mb-8">
+        <h3 className={`${typo.heading} mb-3 flex items-center gap-2`}>
+          <Award size={18} className="text-[var(--sky-blue)]" /> Community Badges
         </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {mockBadges.map((badge: any, i: number) => (
+        <div className="grid grid-cols-2 gap-2.5">
+          {mockBadges.map((badge: any) => (
             <motion.div
               key={badge.id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05, ease: 'easeOut' }}
-              whileHover={{ scale: 1.02, boxShadow: 'var(--shadow-lg)' }}
               whileTap={{ scale: 0.98 }}
-              style={{
-                background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '16px',
-                textAlign: 'center', border: `1px solid var(--cream-dark)`,
-                boxShadow: 'var(--shadow-md)',
-                transition: 'all 0.15s ease',
-              }}
+              className="h-full"
             >
-              <div style={{ fontSize: 32, marginBottom: 8 }}>{badge.icon}</div>
-              <div className={typo.fieldValue}>{badge.label}</div>
-              <div className={`mt-1 ${typo.caption}`}>{badge.desc}</div>
+              <Card elevation="elevated" bodyClassName="p-4 text-center h-full">
+                <div className="mb-2 text-3xl">{badge.icon}</div>
+                <div className={typo.fieldValue}>{badge.label}</div>
+                <div className={`mt-1 ${typo.caption}`}>{badge.desc}</div>
+              </Card>
             </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Timeline */}
-      <div style={{ marginBottom: 24 }}>
-        <h3 className={`mb-3 flex items-center gap-2 ${typo.heading}`}>
-          <History size={18} color="var(--sage-dark)" /> Your Journey
+      <motion.div variants={tabViewVariants.item} className="mb-8">
+        <h3 className={`${typo.heading} mb-3 flex items-center gap-2`}>
+          <History size={18} className="text-[var(--sage-dark)]" /> Your Journey
         </h3>
-        <div style={{ padding: '4px 0 20px 20px', borderLeft: '2px solid var(--cream-dark)', marginLeft: 10 }}>
+        <div className="ml-2.5 border-l-2 border-[var(--cream-dark)] pb-5 pl-7">
           {mockCommunityTimeline.map((item: any, i: number) => (
-            <div key={i} style={{ position: 'relative', marginBottom: 20 }}>
-              <div style={{ 
-                position: 'absolute', left: -27, top: 4, width: 12, height: 12, 
-                borderRadius: 'var(--radius-full)', background: 'var(--sage)', border: '2px solid white' 
-              }} />
+            <div key={i} className="relative mb-5 last:mb-0">
+              <div className="absolute -left-[35px] top-1 h-3 w-3 rounded-full border-2 border-white bg-[var(--sage)] shadow-sm" />
               <div className={typo.body}>{item.action}</div>
               <div className={`mt-0.5 ${typo.caption}`}>{item.date}</div>
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      {/* 
-        Influence Card 
-        NOTE: Deviates from Card.tsx structure to allow specific left-border gradient styling
-        that Card.tsx doesn't natively support without complex class merging.
-      */}
       <motion.div
-        whileHover={{ scale: 1.02 }}
-        className="rounded-[var(--radius-xl)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--blush)] bg-[var(--bg-card)] p-6 text-center shadow-[var(--shadow-md)]"
+        variants={tabViewVariants.item}
+        whileHover={{ scale: 1.02, boxShadow: 'var(--shadow-lg)' }}
+        className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--cream-dark)] bg-[var(--bg-card)] p-6 text-center shadow-[var(--shadow-md)] transition-all duration-200"
       >
+        <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-[var(--blush)] to-[var(--terracotta)]" />
         <Smile size={48} className="mx-auto mb-3 text-[var(--sky-blue)] opacity-60" />
         <h4 className={typo.pageHeroBold}>Your Wisdom Matters</h4>
         <p className={`mt-2 ${typo.body}`}>
@@ -168,7 +141,7 @@ export default function Community() {
         </p>
         <button
           type="button"
-          className="mt-5 cursor-pointer rounded-full border border-[var(--cream-dark)] bg-[var(--blush-light)] px-6 py-2.5 text-sm font-semibold text-[var(--terracotta)] transition-all duration-150 hover:border-[var(--blush)] hover:bg-[var(--blush)] hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--blush)]"
+          className="mt-5 cursor-pointer rounded-full border border-[var(--cream-dark)] bg-gradient-to-r from-[var(--blush-light)] to-[var(--cream)] px-6 py-2.5 text-sm font-bold text-[var(--terracotta)] transition-all duration-150 hover:from-[var(--blush)] hover:to-[var(--terracotta-light)] hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--blush)] shadow-sm hover:shadow-md"
         >
           Invite a Friend
         </button>

@@ -103,45 +103,50 @@ export default function ProfilePage() {
       }
       navigation={<TabStrip activeTab={activeTab} onChange={setActiveTab} />}
     >
-      <div className="rounded-[var(--radius-lg)] bg-[var(--bg-primary)] p-3 sm:p-4 lg:p-5">
-        <AnimatePresence mode="wait">
-          {isTabLoading ? (
-            <motion.div
-              key={`skeleton-${activeTab}`}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              <TabSkeleton />
-            </motion.div>
-          ) : (
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
-            >
-              {activeTab === 'personal' && (
-                <PersonalInfo
-                  user={user}
-                  onUpdate={setUser}
-                  initialEditMode={isEditRequested}
-                  onEditConsumed={() => setIsEditRequested(false)}
-                />
-              )}
-              {activeTab === 'posts' && <MyPosts posts={mockPosts} />}
-              {activeTab === 'tips' && <MyTips tips={mockTips} />}
-              {activeTab === 'children' && <MyChildren childrenList={mockChildren} />}
-              {activeTab === 'vault' && <SafeVault documents={mockDocuments} />}
-              {activeTab === 'privacy' && <PrivacySafety />}
-              {activeTab === 'community' && <Community />}
-              {activeTab === 'wellbeing' && <Wellbeing />}
-              {activeTab === 'journey' && <Journey />}
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <div className="relative">
+        {/* Ambient Glow behind tab content */}
+        <div className="absolute -inset-4 z-0 bg-radial-gradient from-[rgba(248,200,220,0.15)] via-transparent to-transparent opacity-60" />
+        
+        <div className="relative z-10 rounded-[var(--radius-lg)] bg-[var(--bg-card)] p-3 shadow-[var(--shadow-sm)] border border-[var(--cream-dark)] sm:p-4 lg:p-5">
+          <AnimatePresence mode="wait">
+            {isTabLoading ? (
+              <motion.div
+                key={`skeleton-${activeTab}`}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] as any }}
+              >
+                <TabSkeleton />
+              </motion.div>
+            ) : (
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] as any }}
+              >
+                {activeTab === 'personal' && (
+                  <PersonalInfo
+                    user={user}
+                    onUpdate={setUser}
+                    initialEditMode={isEditRequested}
+                    onEditConsumed={() => setIsEditRequested(false)}
+                  />
+                )}
+                {activeTab === 'posts' && <MyPosts posts={mockPosts} />}
+                {activeTab === 'tips' && <MyTips tips={mockTips} />}
+                {activeTab === 'children' && <MyChildren childrenList={mockChildren} />}
+                {activeTab === 'vault' && <SafeVault documents={mockDocuments} />}
+                {activeTab === 'privacy' && <PrivacySafety />}
+                {activeTab === 'community' && <Community />}
+                {activeTab === 'wellbeing' && <Wellbeing />}
+                {activeTab === 'journey' && <Journey />}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
       <BackToTop />
     </ProfileShell>

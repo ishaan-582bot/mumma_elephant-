@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Edit3, ShieldCheck, Briefcase, Camera, Image as ImageIcon, Lightbulb, Baby, MapPin, User } from 'lucide-react';
+import { Edit3, ShieldCheck, Briefcase, Camera, Image as ImageIcon, Lightbulb, Baby, MapPin, User, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Badge from './ui/Badge';
 import { useToast } from './ui/ToastContext';
@@ -160,11 +160,22 @@ export default function ProfileHeader({ user, onEdit, onNavigate, onAvatarChange
           ].map((stat) => (
             <motion.div
               key={stat.label}
-              whileHover={onNavigate ? { y: -4, boxShadow: 'var(--shadow-md)' } : {}}
+              whileHover={onNavigate ? { 
+                y: -6, 
+                boxShadow: 'var(--shadow-lg)',
+                borderColor: 'var(--blush)',
+              } : {}}
               onClick={() => onNavigate && onNavigate(stat.tab)}
-              className="rounded-[var(--radius-md)] border border-[var(--cream-dark)] bg-[var(--bg-card)] px-2 py-2.5 text-center shadow-[var(--shadow-sm)] transition-all duration-150"
+              className="group relative overflow-hidden rounded-[var(--radius-md)] border border-[var(--cream-dark)] bg-[var(--bg-card)] px-2 py-3 text-center shadow-[var(--shadow-sm)] transition-all duration-200"
               style={{ cursor: onNavigate ? 'pointer' : 'default' }}
             >
+              {/* Subtle hover gradient through-line */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 1 }}
+                className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-[var(--blush)] to-[var(--terracotta)]"
+              />
+              
               <div className="text-2xl font-bold text-[var(--blush-dark)]">
                 {stat.count}
               </div>
@@ -172,34 +183,50 @@ export default function ProfileHeader({ user, onEdit, onNavigate, onAvatarChange
                 {stat.icon}
                 <span>{stat.label}</span>
               </div>
+
+              {/* Discovery Chevron */}
+              {onNavigate && (
+                <motion.div 
+                  initial={{ opacity: 0, x: -4 }}
+                  whileHover={{ opacity: 0.4, x: 0 }}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 text-[var(--blush-dark)]"
+                >
+                  <ArrowRight size={10} />
+                </motion.div>
+              )}
             </motion.div>
           ))}
         </div>
 
-        <motion.div
-          animate={{ boxShadow: pulse ? '0 0 15px 2px var(--sage)' : '0 1px 2px 0 rgba(0,0,0,0.05)' }}
-          transition={{ duration: pulse ? 0.3 : 0.8 }}
-          style={{ borderRadius: 'var(--radius-lg)' }}
-          className="w-full"
-        >
-          <Card
-            className="w-full bg-white/70"
-            bodyClassName="px-4 py-3"
+        <div className="relative w-full">
+          {/* Ambient Glow behind profile completion */}
+          <div className="absolute -inset-2 z-0 bg-radial-gradient from-[rgba(248,200,220,0.2)] via-transparent to-transparent opacity-50" />
+          
+          <motion.div
+            animate={{ boxShadow: pulse ? '0 0 15px 2px var(--sage)' : '0 1px 2px 0 rgba(0,0,0,0.05)' }}
+            transition={{ duration: pulse ? 0.3 : 0.8 }}
+            style={{ borderRadius: 'var(--radius-lg)' }}
+            className="relative z-10 w-full"
           >
-            <div className={`flex items-center justify-between ${typo.subheading}`}>
-            <span>Profile complete</span>
-            <span className="font-semibold text-[var(--blush-dark)]">{user.profileCompletion}%</span>
-          </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-[var(--radius-full)] bg-[var(--cream-dark)]">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${user.profileCompletion}%` }}
-              transition={{ duration: 0.6 }}
-              className="h-full rounded-[var(--radius-full)] bg-[linear-gradient(90deg,var(--blush),var(--terracotta))]"
-            />
-          </div>
-        </Card>
-        </motion.div>
+            <Card
+              className="w-full bg-white/70 backdrop-blur-[2px]"
+              bodyClassName="px-4 py-3"
+            >
+              <div className={`flex items-center justify-between ${typo.subheading}`}>
+                <span>Profile complete</span>
+                <span className="font-semibold text-[var(--blush-dark)]">{user.profileCompletion}%</span>
+              </div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-[var(--radius-full)] bg-[var(--cream-dark)]">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${user.profileCompletion}%` }}
+                  transition={{ duration: 0.6 }}
+                  className="h-full rounded-[var(--radius-full)] bg-[linear-gradient(90deg,var(--blush),var(--terracotta))]"
+                />
+              </div>
+            </Card>
+          </motion.div>
+        </div>
       </div>
     </motion.section>
   );

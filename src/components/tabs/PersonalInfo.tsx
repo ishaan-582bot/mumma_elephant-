@@ -13,7 +13,7 @@ import { inputClassName } from '@/lib/utils';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import FormField from '../ui/FormField';
-import TabContent from '../ui/TabContent';
+import TabContent, { tabViewVariants } from '../ui/TabContent';
 import { typo } from '@/lib/typography';
 import FieldLabel from '@/components/ui/FieldLabel';
 
@@ -126,57 +126,56 @@ export default function PersonalInfo({
     'Trying to Conceive', 'Pregnant', 'New Mum', 'Toddler Mum', 'Experienced Mum'
   ];
 
-  // inputClassName is imported from @/lib/utils
-
   return (
     <div className="fade-in-up">
       <TabContent maxWidth="max-w-3xl">
       <div className="lg:max-w-2xl">
 
       {/* Progress Bar */}
-      <Card className="mb-5" bodyClassName="px-5 py-4">
-        <div className="mb-2.5 flex items-center justify-between">
-          <span className={typo.subheading}>
-            Your profile is {user.profileCompletion}% complete 🌸
-          </span>
-          <span className="text-xs font-semibold text-[var(--blush-dark)]">
-            {user.profileCompletion}%
-          </span>
-        </div>
-        <div className="h-2 overflow-hidden rounded-[var(--radius-full)] bg-[var(--cream-dark)]">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ 
-              width: `${user.profileCompletion}%`,
-              background: isFlashing 
-                ? ['linear-gradient(90deg,var(--blush),var(--blush-dark))', 'var(--sage)', 'linear-gradient(90deg,var(--blush),var(--blush-dark))']
-                : 'linear-gradient(90deg,var(--blush),var(--blush-dark))'
-            }}
-            transition={{ duration: isFlashing ? 0.6 : 1, ease: 'easeOut' }}
-            className="h-full rounded-[var(--radius-full)]"
-          />
-        </div>
-        
-        {/* Floating Popup Badge */}
-        <div className="relative">
-          <AnimatePresence>
-            {completionDiff && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                animate={{ opacity: 1, y: -20, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.4 }}
-                className="absolute right-0 top-0 mt-[-24px] rounded-[var(--radius-md)] bg-[var(--sage)] px-2 py-1 text-xs font-bold text-white shadow-[var(--shadow-sm)]"
-              >
-                +{completionDiff}%
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </Card>
+      <motion.div variants={tabViewVariants.item}>
+        <Card className="mb-5" bodyClassName="px-5 py-4">
+          <div className="mb-2.5 flex items-center justify-between">
+            <span className={typo.subheading}>
+              Your profile is {user.profileCompletion}% complete 🌸
+            </span>
+            <span className="text-xs font-semibold text-[var(--blush-dark)]">
+              {user.profileCompletion}%
+            </span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-[var(--radius-full)] bg-[var(--cream-dark)]">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ 
+                width: `${user.profileCompletion}%`,
+                background: isFlashing 
+                  ? ['linear-gradient(90deg,var(--blush),var(--blush-dark))', 'var(--sage)', 'linear-gradient(90deg,var(--blush),var(--blush-dark))']
+                  : 'linear-gradient(90deg,var(--blush),var(--blush-dark))'
+              }}
+              transition={{ duration: isFlashing ? 0.6 : 1, ease: 'easeOut' }}
+              className="h-full rounded-[var(--radius-full)]"
+            />
+          </div>
+          
+          <div className="relative">
+            <AnimatePresence>
+              {completionDiff && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                  animate={{ opacity: 1, y: -20, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.4 }}
+                  className="absolute right-0 top-0 mt-[-24px] rounded-[var(--radius-md)] bg-[var(--sage)] px-2 py-1 text-xs font-bold text-white shadow-[var(--shadow-sm)]"
+                >
+                  +{completionDiff}%
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </Card>
+      </motion.div>
 
       {/* Edit toggles */}
-      <div className="mb-3 flex justify-end">
+      <motion.div variants={tabViewVariants.item} className="mb-3 flex justify-end">
         {editing ? (
           <div className="flex gap-2">
             <Button
@@ -203,48 +202,46 @@ export default function PersonalInfo({
             Edit Info
           </Button>
         )}
-      </div>
+      </motion.div>
 
       {/* Motherhood Stage */}
-      <Card className="mb-3">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--blush-light)] text-[var(--blush-dark)]">
-            <Clock size={18} />
+      <motion.div variants={tabViewVariants.item} className="mb-3">
+        <Card>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 w-full">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--blush-light)] text-[var(--blush-dark)]">
+                <Clock size={18} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <FieldLabel>Motherhood Stage</FieldLabel>
+                {editing ? (
+                  <>
+                    <select
+                      value={editData.motherhoodStage}
+                      onChange={(e) => setEditData({ ...editData, motherhoodStage: e.target.value as UserProfile['motherhoodStage'] })}
+                      className={`${inputClassName} mt-1.5`}
+                    >
+                      {stages.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    <p className={`mt-2 italic ${typo.caption}`}>
+                      This helps us personalize content and connect you with mums at similar stages
+                    </p>
+                  </>
+                ) : (
+                  <div className="mt-1">
+                    <Badge label={`${user.motherhoodStage} · ${user.motherhoodMonths} months`} variant="blush" />
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-          <div className="min-w-0">
-            <FieldLabel>Motherhood Stage</FieldLabel>
-            {editing ? (
-              <>
-                <select
-                  value={editData.motherhoodStage}
-                  onChange={(e) => setEditData({ ...editData, motherhoodStage: e.target.value as UserProfile['motherhoodStage'] })}
-                  className={`${inputClassName} mt-1.5`}
-                >
-                  {stages.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-                <p className={`mt-2 italic ${typo.caption}`}>
-                  This helps us personalize content and connect you with mums at similar stages
-                </p>
-              </>
-            ) : (
-              <Badge label={`${user.motherhoodStage} · ${user.motherhoodMonths} months`} variant="blush" />
-            )}
-          </div>
-        </div>
-      </div>
-      </Card>
+        </Card>
+      </motion.div>
 
       {/* Fields */}
-      <AnimatePresence mode="wait">
-        {fields.map((field, i) => (
-          <motion.div
-            key={field.key}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="mb-2"
-          >
+      <motion.div variants={tabViewVariants.item} className="flex flex-col gap-2">
+        {fields.map((field) => (
+          <div key={field.key}>
             <Card
               density="compact"
               className="shadow-[var(--shadow-sm)] transition-shadow duration-200 hover:shadow-[var(--shadow-md)]"
@@ -288,38 +285,42 @@ export default function PersonalInfo({
                 </div>
               </div>
             </Card>
-          </motion.div>
+          </div>
         ))}
-      </AnimatePresence>
+      </motion.div>
 
       {/* Verification Status */}
-      <Card className="mt-3" bodyClassName="px-5 py-4">
-        <div className="flex items-center gap-3">
-        <div
-          className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)]"
-          style={{
-            background: user.verificationStatus === 'Verified' ? '#D4E8D0' : 'var(--cream-dark)',
-            color: user.verificationStatus === 'Verified' ? '#2A6B2A' : 'var(--text-muted)',
-          }}
-        >
-          {user.verificationStatus === 'Verified' ? <ShieldCheck size={18} /> : <AlertCircle size={18} />}
-        </div>
-        <div>
-          <FieldLabel>ID Verification</FieldLabel>
-          <Badge
-            label={
-              user.verificationStatus === 'Verified' ? 'Verified ✓' :
-              user.verificationStatus === 'Pending' ? 'Pending ⏳' : 'Not Submitted'
-            }
-            variant={
-              user.verificationStatus === 'Verified' ? 'success' :
-              user.verificationStatus === 'Pending' ? 'warning' : 'cream'
-            }
-            size="sm"
-          />
-        </div>
-      </div>
-      </Card>
+      <motion.div variants={tabViewVariants.item} className="mt-3">
+        <Card bodyClassName="px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div
+              className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-sm)]"
+              style={{
+                background: user.verificationStatus === 'Verified' ? '#D4E8D0' : 'var(--cream-dark)',
+                color: user.verificationStatus === 'Verified' ? '#2A6B2A' : 'var(--text-muted)',
+              }}
+            >
+              {user.verificationStatus === 'Verified' ? <ShieldCheck size={18} /> : <AlertCircle size={18} />}
+            </div>
+            <div>
+              <FieldLabel>ID Verification</FieldLabel>
+              <div className="mt-1">
+                <Badge
+                  label={
+                    user.verificationStatus === 'Verified' ? 'Verified ✓' :
+                    user.verificationStatus === 'Pending' ? 'Pending ⏳' : 'Not Submitted'
+                  }
+                  variant={
+                    user.verificationStatus === 'Verified' ? 'success' :
+                    user.verificationStatus === 'Pending' ? 'warning' : 'cream'
+                  }
+                  size="sm"
+                />
+              </div>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
       </div>
       </TabContent>
     </div>

@@ -2,17 +2,17 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Heart, Phone, Moon, Sun, 
-  Smile, Frown, Meh, Zap, 
+  Heart, Phone, Zap, 
   ShieldCheck, ArrowRight, CheckCircle2,
   AlertCircle, Sparkles
 } from 'lucide-react';
-import Badge from '../ui/Badge';
+import Button from '../ui/Button';
 import { useToast } from '../ui/ToastContext';
-import TabContent from '../ui/TabContent';
+import TabContent, { tabViewVariants } from '../ui/TabContent';
 import SectionHero from '../ui/SectionHero';
-import { mockMoods, mockSelfCare } from '@/lib/data';
+import { mockSelfCare } from '@/lib/data';
 import { typo } from '@/lib/typography';
+import Card from '@/components/ui/Card';
 
 export default function Wellbeing() {
   const [enabled, setEnabled] = useState(true);
@@ -20,36 +20,31 @@ export default function Wellbeing() {
   const { showToast } = useToast();
 
   const moods = [
-    { emoji: '✨', label: 'Radiant', color: 'var(--sage)' },
-    { emoji: '😊', label: 'Good', color: 'var(--sky-blue)' },
-    { emoji: '😐', label: 'Okay', color: 'var(--cream-dark)' },
-    { emoji: '😔', label: 'Low', color: 'var(--mauve-light)' },
-    { emoji: '🤯', label: 'Overwhelmed', color: 'var(--terracotta-light)' },
+    { emoji: '✨', label: 'Radiant', color: 'var(--sage)', gradient: 'radial-gradient(circle at 30% 30%, var(--sage-light), var(--sage))' },
+    { emoji: '😊', label: 'Good', color: 'var(--sky-blue)', gradient: 'radial-gradient(circle at 30% 30%, var(--sky-blue-light), var(--sky-blue))' },
+    { emoji: '😐', label: 'Okay', color: 'var(--cream-dark)', gradient: 'radial-gradient(circle at 30% 30%, var(--cream), var(--cream-dark))' },
+    { emoji: '😔', label: 'Low', color: 'var(--mauve-light)', gradient: 'radial-gradient(circle at 30% 30%, var(--mauve-light), var(--mauve))' },
+    { emoji: '🤯', label: 'Overwhelmed', color: 'var(--terracotta-light)', gradient: 'radial-gradient(circle at 30% 30%, var(--terracotta-light), var(--terracotta))' },
   ];
 
   if (!enabled) {
     return (
       <div className="fade-in-up">
         <TabContent>
-        <div style={{ textAlign: 'center' }}>
-        <div style={{ width: 64, height: 64, borderRadius: 'var(--radius-full)', background: 'var(--cream)', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-          <ShieldCheck size={32} />
-        </div>
-        <h2 className={typo.pageHeroBold}>Wellbeing Suite is Private</h2>
-        <p className={`mx-auto mt-2 max-w-xs ${typo.bodyMuted}`}>
-          Your emotional data is never shared. You can enable this feature to track your mood and access resources.
-        </p>
-        <button 
-          onClick={() => setEnabled(true)}
-          style={{
-            padding: '12px 32px', borderRadius: 'var(--radius-full)',
-            background: 'var(--sage)', color: 'white', fontWeight: 700,
-            border: 'none', cursor: 'pointer', boxShadow: 'var(--shadow-md)'
-          }}
-        >
-          Enable Wellbeing Features
-        </button>
-        </div>
+          <motion.div variants={tabViewVariants.item} className="flex flex-col items-center text-center">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-[var(--radius-full)] bg-[var(--cream)] text-[var(--text-muted)]">
+              <ShieldCheck size={32} />
+            </div>
+            <h2 className={typo.pageHeroBold}>Wellbeing Suite is Private</h2>
+            <p className={`${typo.bodyMuted} mx-auto mt-2 max-w-xs`}>
+              Your emotional data is never shared. You can enable this feature to track your mood and access resources.
+            </p>
+            <div className="mt-6">
+              <Button onClick={() => setEnabled(true)}>
+                Enable Wellbeing Features
+              </Button>
+            </div>
+          </motion.div>
         </TabContent>
       </div>
     );
@@ -60,126 +55,145 @@ export default function Wellbeing() {
       <TabContent>
 
       {/* Header */}
-      <SectionHero
-        icon={<Heart size={32} />}
-        title="Wellbeing Suite"
-        subtitle="How are you, Sarah? This is your private space. Only you can see this."
-        accentColor="var(--terracotta)"
-      />
+      <motion.div variants={tabViewVariants.item}>
+        <SectionHero
+          featured={true}
+          icon={<Heart size={32} />}
+          title="Wellbeing Suite"
+          subtitle="How are you, Sarah? This is your private space. Only you can see this."
+          accentColor="var(--terracotta)"
+        />
+      </motion.div>
 
-      {/* Mood Selector */}
-      <div style={{ 
-        background: 'var(--bg-card)', borderRadius: 'var(--radius-xl)', padding: '24px',
-        border: '1px solid var(--cream-dark)', boxShadow: 'var(--shadow-sm)', marginBottom: 24
-      }}>
-        <p className={`mb-5 text-center ${typo.subheading}`}>
-          How are you feeling right now?
-        </p>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-          {moods.map((m) => (
-            <motion.button
-              key={m.label}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => {
-                setSelectedMood(m.label);
-                showToast(`Checked in as ${m.label}. You're doing great, mum! 🌸`, 'success');
-              }}
-              style={{
-                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                background: selectedMood === m.label ? m.color : 'transparent',
-                border: selectedMood === m.label ? 'none' : '1px solid var(--cream-dark)',
-                borderRadius: 'var(--radius-lg)', padding: '12px 4px', cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <span className="text-2xl">{m.emoji}</span>
-              <span className={`text-xs font-semibold uppercase tracking-wider ${selectedMood === m.label ? 'text-white' : 'text-[var(--text-muted)]'}`}>{m.label}</span>
-            </motion.button>
-          ))}
-        </div>
-      </div>
+      {/* Mood Selector - Refined Mood Orbs */}
+      <motion.div variants={tabViewVariants.item}>
+        <Card elevation="elevated" className="mb-6 overflow-hidden" bodyClassName="p-6">
+          <p className={`${typo.subheading} mb-6 text-center font-semibold text-[var(--text-secondary)]`}>
+            How are you feeling right now?
+          </p>
+          <div className="flex justify-between gap-3">
+            {moods.map((m) => (
+              <div key={m.label} className="flex flex-1 flex-col items-center gap-2.5">
+                <motion.button
+                  whileHover={{ scale: 1.1, translateY: -4 }}
+                  whileTap={{ scale: 0.92 }}
+                  onClick={() => {
+                    setSelectedMood(m.label);
+                    showToast(`Checked in as ${m.label}. You're doing great, mum! 🌸`, 'success');
+                  }}
+                  className={`relative flex h-14 w-14 items-center justify-center rounded-[var(--radius-full)] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--blush)] sm:h-16 sm:w-16 ${
+                    selectedMood === m.label 
+                      ? 'shadow-[0_8px_20px_-4px_rgba(0,0,0,0.2)] ring-4 ring-white' 
+                      : 'border-2 border-[var(--cream-dark)] opacity-70 grayscale-[30%] hover:opacity-100 hover:grayscale-0'
+                  }`}
+                  style={{
+                    background: m.gradient,
+                  }}
+                >
+                  {selectedMood === m.label && (
+                    <motion.div 
+                      layoutId="orb-glow"
+                      className="absolute -inset-2 z-[-1] rounded-full blur-md"
+                      style={{ background: m.color, opacity: 0.4 }}
+                    />
+                  )}
+                  <span className="text-2xl sm:text-3xl">{m.emoji}</span>
+                  {m.label === 'Radiant' && (
+                    <Sparkles size={12} className="absolute -top-1 -right-1 text-yellow-400 animate-pulse" />
+                  )}
+                </motion.button>
+                <span className={`text-[10px] font-bold uppercase tracking-widest transition-colors duration-200 ${selectedMood === m.label ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
+                  {m.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </motion.div>
 
       {/* Insights */}
-      <div className="mb-6 flex gap-4 rounded-[var(--radius-lg)] border border-[var(--cream-dark)] border-l-4 border-l-[var(--sage)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-md)] transition-shadow duration-200 hover:shadow-[var(--shadow-lg)]">
-        <AlertCircle size={24} color="var(--sage)" className="shrink-0" />
-        <div>
-          <h4 className={typo.heading}>Wellbeing Insight</h4>
-          <p className={`mt-1 ${typo.bodyMuted}`}>
-            You&apos;ve reported feeling <strong>Overwhelmed</strong> twice this week. Remember, it&apos;s okay to ask for help. Would you like to check out the sleep group?
-          </p>
-          <button
-            type="button"
-            className="mt-3 flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-sm font-semibold text-[var(--sage-dark)]"
-          >
-            Explore Support Groups <ArrowRight size={14} />
-          </button>
+      <motion.div variants={tabViewVariants.item}>
+        <div className="relative mb-6 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--cream-dark)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-md)] transition-shadow duration-200 hover:shadow-[var(--shadow-lg)]">
+          <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-[var(--sage)] to-[var(--sage-dark)]" />
+          <div className="flex gap-4">
+            <AlertCircle size={24} color="var(--sage)" className="shrink-0" />
+            <div>
+              <h4 className={typo.heading}>Wellbeing Insight</h4>
+              <p className={`mt-1 ${typo.bodyMuted} leading-relaxed`}>
+                You&apos;ve reported feeling <strong>Overwhelmed</strong> twice this week. Remember, it&apos;s okay to ask for help. Would you like to check out the sleep group?
+              </p>
+              <button
+                type="button"
+                className="mt-3 flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-sm font-bold text-[var(--sage-dark)] hover:text-[var(--terracotta)] transition-colors"
+              >
+                Explore Support Groups <ArrowRight size={14} />
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Crisis Support */}
-      <div style={{ 
-        background: 'var(--terracotta-light)', borderRadius: 'var(--radius-lg)', padding: '20px',
-        marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-      }}>
-        <div>
-          <h4 className={`text-lg font-bold text-[var(--terracotta)]`}>Need to talk?</h4>
-          <p className="mt-0.5 text-xs font-medium leading-relaxed text-[var(--terracotta)] opacity-80">
-            Immediate support for postpartum mental health.
-          </p>
+      <motion.div variants={tabViewVariants.item}>
+        <div className="mb-6 flex items-center justify-between overflow-hidden rounded-[var(--radius-lg)] bg-[var(--terracotta-light)] p-5 shadow-sm">
+          <div>
+            <h4 className="text-lg font-bold text-[var(--terracotta)]">Need to talk?</h4>
+            <p className="mt-0.5 text-xs font-semibold leading-relaxed text-[var(--terracotta)] opacity-80">
+              Immediate support for postpartum mental health.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="flex cursor-pointer items-center gap-2 rounded-[var(--radius-md)] border-none bg-[var(--terracotta)] px-4 py-3 text-sm font-bold text-white transition-all shadow-md hover:shadow-lg active:scale-95"
+          >
+            <Phone size={14} /> Talk to Someone
+          </button>
         </div>
-        <button
-          type="button"
-          className="flex items-center gap-2 rounded-full border-none bg-[var(--terracotta)] px-4 py-2.5 text-sm font-semibold text-white"
-          style={{ cursor: 'pointer' }}
-        >
-          <Phone size={14} /> Talk to Someone
-        </button>
-      </div>
+      </motion.div>
 
       {/* Self Care Goals */}
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <motion.div variants={tabViewVariants.item} className="mb-8">
+        <div className="mb-4 flex items-center justify-between px-1">
           <h3 className={`flex items-center gap-2 ${typo.heading}`}>
-            <Sparkles size={18} color="var(--sage)" /> Today&apos;s Self-Care
+            <Sparkles size={18} className="text-[var(--sage)]" /> Today&apos;s Self-Care
           </h3>
-          <span className="text-xs font-semibold text-[var(--sage-dark)]">
-            <Zap size={12} fill="var(--sage)" style={{ display: 'inline', marginRight: 4 }} /> 5 Day Streak!
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--sage-light)] px-3 py-1 text-xs font-bold text-[var(--sage-dark)] shadow-sm">
+            <Zap size={12} className="fill-[var(--sage)]" /> 5 Day Streak!
           </span>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="flex flex-col gap-3">
           {mockSelfCare.map((goal) => (
             <motion.div
               key={goal.id}
               whileTap={{ x: 4 }}
-              style={{
-                background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', padding: '14px 16px',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                border: goal.completed ? '1px solid var(--sage-light)' : '1px solid var(--cream-dark)',
-                opacity: goal.completed ? 0.7 : 1
-              }}
             >
-              <span className={`${typo.body} ${goal.completed ? 'line-through' : ''}`}>{goal.label}</span>
-              {goal.completed ? (
-                <CheckCircle2 size={20} color="var(--sage)" />
-              ) : (
-                <div style={{ width: 20, height: 20, borderRadius: 'var(--radius-full)', border: '2px solid var(--cream-dark)' }} />
-              )}
+              <Card 
+                elevation={goal.completed ? 'resting' : 'elevated'}
+                className={`transition-all duration-300 ${goal.completed ? 'opacity-70' : ''}`}
+                bodyClassName="p-4 flex items-center justify-between"
+              >
+                <span className={`${typo.body} ${goal.completed ? 'line-through text-[var(--text-muted)]' : ''}`}>{goal.label}</span>
+                {goal.completed ? (
+                  <CheckCircle2 size={24} className="text-[var(--sage)]" />
+                ) : (
+                  <div className="h-6 w-6 rounded-full border-2 border-[var(--cream-dark)]" />
+                )}
+              </Card>
             </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Settings Link */}
-      <div style={{ textAlign: 'center', marginTop: 32, padding: '16px', borderTop: '1px dashed var(--cream-dark)' }}>
+      <motion.div variants={tabViewVariants.item} className="mt-8 border-t border-dashed border-[var(--cream-dark)] p-6 text-center">
         <button 
           type="button"
           onClick={() => setEnabled(false)}
-          className={`border-none bg-transparent underline ${typo.caption}`}
-          style={{ cursor: 'pointer' }}
+          className={`${typo.caption} cursor-pointer border-none bg-transparent font-medium text-[var(--text-muted)] underline decoration-[var(--cream-dark)] underline-offset-4 transition-colors hover:text-[var(--terracotta)]`}
         >
           Disable wellbeing check-ins in settings
         </button>
-      </div>
+      </motion.div>
       </TabContent>
     </div>
   );

@@ -1,14 +1,16 @@
 'use client';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Eye, ThumbsUp, ThumbsDown, MoreHorizontal, X, Share2, Trash2, Info } from 'lucide-react';
+import { Plus, Eye, ThumbsUp, ThumbsDown, Share2, Info } from 'lucide-react';
+import Badge from '../ui/Badge';
 import EmptyState from '../ui/EmptyState';
 import BottomSheet from '../ui/BottomSheet';
 import { useToast } from '../ui/ToastContext';
 import HoldToDeleteButton from '../ui/HoldToDeleteButton';
-import TabContent from '../ui/TabContent';
+import TabContent, { tabViewVariants } from '../ui/TabContent';
 import type { Tip, TipTag } from '@/lib/data';
 import { typo } from '@/lib/typography';
+import Button from '../ui/Button';
 
 const TAG_CLASSES: Record<TipTag, string> = {
   'Nutrition': 'tag-nutrition',
@@ -55,56 +57,40 @@ export default function MyTips({ tips }: MyTipsProps) {
     <div className="fade-in-up">
       <TabContent>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <span className={typo.subheading}>
+      <motion.div variants={tabViewVariants.item} className="mb-4 flex items-center justify-between px-1">
+        <span className={`${typo.subheading} font-semibold`}>
           {tips.length} tips shared
         </span>
         <button
           type="button"
-          className="flex items-center gap-1.5 rounded-[var(--radius-md)] border-none bg-[linear-gradient(135deg,var(--blush),var(--blush-dark))] px-4 py-2 text-sm font-semibold text-white"
+          className="group flex cursor-pointer items-center gap-1.5 rounded-[var(--radius-md)] border-none bg-[linear-gradient(135deg,var(--blush),var(--blush-dark))] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:shadow-md active:scale-95"
           onClick={() => setShowNewTip(true)}
-          style={{ cursor: 'pointer', fontFamily: 'inherit' }}
         >
-          <Plus size={16} /> New Tip
+          <Plus size={16} className="transition-transform group-hover:rotate-90" /> New Tip
         </button>
-      </div>
+      </motion.div>
 
       {/* Tip Cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {tips.map((tip, i) => (
+      <motion.div variants={tabViewVariants.item} className="flex flex-col gap-3">
+        {tips.map((tip) => (
           <motion.div
             key={tip.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06 }}
+            whileHover={{ y: -4, boxShadow: 'var(--shadow-lg)' }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setExpandedTip(tip)}
-            style={{
-              background: 'var(--bg-card)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '20px',
-              boxShadow: 'var(--shadow-md)',
-              cursor: 'pointer',
-              transition: 'box-shadow 0.2s ease',
-            }}
-            onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
-            onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+            className="cursor-pointer rounded-[var(--radius-lg)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-md)] transition-all duration-300"
           >
             {/* Text excerpt */}
-            <p
-              className={`mb-3 line-clamp-3 ${typo.body}`}
-            >
-              {tip.text}
+            <p className={`mb-4 line-clamp-3 ${typo.body} italic leading-relaxed`}>
+              &quot;{tip.text}&quot;
             </p>
 
             {/* Tags */}
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+            <div className="mb-4 flex flex-wrap gap-2">
               {tip.tags.map((tag) => (
                 <span
                   key={tag}
-                  className={`${TAG_CLASSES[tag]} px-2.5 py-0.5 text-xs font-semibold`}
-                  style={{
-                    borderRadius: 'var(--radius-full)',
-                  }}
+                  className={`${TAG_CLASSES[tag]} rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider`}
                 >
                   {tag}
                 </span>
@@ -112,111 +98,85 @@ export default function MyTips({ tips }: MyTipsProps) {
             </div>
 
             {/* Relevance bar */}
-            <div
-              style={{
-                marginBottom: 10,
-                padding: '8px 10px',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-card)',
-                boxShadow: 'var(--shadow-sm)',
-                transition: 'box-shadow 0.2s ease',
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.boxShadow = 'var(--shadow-sm)'; }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                <span className={`${typo.caption} font-semibold text-[var(--text-secondary)]`}>
-                  {tip.helpfulPercent > 0 ? `${tip.helpfulPercent}% found this helpful` : 'Be the first to rate this'}
+            <div className="mb-4 rounded-[var(--radius-md)] border border-[var(--cream-dark)] bg-[var(--bg-primary)] p-3 shadow-inner">
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className={`${typo.caption} font-bold text-[var(--text-secondary)]`}>
+                  {tip.helpfulPercent > 0 ? `${tip.helpfulPercent}% helpful` : 'New Tip'}
                 </span>
-                <span className={typo.caption}>
+                <span className={`${typo.caption} font-semibold`}>
                   👍 {tip.upvotes} · 👎 {tip.downvotes}
                 </span>
               </div>
-              <div style={{
-                height: 5,
-                background: 'var(--cream-dark)',
-                borderRadius: 'var(--radius-full)',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  height: '100%',
-                  width: `${tip.helpfulPercent}%`,
-                  background: 'linear-gradient(90deg, var(--sage), var(--sage-dark))',
-                  borderRadius: 'var(--radius-full)',
-                  transition: 'width 0.5s ease',
-                }} />
+              <div className="h-1.5 overflow-hidden rounded-full bg-[var(--cream-dark)]">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${tip.helpfulPercent}%` }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
+                  className="h-full rounded-full bg-[linear-gradient(90deg,var(--sage),var(--sage-dark))]"
+                />
               </div>
             </div>
 
             {/* Footer */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span className={typo.caption}>{tip.date}</span>
-              <span className={`flex items-center gap-1 ${typo.caption}`}>
-                <Eye size={12} /> {tip.views} views
+            <div className="flex items-center justify-between border-t border-dashed border-[var(--cream-dark)] pt-3">
+              <span className={`italic ${typo.caption}`}>{tip.date}</span>
+              <span className={`flex items-center gap-1 font-semibold ${typo.caption}`}>
+                <Eye size={12} className="text-[var(--mauve)]" /> {tip.views} views
               </span>
             </div>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Expanded Tip Sheet */}
       <BottomSheet
         isOpen={expandedTip !== null}
         onClose={() => setExpandedTip(null)}
-        title="Tip Details"
+        title="Your Wisdom"
       >
         {expandedTip && (
-          <div>
-            <p className={`mb-4 ${typo.body}`}>
-              {expandedTip.text}
+          <div className="flex flex-col gap-4">
+            <p className={`${typo.body} italic leading-relaxed text-[var(--text-primary)]/90`}>
+              &quot;{expandedTip.text}&quot;
             </p>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
+            
+            <div className="flex flex-wrap gap-2">
               {expandedTip.tags.map((tag) => (
-                <span key={tag} className={`${TAG_CLASSES[tag]} px-3 py-1 text-xs font-semibold`} style={{
-                  borderRadius: 'var(--radius-full)',
-                }}>
+                <span key={tag} className={`${TAG_CLASSES[tag]} rounded-full px-3.5 py-1 text-[10px] font-bold uppercase tracking-wider`}>
                   {tag}
                 </span>
               ))}
             </div>
 
-            {/* Full relevance */}
-            <div style={{
-              background: 'var(--cream)',
-              borderRadius: 'var(--radius-md)',
-              padding: '14px 16px',
-              marginBottom: 16,
-            }}>
-              <div className={`mb-2 ${typo.subheading}`}>
-                Helpfulness
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--sage-dark)' }}>
-                  <ThumbsUp size={16} /> <span style={{ fontWeight: 700 }}>{expandedTip.upvotes}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--terracotta)' }}>
-                  <ThumbsDown size={16} /> <span style={{ fontWeight: 700 }}>{expandedTip.downvotes}</span>
-                </div>
-                <span className={`ml-auto ${typo.subheading}`}>
-                  {expandedTip.helpfulPercent}% helpful
-                </span>
-              </div>
+            {/* Helpfulness Metrics */}
+            <div className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--cream-dark)] bg-[var(--cream)] p-4 shadow-inner">
+               <h4 className={`font-bold ${typo.subheading}`}>Community Sentiment</h4>
+               <div className="flex items-center gap-6">
+                 <div className="flex items-center gap-1.5 text-[var(--sage-dark)]">
+                   <ThumbsUp size={18} strokeWidth={2.5} />
+                   <span className="text-sm font-extrabold">{expandedTip.upvotes}</span>
+                 </div>
+                 <div className="flex items-center gap-1.5 text-[var(--terracotta)]">
+                   <ThumbsDown size={18} strokeWidth={2.5} />
+                   <span className="text-sm font-extrabold">{expandedTip.downvotes}</span>
+                 </div>
+                 <Badge label={`${expandedTip.helpfulPercent}% Positive`} variant="sage" size="sm" className="ml-auto" />
+               </div>
             </div>
 
-            {/* CTAs */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-              <button type="button" className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius-md)] border-none bg-[var(--sage-light)] py-3 text-sm font-semibold text-[#4A6B3A]" style={{ fontFamily: 'inherit' }}>
-                <ThumbsUp size={16} /> Helpful
-              </button>
-              <button type="button" className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-[var(--radius-md)] border-none bg-[var(--cream-dark)] py-3 text-sm font-semibold text-[var(--text-secondary)]" style={{ fontFamily: 'inherit' }}
-              >
-                <Share2 size={16} /> Share
-              </button>
+            {/* Actions */}
+            <div className="grid grid-cols-2 gap-3">
+              <Button variant="secondary" className="bg-[var(--sage-light)] text-[var(--sage-dark)] border-none">
+                <ThumbsUp size={18} /> Helpful
+              </Button>
+              <Button variant="secondary" className="bg-[var(--cream-dark)] text-[var(--text-secondary)] border-none">
+                <Share2 size={18} /> Share
+              </Button>
             </div>
 
-            <div style={{ borderTop: '1px solid var(--cream-dark)', paddingTop: 16 }}>
-              <p className={`mb-3 text-center ${typo.caption}`}>
-                Destructive Action
+            <div className="mt-2 border-t border-dashed border-[var(--cream-dark)] pt-5">
+              <p className={`mb-3 text-center font-bold text-[var(--text-muted)] ${typo.caption} uppercase tracking-widest`}>
+                Manage Entry
               </p>
               <HoldToDeleteButton 
                 onConfirm={() => {
@@ -234,38 +194,31 @@ export default function MyTips({ tips }: MyTipsProps) {
       <BottomSheet
         isOpen={showNewTip}
         onClose={() => { setShowNewTip(false); setNewTipText(''); setNewTipTags([]); }}
-        title="Share a New Tip"
+        title="Share Wisdom"
       >
-        <div>
-          <div style={{ position: 'relative', marginBottom: 16 }}>
+        <div className="flex flex-col gap-5">
+          <div className="relative">
             <textarea
               value={newTipText}
               onChange={(e) => { if (e.target.value.length <= 500) setNewTipText(e.target.value); }}
-              placeholder="Share your wisdom with other mums... 🌸"
-              className="min-h-[120px] w-full resize-y rounded-[var(--radius-md)] border-2 border-[var(--cream-dark)] bg-[var(--cream)] px-3.5 py-3.5 text-sm font-medium leading-relaxed text-[var(--text-primary)] outline-none"
-              style={{ fontFamily: 'inherit' }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--blush)'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--cream-dark)'; }}
+              placeholder="Share what worked for you... 🌸"
+              className="min-h-[160px] w-full resize-none rounded-[var(--radius-lg)] border-2 border-[var(--cream-dark)] bg-[var(--bg-primary)] px-4 py-4 text-sm font-bold leading-relaxed text-[var(--text-primary)] outline-none transition-all focus:border-[var(--blush)] focus:shadow-[var(--shadow-glow-blush)]"
             />
-            <span className={`absolute bottom-2 right-3 text-xs font-semibold ${newTipText.length > 450 ? 'text-[var(--terracotta)]' : 'text-[var(--text-muted)]'}`}
+            <span className={`absolute bottom-3 right-4 text-[10px] font-extrabold tracking-wider ${newTipText.length > 450 ? 'text-[var(--terracotta)]' : 'text-[var(--text-muted)]'}`}
             >
-              {newTipText.length}/500
+              {newTipText.length} / 500
             </span>
           </div>
 
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-              <p className={`${typo.subheading}`}>
-                Tags (up to 3)
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)' }} title="Tags help other mums find your tip when they need it most.">
-                <Info size={14} />
-              </div>
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <h4 className={`font-bold ${typo.subheading}`}>Categorize it (Max 3)</h4>
+              <Info size={14} className="text-[var(--text-muted)]" />
             </div>
-            <p className={`mb-3 ${typo.caption}`}>
-              Tags help other mums find your tip when they need it most. Choose up to 3 that best describe your advice.
+            <p className={`mb-3 italic ${typo.caption} leading-tight`}>
+              Tags help other mums find your advice when they search for specific support areas.
             </p>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <div className="flex flex-wrap gap-2">
               {allTags.map((tag) => {
                 const selected = newTipTags.includes(tag);
                 return (
@@ -273,10 +226,11 @@ export default function MyTips({ tips }: MyTipsProps) {
                     key={tag}
                     type="button"
                     onClick={() => toggleTag(tag)}
-                    className={`cursor-pointer rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all duration-200 ${selected ? TAG_CLASSES[tag] : 'border-2 border-[var(--cream-dark)] bg-transparent text-[var(--text-muted)]'}`}
-                    style={{
-                      fontFamily: 'inherit',
-                    }}
+                    className={`cursor-pointer rounded-full border-2 px-4 py-1.5 text-xs font-bold transition-all duration-200 ${
+                      selected 
+                        ? TAG_CLASSES[tag] + ' border-transparent scale-105 shadow-sm' 
+                        : 'border-[var(--cream-dark)] bg-transparent text-[var(--text-muted)] hover:border-[var(--mauve-light)]'
+                    }`}
                   >
                     {tag}
                   </button>
@@ -285,21 +239,18 @@ export default function MyTips({ tips }: MyTipsProps) {
             </div>
           </div>
 
-          <button
-            type="button"
+          <Button
             disabled={!newTipText.trim()}
-            className="w-full rounded-[var(--radius-md)] border-none py-3.5 text-base font-semibold disabled:cursor-not-allowed"
-            style={{
-              background: newTipText.trim()
-                ? 'linear-gradient(135deg, var(--blush), var(--blush-dark))'
-                : 'var(--cream-dark)',
-              color: newTipText.trim() ? 'white' : 'var(--text-muted)',
-              cursor: newTipText.trim() ? 'pointer' : 'not-allowed',
-              fontFamily: 'inherit',
+            onClick={() => {
+              setShowNewTip(false);
+              showToast('Your tip is live! Mums can now find your wisdom. ✨', 'success');
+              setNewTipText('');
+              setNewTipTags([]);
             }}
+            className="mt-2"
           >
-            Publish Tip 🌸
-          </button>
+            Publish to Community 🌸
+          </Button>
         </div>
       </BottomSheet>
       </TabContent>
