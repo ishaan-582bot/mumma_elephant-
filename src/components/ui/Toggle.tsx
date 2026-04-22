@@ -16,14 +16,15 @@ export default function Toggle({
   activeColor = 'var(--sage)',
 }: ToggleProps) {
   return (
-    <div
+    <motion.div
       onClick={() => onChange(!checked)}
+      className="relative flex h-7 w-12 cursor-pointer items-center rounded-full px-0.5 transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sage)]"
       style={{
-        background: checked ? activeColor : 'var(--cream-dark)',
+        background: checked ? activeColor : 'var(--cream-deep)',
+        boxShadow: checked ? `0 0 12px ${activeColor}40` : 'inset 0 1px 3px rgba(45,33,24,0.08)',
+        justifyContent: checked ? 'flex-end' : 'flex-start',
       }}
-      className={`relative flex h-6 w-11 cursor-pointer items-center rounded-full px-0.5 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sage)] ${
-        checked ? 'justify-end' : 'justify-start'
-      }`}
+      whileTap={{ scale: 0.95 }}
       role="switch"
       aria-checked={checked}
       aria-label={ariaLabel}
@@ -37,9 +38,14 @@ export default function Toggle({
     >
       <motion.div
         layout
-        className="h-5 w-5 rounded-full bg-white shadow-sm"
+        className="h-6 w-6 rounded-full bg-white shadow-sm"
         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+        style={{
+          boxShadow: checked
+            ? `0 1px 4px ${activeColor}60`
+            : '0 1px 3px rgba(45,33,24,0.15)',
+        }}
       />
-    </div>
+    </motion.div>
   );
 }

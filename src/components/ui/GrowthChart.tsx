@@ -38,7 +38,7 @@ export default function GrowthChart({ data, color, unit, label }: GrowthChartPro
     `M ${points.map((p, i) => `${p.x},${p.y + offset + Math.sin(i) * 5}`).join(' L ')}`;
 
   return (
-    <div style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '16px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--cream-dark)' }}>
+    <div style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', padding: '16px', boxShadow: 'var(--shadow-resting)', border: '1px solid var(--border)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <FieldLabel>{label}</FieldLabel>
         <span style={{ fontSize: '0.9rem', fontWeight: 700, color: color }}>{data[data.length - 1].value} {unit}</span>

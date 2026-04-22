@@ -1,29 +1,30 @@
-import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
-import "./globals.css";
+import type { Metadata, Viewport } from 'next';
+import { Nunito } from 'next/font/google';
+import './globals.css';
 
 const nunito = Nunito({
-  variable: "--font-nunito",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-nunito',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "MummaElephant — Your Safe Space",
-  description: "A warm, nurturing maternal support app crafted with love for every stage of motherhood.",
+  title: 'MummaElephant — Safe, Smart, Supportive for Mums',
+  description: 'A safe, supportive space for mums. Track your children, store memories securely, and connect with a community of mums who understand.',
+  appleWebApp: { statusBarStyle: 'black-translucent' },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#FFFBF7',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${nunito.variable} h-full`}>
-      <body
-        className="min-h-full flex flex-col"
-        style={{ fontFamily: "var(--font-nunito), 'Nunito', sans-serif" }}
-      >
+    <html lang="en" className={nunito.variable}>
+      <body className={`${nunito.className} antialiased`}>
         {children}
       </body>
     </html>

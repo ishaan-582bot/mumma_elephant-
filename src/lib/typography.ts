@@ -1,35 +1,45 @@
-/**
- * Six-level typographic scale — Tailwind utilities only (no arbitrary text-[npx]).
- * Weight tiers: 800 displayExtrabold (two call sites only) → 700 bold → 600 semibold → 500 medium.
- */
+/* ═══════════════════════════════════════════
+   Typography Scale — Nunito
+   Warm, approachable, clear hierarchy
+   ═══════════════════════════════════════════ */
+
 export const typo = {
-  /** 800 extrabold — ProfileHeader user name + Wellbeing main prompt only */
-  displayExtrabold: 'text-3xl font-extrabold tracking-tight text-[var(--text-primary)]',
+  /* Display — Profile name, hero moments */
+  displayExtrabold: 'text-2xl lg:text-[28px] font-extrabold tracking-tight text-[var(--text-primary)] leading-tight',
 
-  /** 700 bold — hero page titles (Journey, Community, Privacy, SafeVault lock, Wellbeing disabled) */
-  pageHeroBold: 'text-2xl font-bold tracking-tight text-[var(--text-primary)]',
+  /* Page Hero — Section titles */
+  pageHeroBold: 'text-xl lg:text-[22px] font-bold tracking-tight text-[var(--text-primary)] leading-snug',
 
-  /** 700 bold — card titles, major section headers */
-  heading: 'text-lg font-bold text-[var(--text-primary)]',
+  /* Heading — Card titles, section headers */
+  heading: 'text-[15px] lg:text-[17px] font-bold text-[var(--text-primary)] leading-snug',
 
-  /** 700 bold — profile stat row labels (Posts / Tips / Children) */
-  statLabel: 'text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]',
+  /* Subheading — Labels, secondary headers */
+  subheading: 'text-[13px] lg:text-sm font-semibold text-[var(--text-secondary)] leading-snug',
 
-  /** 600 semibold — section intros, card subtitles */
-  subheading: 'text-sm font-semibold text-[var(--text-secondary)]',
+  /* Body — Content text */
+  body: 'text-sm font-medium text-[var(--text-primary)] leading-relaxed',
 
-  /** 600 semibold — read-only profile field values */
-  fieldValue: 'text-sm font-semibold leading-relaxed text-[var(--text-primary)]',
+  /* Body Muted — Descriptions, secondary content */
+  bodyMuted: 'text-sm font-medium text-[var(--text-muted)] leading-relaxed',
 
-  /** 500 medium — primary body */
-  body: 'text-sm font-medium leading-relaxed text-[var(--text-primary)]',
-  /** 500 medium — secondary body */
-  bodyMuted: 'text-sm font-medium leading-relaxed text-[var(--text-secondary)]',
+  /* Caption — Metadata, hints, dates */
+  caption: 'text-xs font-semibold text-[var(--text-muted)] leading-snug',
 
-  /** 500 medium — timestamps, tertiary metadata */
-  caption: 'text-xs font-medium text-[var(--text-muted)]',
+  /* Stat — Numbers in stat cards */
+  stat: 'text-2xl font-bold leading-none',
 
-  /** Tab strip labels — inactive (600) / active (700); pair with color classes in TabStrip */
-  tabLabel: 'text-sm font-semibold uppercase tracking-wide',
-  tabLabelActive: 'text-sm font-bold uppercase tracking-wide',
+  /* Stat Label — Labels under stat numbers */
+  statLabel: 'text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider',
+
+  /* Field Label — Form field labels */
+  fieldLabel: 'text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wide',
+
+  /* Field Value — Form field values */
+  fieldValue: 'text-sm font-semibold text-[var(--text-primary)] leading-snug',
+
+  /* Tab Label — Inactive tab text */
+  tabLabel: 'text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider',
+
+  /* Tab Label Active — Active tab text */
+  tabLabelActive: 'text-[11px] font-bold text-[var(--blush-deep)] uppercase tracking-wider',
 } as const;

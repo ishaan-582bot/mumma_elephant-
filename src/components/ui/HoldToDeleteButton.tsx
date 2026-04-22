@@ -75,7 +75,7 @@ export default function HoldToDeleteButton({
         width: '100%',
         height: 48,
         borderRadius: 'var(--radius-md)',
-        background: 'var(--cream-dark)',
+        background: 'var(--cream-deep)',
         border: 'none',
         position: 'relative',
         overflow: 'hidden',

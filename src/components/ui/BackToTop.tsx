@@ -1,52 +1,38 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronUp } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 
 export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const toggleVisibility = () => {
-      if (window.scrollY > 300) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
+      setIsVisible(window.scrollY > 400);
     };
-
     window.addEventListener('scroll', toggleVisibility);
     return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.button
-          initial={{ opacity: 0, scale: 0.5, y: 20 }}
+          initial={{ opacity: 0, scale: 0.6, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.5, y: 20 }}
+          exit={{ opacity: 0, scale: 0.6, y: 16 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 28 }}
           onClick={scrollToTop}
           aria-label="Back to top"
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.08, y: -2 }}
           whileTap={{ scale: 0.9 }}
-          /*
-           * z-index layering:
-           * 40 = BackToTop (this button)
-           * 50 = FABs (MyPosts.tsx, SafeVault.tsx upload buttons)
-           * 10000 = Toast notifications
-           * BackToTop sits below FABs so it never obscures primary actions.
-           */
-          className="fixed bottom-6 right-6 z-[40] flex h-11 w-11 cursor-pointer items-center justify-center rounded-[var(--radius-full)] border-none bg-[var(--mauve)] text-white shadow-[var(--shadow-lg)] lg:bottom-8 lg:right-[calc((100vw-min(100vw,1152px))/2+24px)]"
+          className="fixed bottom-6 right-6 z-[40] flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-light)] bg-[var(--surface-glass)] text-[var(--text-secondary)] shadow-[var(--shadow-featured)] backdrop-blur-xl transition-colors hover:bg-white hover:text-[var(--blush-deep)] lg:bottom-8 lg:right-[calc((100vw-min(100vw,1152px))/2+24px)]"
         >
-          <ChevronUp size={24} />
+          <ArrowUp size={20} strokeWidth={2.5} />
         </motion.button>
       )}
     </AnimatePresence>

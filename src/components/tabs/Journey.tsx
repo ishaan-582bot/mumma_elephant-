@@ -1,175 +1,298 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  History, Clock, Camera, Mail, 
-  ArrowRight, Heart, Star, 
-  CalendarDays as CalendarIcon, Sparkles, Plus, Lock,
-  Calendar, Lightbulb, Baby,
-} from 'lucide-react';
-import Badge from '../ui/Badge';
-import { useToast } from '../ui/ToastContext';
 import {
-  mockJourneyEvents,
-  mockHistoricalMemories,
-  mockLegacyLetters,
-  mockGrowthComparison,
-  type JourneyEventIconKind,
-} from '@/lib/data';
+  History, Lock, TrendingUp, ArrowRight,
+  Star, BookHeart, Sprout
+} from 'lucide-react';
+import { useToast } from '../ui/ToastContext';
+import TabContent, { tabViewVariants } from '../ui/TabContent';
+import SectionHero from '../ui/SectionHero';
 import { typo } from '@/lib/typography';
-import TabContent, { tabViewVariants } from '@/components/ui/TabContent';
-import SectionHero from '@/components/ui/SectionHero';
 import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
 
-function JourneyTimelineIcon({ kind }: { kind: JourneyEventIconKind }) {
-  const iconColor = 'var(--mauve)';
-  const common = { size: 20 as const, strokeWidth: 2 as const, className: 'shrink-0', color: iconColor };
-  switch (kind) {
-    case 'calendar': return <Calendar {...common} />;
-    case 'lightbulb': return <Lightbulb {...common} />;
-    case 'baby': return <Baby {...common} />;
-    case 'heart': return <Heart {...common} />;
-    default: return null;
-  }
-}
+const MEMORIES = [
+  {
+    id: 'm1', title: 'Emma, remember this', date: 'Feb 14, 2026', body: 'On the night you were born, the moon was full and the room smelled of lavender. You were so small, your father's hand covered your entire back. He cried. I smiled. That was the moment I understood what unconditional love truly meant. Never forget how wanted you were, how loved you are, and how strong you will become. - Mum', locked: true,
+  },
+  {
+    id: 'm2', title: 'The Memory Wall', date: '2024 — 2026', body: 'A scrapbook of photos showing Sarah\'s first trimester bump, the nursery being painted, the baby shower, and the first family photo with Emma in the hospital.', locked: true,
+  },
+];
+
+const ANNIVERSARIES = [
+  { id: 'a1', label: '120 Days as a Mum', date: 'Feb 14, 2026', achieved: true },
+  { id: 'a2', label: 'First Smile Anniversary', date: 'Mar 20, 2026', achieved: true },
+  { id: 'a3', label: 'First Steps Anniversary', date: 'Upcoming', achieved: false },
+  { id: 'a4', label: 'First Word Anniversary', date: 'Upcoming', achieved: false },
+  { id: 'a5', label: 'Emma\'s First Birthday', date: 'Upcoming', achieved: false },
+];
 
 export default function Journey() {
   const { showToast } = useToast();
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [showLetter, setShowLetter] = useState<string | null>(null);
+  const [isWritingLetter, setIsWritingLetter] = useState(false);
+  const [letterText, setLetterText] = useState('');
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [lastScrollTop, setLastScrollTop] = useState(0);
+
   return (
     <div className="fade-in-up">
       <TabContent>
-      {/* Hero recap */}
-      <motion.div variants={tabViewVariants.item}>
-        <SectionHero
-          featured={true}
-          icon={<History size={32} />}
-          title="Your Motherhood Story"
-          subtitle="10 months of growth, 154 lives touched, and 1 beautiful journey."
-          accentColor="var(--lavender)"
-        />
-      </motion.div>
+        {/* Hero */}
+        <motion.div variants={tabViewVariants.item}>
+          <SectionHero
+            icon={<History size={28} />}
+            title="The Journey"
+            subtitle="You've come so far, Sarah. Look at everything you've already achieved."
+            accentColor="var(--mauve)"
+          />
+        </motion.div>
 
-      {/* This Day Last Year */}
-      <motion.div variants={tabViewVariants.item} className="mb-8">
-        <h3 className={`${typo.heading} mb-3 flex items-center gap-2`}>
-          <Clock size={18} className="text-[var(--terracotta)]" /> This Day Last Year
-        </h3>
-        {mockHistoricalMemories.map((mem) => (
-          <motion.div
-            key={mem.id}
-            whileHover={{ y: -6, scale: 1.01 }}
-            className="transition-all duration-300"
-          >
-            <Card 
-              elevation="featured" 
-              className="group relative h-full overflow-hidden border-2 border-[var(--blush-light)]" 
-              bodyClassName="p-0 bg-gradient-to-br from-[var(--cream)] to-white"
-            >
-              <div className="absolute top-3 right-3 z-[3] rounded-full bg-white/80 p-1.5 text-[var(--terracotta)] shadow-sm backdrop-blur-sm">
-                <Sparkles size={14} />
-              </div>
-              <div className={`relative flex h-48 items-center justify-center bg-[var(--cream-dark)] italic ${typo.caption}`}>
-                <Camera size={40} className="opacity-10" />
-                <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                <span className="absolute bottom-4 left-5 z-[2] flex items-center gap-1.5 text-xs font-bold text-white">
-                  <Calendar size={12} /> {mem.date}
-                </span>
-              </div>
-              <div className="p-6">
-                <p className={`${typo.body} leading-relaxed italic text-[var(--text-primary)]/90`}>
-                  &quot;{mem.caption}&quot;
-                </p>
-                <div className="mt-4 flex gap-2">
-                  <Badge label="Nursery Prep" variant="cream" size="sm" />
-                  <Badge label="Pregnancy Days" variant="sage" size="sm" />
-                </div>
-              </div>
-              {/* Nostalgic Overlay */}
-              <div className="pointer-events-none absolute inset-0 bg-[var(--terracotta)]/5 opacity-40 group-hover:opacity-20 transition-opacity" />
-            </Card>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* Timeline */}
-      <motion.div variants={tabViewVariants.item} className="mb-8">
-        <h3 className={`${typo.heading} mb-5 flex items-center gap-2`}>
-          <Star size={18} className="text-[var(--mauve)]" /> Key Moments
-        </h3>
-        <div className="ml-2.5 border-l-2 border-dashed border-[var(--cream-dark)] pl-5">
-          {mockJourneyEvents.map((evt: any, i: number) => (
-            <motion.div key={evt.id} 
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.08, ease: 'easeOut' }}
-              className="relative mb-6"
-            >
-              <div className="absolute -left-[27px] top-1.5 h-3 w-3 rounded-full border-[3px] border-[var(--mauve)] bg-white shadow-sm" />
-              <div className="flex items-center gap-3">
-                <JourneyTimelineIcon kind={evt.icon} />
-                <div>
-                  <div className={`${typo.subheading} text-[var(--text-primary)]`}>{evt.title}</div>
-                  <div className={`${typo.caption} mt-0.5`}>
-                    {new Date(evt.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+        {/* Growth Tracker */}
+        <motion.div variants={tabViewVariants.item}>
+          <Card title="Growth Comparison" description="Baby vs. You &mdash; tracked in real-time" className="mb-6" elevation="featured" hover>
+            <div className="flex flex-col gap-2">
+              {[
+                { emoji: '\u{1F476}', label: 'Baby', stat: '15 lbs', day: '120 days', bg: 'var(--blush-soft)', bar: 'var(--blush)' },
+                { emoji: '\u{1F469}', label: 'Mum', stat: '+8 lbs gained', day: '120 days postpartum', bg: 'var(--mauve-soft)', bar: 'var(--mauve)' },
+              ].map((row, i) => (
+                <motion.div
+                  key={row.label}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.15 + i * 0.1 }}
+                  className="flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2.5"
+                  style={{ background: row.bg }}
+                >
+                  <span className="text-xl">{row.emoji}</span>
+                  <span className={`flex-1 font-bold ${typo.body}`}>{row.label}</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/60">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: i === 0 ? '75%' : '40%' }}
+                          transition={{ duration: 1, ease: 'easeOut' }}
+                          className="h-full rounded-full"
+                          style={{ background: row.bar }}
+                        />
+                      </div>
+                      <span className={`shrink-0 font-semibold ${typo.caption}`}>{row.stat}</span>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Then vs Now */}
-      <motion.div variants={tabViewVariants.item} className="mb-8">
-        <h3 className={`${typo.heading} mb-3 flex items-center gap-2`}>
-          <Sparkles size={18} className="text-[var(--sage)]" /> Then vs Now
-        </h3>
-        <div className="grid grid-cols-2 gap-3">
-          <Card elevation="resting" bodyClassName="p-3 text-center">
-            <div className="mb-2.5 flex h-[100px] items-center justify-center rounded-[var(--radius-md)] bg-[var(--cream)] shadow-inner">
-               <Camera size={24} className="opacity-10" />
+                  <span className={`shrink-0 ${typo.caption}`}>{row.day}</span>
+                </motion.div>
+              ))}
             </div>
-            <div className={typo.fieldValue}>{mockGrowthComparison.then.date}</div>
-            <div className={`${typo.caption} mt-0.5`}>{mockGrowthComparison.then.weight}kg • {mockGrowthComparison.then.height}cm</div>
           </Card>
-          <Card elevation="elevated" bodyClassName="p-3 text-center border-2 border-[var(--sage-light)] overflow-hidden">
-            <div className="mb-2.5 flex h-[100px] items-center justify-center rounded-[var(--radius-md)] bg-[var(--sage-light)] shadow-inner">
-               <Camera size={24} className="opacity-10" />
-            </div>
-            <div className={typo.fieldValue}>{mockGrowthComparison.now.date}</div>
-            <div className={`${typo.caption} mt-0.5`}>{mockGrowthComparison.now.weight}kg • {mockGrowthComparison.now.height}cm</div>
-          </Card>
-        </div>
-      </motion.div>
+        </motion.div>
 
-      {/* Legacy Letters */}
-      <motion.div variants={tabViewVariants.item} className="mb-8">
-        <h3 className={`${typo.heading} mb-3 flex items-center gap-2`}>
-          <Mail size={18} className="text-[var(--sky-blue)]" /> Letters to Future You
-        </h3>
-        <Card elevation="featured" bodyClassName="p-5">
-          <div className="flex flex-col gap-4">
-            {mockLegacyLetters.map((letter: any) => (
-              <div key={letter.id} className="flex items-center justify-between border-b border-dashed border-[var(--cream-dark)] pb-3 last:border-none last:pb-0">
-                <div>
-                  <div className={typo.fieldValue}>To {letter.to}</div>
-                  <div className={`${typo.caption} mt-0.5`}>
-                    Unlocks on {new Date(letter.unlockDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+        {/* Milestones */}
+        <motion.div variants={tabViewVariants.item} className="mb-6">
+          <div className="mb-3 flex items-center justify-between px-1">
+            <h3 className={`flex items-center gap-2 ${typo.heading}`}>
+              <Star size={17} className="text-[var(--blush)]" /> Milestones Achieved
+            </h3>
+            <Badge label="3 of 5 Unlocked" variant="blush" size="sm" />
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            {ANNIVERSARIES.map((milestone, i) => (
+              <motion.div
+                key={milestone.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.07 }}
+                whileHover={milestone.achieved ? { y: -4, boxShadow: 'var(--shadow-featured)' } : {}}
+                whileTap={milestone.achieved ? { scale: 0.97 } : {}}
+              >
+                <Card
+                  elevation={milestone.achieved ? 'elevated' : 'resting'}
+                  className={milestone.achieved ? '' : 'opacity-45'}
+                  bodyClassName="p-4"
+                  hover={milestone.achieved}
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    {milestone.achieved ? (
+                      <Star size={16} className="text-[var(--blush)]" fill="currentColor" />
+                    ) : (
+                      <Lock size={14} className="text-[var(--text-muted)]" />
+                    )}
+                    <Badge
+                      label={milestone.achieved ? 'Unlocked' : 'Locked'}
+                      variant={milestone.achieved ? 'blush' : 'cream'}
+                      size="sm"
+                    />
                   </div>
-                </div>
-                <div className="text-[var(--sky-blue)] opacity-40"><Lock size={20} /></div>
-              </div>
+                  <div className={`mb-1 ${typo.body} font-bold leading-tight`}>{milestone.label}</div>
+                  <div className={typo.caption}>{milestone.date}</div>
+                </Card>
+              </motion.div>
             ))}
           </div>
-          <button 
-            type="button"
-            className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-[var(--radius-md)] border-none bg-gradient-to-r from-[var(--sky-blue-light)] to-[var(--sky-blue)] py-3.5 text-sm font-bold text-white transition-all shadow-md hover:shadow-lg active:scale-[0.98]"
-            onClick={() => showToast('Your letter has been safely stored for the future.', 'success')}
+        </motion.div>
+
+        {/* Memories */}
+        <motion.div variants={tabViewVariants.item} className="mb-8">
+          <div className="mb-3 flex items-center justify-between px-1">
+            <h3 className={`flex items-center gap-2 ${typo.heading}`}>
+              <BookHeart size={17} className="text-[var(--sage-deep)]" /> Letters & Memories
+            </h3>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setIsWritingLetter(true)}
+              className="text-[var(--sage-deep)]"
+            >
+              <Sprout size={14} /> Write Letter
+            </Button>
+          </div>
+          <div className="flex flex-col gap-3">
+            {MEMORIES.map((memory) => (
+              <motion.div
+                key={memory.id}
+                whileHover={{ y: -2 }}
+                transition={{ type: 'spring', stiffness: 400 }}
+              >
+                <Card elevation="elevated" hover>
+                  <div className="p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className={typo.heading}>{memory.title}</h4>
+                      {memory.locked && <Lock size={14} className="text-[var(--text-muted)]" />}
+                    </div>
+                    <p className={`${typo.bodyMuted} mb-4 line-clamp-3 leading-relaxed`}>{memory.body}</p>
+                    <div className="flex items-center justify-between">
+                      <Badge label={memory.date} variant="cream" size="sm" />
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        type="button"
+                        onClick={() => setShowLetter(memory.id)}
+                        className="flex cursor-pointer items-center gap-1.5 rounded-[var(--radius-sm)] border-none bg-transparent px-3 py-1.5 text-sm font-bold text-[var(--blush-deep)] hover:bg-[var(--blush-soft)] transition-colors"
+                      >
+                        Reveal Message <ArrowRight size={14} />
+                      </motion.button>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Letter Reveal Modal */}
+        {showLetter && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-[var(--text-primary)]/95 p-6 backdrop-blur-md"
+            onClick={() => {
+              setShowLetter(null);
+              setIsRevealed(false);
+            }}
           >
-            <Plus size={16} /> Write a New Letter
-          </button>
-        </Card>
-      </motion.div>
+            <motion.div
+              initial={{ scale: 0.88, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.88, y: 20 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-[440px] overflow-hidden rounded-[var(--radius-xl)] border border-white/20 bg-[var(--bg-card)] text-center shadow-2xl"
+            >
+              <div className="p-8">
+                {!isRevealed ? (
+                  <div>
+                    <Lock size={40} className="mx-auto mb-3 text-[var(--mauve)] opacity-50" />
+                    <h4 className={`mb-2 ${typo.pageHeroBold}`}>A Letter for Your Future Self</h4>
+                    <p className={`mx-auto mb-6 max-w-xs ${typo.bodyMuted}`}>
+                      This is a private memory you saved for yourself. Open it when you need a reminder of your strength.
+                    </p>
+                    <Button
+                      onClick={() => setIsRevealed(true)}
+                      className="!bg-gradient-to-r !from-[var(--mauve)] !to-[var(--mauve-deep)] !text-white"
+                    >
+                      <BookHeart size={16} /> Reveal Message
+                    </Button>
+                  </div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1.5 }}
+                  >
+                    <p className={`${typo.body} mx-auto max-w-sm text-left italic leading-loose`}>
+                      On the night you were born, the moon was full and the room smelled of lavender. You were so small, your father's hand covered your entire back. He cried. I smiled. That was the moment I understood what unconditional love truly meant. Never forget how wanted you were, how loved you are, and how strong you will become. - Mum
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => { setShowLetter(null); setIsRevealed(false); }}
+                      className="mt-8 text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                    >
+                      Close
+                    </button>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Write Letter Modal */}
+        {isWritingLetter && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-[var(--text-primary)]/95 p-6 backdrop-blur-md"
+            onClick={() => {
+              setIsWritingLetter(false);
+              setLetterText('');
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.88, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-[440px] overflow-hidden rounded-[var(--radius-xl)] border border-white/20 bg-[var(--bg-card)] shadow-2xl"
+            >
+              <div className="p-8">
+                <h4 className={`mb-1 ${typo.pageHeroBold}`}>Write a Letter to Your Future Self</h4>
+                <p className={`mb-5 ${typo.bodyMuted}`}>
+                  This will be sealed and private. No one but you can see it.
+                </p>
+                <textarea
+                  value={letterText}
+                  onChange={(e) => { if (e.target.value.length <= 500) setLetterText(e.target.value); }}
+                  placeholder="Dear future me..."
+                  className="mb-4 h-48 w-full resize-none rounded-[var(--radius-lg)] border-2 border-[var(--border)] bg-[var(--bg-primary)] px-5 py-4 text-sm font-semibold leading-relaxed outline-none transition-all focus:border-[var(--mauve)] focus:shadow-[var(--shadow-glow-blush)]"
+                />
+                <div className="mb-5 flex justify-between items-center">
+                  <span className={typo.caption}>{letterText.length} / 500</span>
+                </div>
+                <Button
+                  disabled={!letterText.trim()}
+                  onClick={() => {
+                    setIsWritingLetter(false);
+                    setLetterText('');
+                    showToast('Letter sealed. It will be revealed on your selected date.', 'success');
+                  }}
+                  className="w-full !bg-gradient-to-r !from-[var(--sage)] !to-[var(--sage-deep)] !text-white"
+                >
+                  Seal for the Future
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => { setIsWritingLetter(false); setLetterText(''); }}
+                  className="mt-3 w-full cursor-pointer border-none bg-transparent text-sm font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </TabContent>
     </div>
   );

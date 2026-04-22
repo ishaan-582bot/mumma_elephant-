@@ -22,7 +22,7 @@ export default function PinPad({ length = 4, onComplete, title, subtitle, error 
         setTimeout(() => {
           onComplete(newPin);
           setPin('');
-        }, 200);
+        }, 250);
       }
     }
   }, [pin, length, onComplete]);
@@ -45,25 +45,36 @@ export default function PinPad({ length = 4, onComplete, title, subtitle, error 
           {subtitle}
         </p>
       )}
-      
+
       {/* PIN Dots */}
       <div className="my-2 flex gap-4">
         {Array.from({ length }).map((_, i) => (
-          <div
+          <motion.div
             key={i}
-            className={`pin-dot ${i < pin.length ? 'filled' : ''} ${error ? 'border-[var(--terracotta)]' : ''}`}
+            animate={{
+              scale: i < pin.length ? [1, 1.3, 1] : 1,
+              borderColor: error ? 'var(--status-error)' : i < pin.length ? 'var(--blush)' : 'var(--border)',
+            }}
+            transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+            className={`h-4 w-4 rounded-full border-[2.5px] transition-colors duration-200 ${
+              i < pin.length ? 'bg-[var(--blush)] shadow-[var(--shadow-glow-blush)]' : 'bg-transparent'
+            } ${error ? 'border-[var(--status-error)]' : ''}`}
           />
         ))}
       </div>
 
       {error && (
-        <p className="text-sm font-semibold text-[var(--terracotta)]">
+        <motion.p
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm font-semibold text-[var(--status-error)]"
+        >
           {error}
-        </p>
+        </motion.p>
       )}
 
       {/* Number Pad */}
-      <div className="grid w-full max-w-[280px] grid-cols-3 gap-3">
+      <div className="grid w-full max-w-[260px] grid-cols-3 gap-3">
         {buttons.map((btn, i) => {
           if (btn === '') return <div key={i} />;
           if (btn === 'del') {
@@ -71,10 +82,10 @@ export default function PinPad({ length = 4, onComplete, title, subtitle, error 
               <motion.button
                 key={i}
                 onClick={handleDelete}
-                whileTap={{ scale: 0.9, color: 'var(--terracotta)' }}
-                className="flex h-[72px] w-[72px] cursor-pointer items-center justify-center justify-self-center rounded-[var(--radius-full)] border-none bg-transparent text-[var(--text-secondary)]"
+                whileTap={{ scale: 0.88 }}
+                className="flex h-[68px] w-[68px] cursor-pointer items-center justify-center justify-self-center rounded-[var(--radius-full)] border-none bg-transparent text-[var(--text-muted)] transition-colors hover:text-[var(--status-error)]"
               >
-                <Delete size={24} />
+                <Delete size={22} />
               </motion.button>
             );
           }
@@ -82,12 +93,11 @@ export default function PinPad({ length = 4, onComplete, title, subtitle, error 
             <motion.button
               key={i}
               onClick={() => handlePress(btn)}
-              whileTap={{ 
-                scale: 0.94, 
-                backgroundColor: 'var(--blush-light)',
-                borderColor: 'var(--blush)'
+              whileTap={{
+                scale: 0.92,
+                backgroundColor: 'var(--blush-soft)',
               }}
-              className="h-[72px] w-[72px] cursor-pointer justify-self-center rounded-full border-2 border-[var(--cream-dark)] bg-[var(--bg-card)] text-2xl font-bold text-[var(--text-primary)] transition-all duration-100"
+              className="h-[68px] w-[68px] cursor-pointer justify-self-center rounded-full border-2 border-[var(--border)] bg-[var(--bg-card)] text-[22px] font-bold text-[var(--text-primary)] transition-all duration-150 hover:border-[var(--blush)] hover:shadow-[var(--shadow-elevated)]"
             >
               {btn}
             </motion.button>

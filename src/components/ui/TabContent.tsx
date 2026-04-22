@@ -1,42 +1,42 @@
+'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
-
-interface TabContentProps {
-  children: React.ReactNode;
-  maxWidth?: 'max-w-2xl' | 'max-w-3xl' | 'max-w-4xl' | 'max-w-xl' | 'max-w-5xl' | 'max-w-full';
-  dense?: boolean;
-}
 
 export const tabViewVariants = {
   container: {
     hidden: { opacity: 0 },
-    visible: {
+    show: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.05,
-      },
+      transition: { staggerChildren: 0.08, delayChildren: 0.05 },
     },
   },
   item: {
-    hidden: { opacity: 0, y: 15 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.4, ease: [0.32, 0.72, 0, 1] as any }
+    hidden: { opacity: 0, y: 16, scale: 0.98 },
+    show: {
+      opacity: 1, y: 0, scale: 1,
+      transition: { type: 'spring', stiffness: 400, damping: 30 },
     },
   },
 };
 
-export default function TabContent({
-  children,
-  maxWidth = 'max-w-2xl',
-  dense = false,
-}: TabContentProps) {
+interface TabContentProps {
+  children: React.ReactNode;
+  maxWidth?: string;
+}
+
+export default function TabContent({ children, maxWidth = 'max-w-3xl' }: TabContentProps) {
   return (
-    <motion.div 
+    <motion.div
       variants={tabViewVariants.container}
       initial="hidden"
+      animate="show"
+      className={`${maxWidth} mx-auto w-full`}
+    >
+      {children}
+    </motion.div>
+  );
+}
+"
       animate="visible"
       className={`mx-auto w-full ${maxWidth} px-4 sm:px-8 lg:px-10 ${dense ? 'py-4 sm:py-6 lg:py-6' : 'py-6 sm:py-8 lg:py-10'}`}
     >

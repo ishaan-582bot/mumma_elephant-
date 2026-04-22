@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, AlertTriangle, Info, XCircle } from 'lucide-react';
 
 interface ToastProps {
   message: string;
@@ -11,12 +12,32 @@ interface ToastProps {
   type?: 'success' | 'warning' | 'info' | 'error' | 'default';
 }
 
-const typeConfig: Record<string, { border: string; dot: string }> = {
-  success: { border: 'var(--sage)', dot: 'var(--sage)' },
-  warning: { border: 'var(--terracotta)', dot: 'var(--terracotta)' },
-  info: { border: '#60A5FA', dot: '#60A5FA' },
-  error: { border: '#E05D5D', dot: '#E05D5D' },
-  default: { border: 'transparent', dot: 'transparent' },
+const typeConfig = {
+  success: {
+    border: 'var(--sage)',
+    bg: 'var(--sage-soft)',
+    icon: <CheckCircle2 size={18} className="text-[var(--sage-deep)] shrink-0" />,
+  },
+  warning: {
+    border: 'var(--status-warning)',
+    bg: 'var(--warning-soft)',
+    icon: <AlertTriangle size={18} className="text-[#8B6A2A] shrink-0" />,
+  },
+  info: {
+    border: 'var(--status-info)',
+    bg: 'var(--info-soft)',
+    icon: <Info size={18} className="text-[var(--status-info)] shrink-0" />,
+  },
+  error: {
+    border: 'var(--status-error)',
+    bg: 'var(--error-soft)',
+    icon: <XCircle size={18} className="text-[var(--status-error)] shrink-0" />,
+  },
+  default: {
+    border: 'transparent',
+    bg: 'transparent',
+    icon: null,
+  },
 };
 
 export default function Toast({ message, show, onClose, action, duration = 5000, type = 'default' }: ToastProps) {
@@ -25,9 +46,7 @@ export default function Toast({ message, show, onClose, action, duration = 5000,
   useEffect(() => {
     if (show) {
       setIsVisible(true);
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-      }, duration);
+      const timer = setTimeout(() => setIsVisible(false), duration);
       return () => clearTimeout(timer);
     } else {
       setIsVisible(false);
@@ -35,9 +54,7 @@ export default function Toast({ message, show, onClose, action, duration = 5000,
   }, [show, duration]);
 
   const handleExitComplete = () => {
-    if (!isVisible) {
-      onClose();
-    }
+    if (!isVisible) onClose();
   };
 
   const cfg = typeConfig[type] || typeConfig.default;
@@ -46,66 +63,46 @@ export default function Toast({ message, show, onClose, action, duration = 5000,
     <AnimatePresence onExitComplete={handleExitComplete}>
       {isVisible && (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          initial={{ opacity: 0, y: -24, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -16, scale: 0.97 }}
+          transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+          className="fixed top-6 left-1/2 z-[10000] flex items-center gap-3"
           style={{
-            position: 'fixed',
-            top: 24,
-            left: '50%',
             transform: 'translateX(-50%)',
-            background: 'var(--bg-card)',
-            color: 'var(--text-primary)',
-            padding: '14px 20px',
-            borderRadius: 'var(--radius-lg)',
-            boxShadow: 'var(--shadow-lg)',
-            borderLeft: type && type !== 'default' ? `4px solid ${cfg.border}` : 'none',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            zIndex: 10000,
-            fontSize: '0.9rem',
-            fontWeight: 600,
             maxWidth: 448,
             width: 'calc(100vw - 32px)',
           }}
         >
-          {type && type !== 'default' && (
-            <span
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                background: cfg.dot,
-                flexShrink: 0,
-              }}
-            />
-          )}
-          <span style={{ flex: 1 }}>{message}</span>
-          {action && (
-            <button
-              onClick={action.onClick}
-              style={{
-                background: 'transparent',
-                color: 'var(--text-secondary)',
-                border: '1.5px solid var(--cream-dark)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '6px 14px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                fontSize: '0.85rem',
-                fontFamily: 'inherit',
-                transition: 'all 0.15s ease',
-                flexShrink: 0,
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--blush)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--cream-dark)'; }}
-            >
-              {action.label}
-            </button>
-          )}
+          <div
+            className="flex items-center gap-3 w-full rounded-[var(--radius-lg)] px-5 py-3.5 shadow-[var(--shadow-featured)] border"
+            style={{
+              background: 'var(--surface-glass)',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              borderColor: type !== 'default' ? cfg.border : 'var(--border)',
+              borderLeftWidth: type !== 'default' ? '4px' : '1px',
+            }}
+          >
+            {cfg.icon}
+            <span className="flex-1 text-sm font-semibold text-[var(--text-primary)] leading-snug">
+              {message}
+            </span>
+            {action && (
+              <button
+                onClick={action.onClick}
+                className="shrink-0 rounded-[var(--radius-sm)] border border-[var(--border)] bg-transparent px-3 py-1.5 text-xs font-bold text-[var(--text-secondary)] transition-all duration-150 hover:border-[var(--blush)] hover:text-[var(--blush-deep)] cursor-pointer"
+              >
+                {action.label}
+              </button>
+            )}
+          </div>
         </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+iv>
       )}
     </AnimatePresence>
   );

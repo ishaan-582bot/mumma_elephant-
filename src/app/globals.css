@@ -1,63 +1,134 @@
 @import "tailwindcss";
 
 :root {
-  /* Warm Pastel Palette */
-  --blush: #F8C8DC;
-  --blush-light: #FDE4EE;
-  --blush-dark: #E8A0B8;
-  --cream: #FFF8F0;
-  --cream-dark: #F5EBE0;
-  --mauve: #C9A9C7;
-  --mauve-light: #E0D0DF;
-  --mauve-dark: #9A7A8F;
-  --sage: #B7C9A8;
-  --sage-light: #D4E4C8;
-  --sage-dark: #8EAF7A;
-  --terracotta: #D4876C;
-  --terracotta-light: #E8B5A0;
-  --rose: #E8B4B8;
+  /* ═══════════════════════════════════════════
+     WARM ORGANIC PREMIUM — Design Tokens
+     Elevated palette with refined harmony
+     ═══════════════════════════════════════════ */
+
+  /* Primary Brand — Blush */
+  --blush: #F2A4C0;
+  --blush-soft: #FDE8F0;
+  --blush-deep: #D67A9A;
+  --blush-glow: rgba(242, 164, 192, 0.35);
+
+  /* Secondary — Sage (positive, growth) */
+  --sage: #9CB89A;
+  --sage-soft: #D4E8D0;
+  --sage-deep: #7A9E78;
+  --sage-glow: rgba(156, 184, 154, 0.3);
+
+  /* Accent — Terracotta (warmth, action) */
+  --terracotta: #C97B5D;
+  --terracotta-soft: #F0C9B8;
+  --terracotta-deep: #A85F42;
+
+  /* Tertiary — Mauve */
+  --mauve: #B899B6;
+  --mauve-soft: #E8DAE7;
+  --mauve-deep: #967A94;
+
+  /* Neutral — Lavender */
   --lavender: #C5B3D4;
-  --lavender-light: #E0D5EB;
-  --peach: #F5C9A8;
-  --peach-light: #FAE0CC;
-  --sky-blue: #A8C8E8;
-  --sky-blue-light: #CCE0F5;
-  --sky-blue-dark: #7BA8D0;
+  --lavender-soft: #E8E0F0;
+
+  /* Sky Blue */
+  --sky-blue: #96B8D8;
+  --sky-blue-soft: #C8DDF0;
+
+  /* Peach */
+  --peach: #E8B89A;
+  --peach-soft: #F5D9C8;
+
+  /* Surface System */
+  --cream: #FFFBF7;
+  --cream-deep: #F5EDE6;
+  --surface: #FFFFFF;
+  --surface-elevated: #FFF8F3;
+  --surface-glass: rgba(255, 255, 255, 0.72);
 
   /* Text */
-  --text-primary: #4A3728;
-  --text-secondary: #7A6B5D;
-  --text-muted: #A89888;
-  --text-inverse: #FFF8F0;
+  --text-primary: #2D2118;
+  --text-secondary: #6B5D52;
+  --text-muted: #A89B91;
+  --text-inverse: #FFFBF7;
 
-  /* Backgrounds */
-  --bg-primary: #FFF8F0;
+  /* Borders */
+  --border: #F0E6DE;
+  --border-light: #F7F0EA;
+  --border-focus: #F2A4C0;
+
+  /* Background */
+  --bg-primary: #FFFBF7;
   --bg-card: #FFFFFF;
-  --bg-card-hover: #FFF0E8;
-  --bg-overlay: rgba(74, 55, 40, 0.4);
+  --bg-card-hover: #FFF8F3;
+  --bg-overlay: rgba(45, 33, 24, 0.45);
 
-  /* 
-   * Radius Guidelines:
-   * --radius-sm: 10px (Badges, small pills)
-   * --radius-md: 16px (Interactive elements: Buttons, Inputs, Tab items)
-   * --radius-lg: 20px (Content blocks: Cards, Standard grid items)
-   * --radius-xl: 24px (Large sections: Banner blocks, Hero headers)
-   * --radius-3xl: 28px (Shell/Outer: Bottom sheets, Profile container)
-   * --radius-full: 9999px (Circular: Avatars, FABs)
-   */
+  /* Status */
+  --status-success: #7A9E78;
+  --success-soft: #E0F0DE;
+  --status-warning: #D4A843;
+  --warning-soft: #F5ECD4;
+  --status-error: #C75B5B;
+  --error-soft: #F0D4D4;
+  --status-info: #6A9EC8;
+  --info-soft: #D4E6F0;
+
+  /* ═══════════════════════════════════════════
+     Radius Scale — soft, approachable
+     ═══════════════════════════════════════════ */
   --radius-sm: 10px;
-  --radius-md: 16px;
+  --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 24px;
-  --radius-3xl: 28px;
+  --radius-2xl: 28px;
   --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(74, 55, 40, 0.06);
-  --shadow-md: 0 4px 16px rgba(74, 55, 40, 0.08);
-  --shadow-lg: 0 8px 32px rgba(74, 55, 40, 0.12);
-  --shadow-glow-blush: 0 0 20px rgba(248, 200, 220, 0.5);
-  --shadow-glow-sage: 0 0 20px rgba(183, 201, 168, 0.5);
+  /* ═══════════════════════════════════════════
+     Shadow System — 4-layer depth
+     ═══════════════════════════════════════════ */
+  --shadow-resting:
+    0 1px 3px rgba(45, 33, 24, 0.04),
+    0 1px 2px rgba(45, 33, 24, 0.02);
+  --shadow-elevated:
+    0 4px 12px rgba(45, 33, 24, 0.05),
+    0 2px 4px rgba(45, 33, 24, 0.03);
+  --shadow-featured:
+    0 12px 32px rgba(45, 33, 24, 0.08),
+    0 4px 8px rgba(45, 33, 24, 0.04);
+  --shadow-glow-blush: 0 0 24px rgba(242, 164, 192, 0.4);
+  --shadow-glow-sage: 0 0 24px rgba(156, 184, 154, 0.35);
+  --shadow-inner: inset 0 2px 4px rgba(45, 33, 24, 0.03);
+
+  /* Legacy aliases for backward compatibility */
+  --blush-light: var(--blush-soft);
+  --cream-dark: var(--cream-deep);
+  --mauve-light: var(--mauve-soft);
+  --mauve-dark: var(--mauve-deep);
+  --sage-light: var(--sage-soft);
+  --sage-dark: var(--sage-deep);
+  --terracotta-light: var(--terracotta-soft);
+  --terracotta-dark: var(--terracotta-deep);
+  --lavender-light: var(--lavender-soft);
+  --sky-blue-light: var(--sky-blue-soft);
+  --sky-blue-dark: #7A9EC8;
+  --peach-light: var(--peach-soft);
+  --shadow-sm: var(--shadow-resting);
+  --shadow-md: var(--shadow-elevated);
+  --shadow-lg: var(--shadow-featured);
+  --radius-3xl: var(--radius-2xl);
+
+  /* Tag color mappings */
+  --tag-nutrition-bg: var(--sage-soft);
+  --tag-nutrition-text: #4A6B3A;
+  --tag-sleep-bg: var(--sky-blue-soft);
+  --tag-sleep-text: #3A5A7A;
+  --tag-mental-bg: var(--lavender-soft);
+  --tag-mental-text: #5A3A7A;
+  --tag-breastfeeding-bg: var(--peach-soft);
+  --tag-breastfeeding-text: #7A5A3A;
+  --tag-postpartum-bg: #F0C4C8;
+  --tag-postpartum-text: #7A3A4A;
 }
 
 * {
@@ -69,40 +140,85 @@
 html {
   font-family: 'Nunito', sans-serif;
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100dvh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1, 'liga' 1;
 }
 
+/* ═══════════════════════════════════════════
+   Profile Page — ambient gradient background
+   ═══════════════════════════════════════════ */
 .profile-page-bg {
   background-color: var(--bg-primary);
   background-image:
-    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(248, 200, 220, 0.22) 0%, transparent 60%);
+    radial-gradient(ellipse 70% 35% at 50% -5%, rgba(242, 164, 192, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 25% at 85% 60%, rgba(156, 184, 154, 0.08) 0%, transparent 50%);
+}
+
+/* ═══════════════════════════════════════════
+   Scrollbar — minimal, warm
+   ═══════════════════════════════════════════ */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
-/* Skeleton Loader */
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+/* ═══════════════════════════════════════════
+   Skeleton — shimmer wave animation
+   ═══════════════════════════════════════════ */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .skeleton {
-  background: linear-gradient(90deg, var(--cream-dark) 25%, var(--cream) 50%, var(--cream-dark) 75%);
+  background: linear-gradient(90deg,
+    var(--cream-deep) 0%,
+    var(--surface) 25%,
+    var(--cream-deep) 50%,
+    var(--surface) 75%,
+    var(--cream-deep) 100%
+  );
   background-size: 200% 100%;
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  animation: skeleton-shimmer 2s ease-in-out infinite;
   border-radius: var(--radius-md);
 }
 
-/* Confetti */
+/* ═══════════════════════════════════════════
+   Fade In Up — entrance animation
+   ═══════════════════════════════════════════ */
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(16px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.fade-in-up {
+  animation: fade-in-up 0.45s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+/* ═══════════════════════════════════════════
+   Confetti — celebratory fall animation
+   ═══════════════════════════════════════════ */
 @keyframes confetti-fall {
   0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
@@ -119,58 +235,70 @@ body {
   pointer-events: none;
 }
 
-/* Scrollbar styling */
-/* Fade in animation */
-@keyframes fade-in-up {
-  0% { opacity: 0; transform: translateY(12px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
+/* ═══════════════════════════════════════════
+   Tag Color Classes
+   ═══════════════════════════════════════════ */
+.tag-nutrition { background: var(--tag-nutrition-bg); color: var(--tag-nutrition-text); }
+.tag-sleep { background: var(--tag-sleep-bg); color: var(--tag-sleep-text); }
+.tag-mental-health { background: var(--tag-mental-bg); color: var(--tag-mental-text); }
+.tag-breastfeeding { background: var(--tag-breastfeeding-bg); color: var(--tag-breastfeeding-text); }
+.tag-postpartum { background: var(--tag-postpartum-bg); color: var(--tag-postpartum-text); }
 
-.fade-in-up {
-  animation: fade-in-up 0.4s ease-out forwards;
-}
-
-/* Tag Colors */
-.tag-nutrition { background: var(--sage-light); color: #4A6B3A; }
-.tag-sleep { background: var(--sky-blue-light); color: #3A5A7A; }
-.tag-mental-health { background: var(--lavender-light); color: #5A3A7A; }
-.tag-breastfeeding { background: var(--peach-light); color: #7A5A3A; }
-.tag-postpartum { background: var(--rose); color: #7A3A4A; }
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--mauve-light);
-  border-radius: var(--radius-full);
-}
-
-/* PIN Pad */
+/* ═══════════════════════════════════════════
+   PIN Pad Dots
+   ═══════════════════════════════════════════ */
 .pin-dot {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 2px solid var(--mauve);
-  transition: all 0.2s ease;
+  border: 2.5px solid var(--border);
+  transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .pin-dot.filled {
-  background: var(--blush-dark);
-  border-color: var(--blush-dark);
-  transform: scale(1.1);
+  background: var(--blush);
+  border-color: var(--blush);
+  transform: scale(1.15);
+  box-shadow: var(--shadow-glow-blush);
+}
+.pin-dot.error {
+  border-color: var(--status-error);
+  animation: shake 0.4s ease-in-out;
 }
 
-/* Tap targets */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* ═══════════════════════════════════════════
+   Tap targets — accessible minimum sizing
+   ═══════════════════════════════════════════ */
 button, a, [role="button"] {
   min-height: 44px;
   min-width: 44px;
 }
 
-/* Reduce motion */
+/* ═══════════════════════════════════════════
+   Focus styles — visible, on-brand
+   ═══════════════════════════════════════════ */
+*:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ═══════════════════════════════════════════
+   Selection color — warm blush tint
+   ═══════════════════════════════════════════ */
+::selection {
+  background: var(--blush-soft);
+  color: var(--text-primary);
+}
+
+/* ═══════════════════════════════════════════
+   Reduced motion — respect user preference
+   ═══════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -178,4 +306,5 @@ button, a, [role="button"] {
     transition-duration: 0.01ms !important;
   }
   .confetti-piece { display: none; }
+  .skeleton { animation: none; background: var(--cream-deep); }
 }
