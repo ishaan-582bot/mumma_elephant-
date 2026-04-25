@@ -16,7 +16,7 @@ import Button from './ui/Button';
 import { typo } from '@/lib/typography';
 
 interface ProfileHeaderProps {
-  user: UserProfile;
+  user: UserProfile | null;  // <-- CHANGED: allow null
   onEdit: () => void;
   onNavigate?: (tab: TabId) => void;
   onAvatarChange?: (avatar: string | null) => void;
@@ -24,11 +24,32 @@ interface ProfileHeaderProps {
 
 export default function ProfileHeader({ user, onEdit, onNavigate, onAvatarChange }: ProfileHeaderProps) {
   const [avatarHover, setAvatarHover] = useState(false);
-  const [currentAvatar, setCurrentAvatar] = useState(user.avatar);
+  const [currentAvatar, setCurrentAvatar] = useState(user?.avatar ?? null);  // <-- CHANGED: optional chaining + nullish coalescing
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pulse, setPulse] = useState(false);
-  const prevCompletion = useRef(user.profileCompletion);
+  const prevCompletion = useRef(user?.profileCompletion ?? 0);  // <-- CHANGED: optional chaining
+
+  // ADDED: Early return if no user data
+  if (!user) {
+    return (
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="relative overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border)] p-6 shadow-[var(--shadow-featured)] lg:p-7"
+        style={{
+          background: 'linear-gradient(160deg, var(--blush-soft) 0%, var(--cream) 40%, var(--surface) 100%)',
+        }}
+      >
+        <div className="flex flex-col items-center gap-4 py-8 text-center">
+          <div className="h-24 w-24 animate-pulse rounded-full bg-[var(--cream-deep)]" />
+          <div className="h-6 w-32 animate-pulse rounded bg-[var(--cream-deep)]" />
+          <div className="h-4 w-48 animate-pulse rounded bg-[var(--cream-deep)]" />
+          <p className={typo.caption}>Loading profile...</p>
+        </div>
+      </motion.section>
+    );
+  }
 
   React.useEffect(() => {
     if (user.profileCompletion > prevCompletion.current) {

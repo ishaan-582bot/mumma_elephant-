@@ -7,9 +7,8 @@ import ProfileShell from '@/components/profile/ProfileShell';
 import BackToTop from '@/components/ui/BackToTop';
 import {
   SkeletonBox, ProfileHeaderSkeleton, ContentSkeleton,
-  PersonalInfoSkeleton, MyChildrenSkeleton, SafeVaultSkeleton,
-  MyPostsSkeleton, MyTipsSkeleton
 } from '@/components/ui/Skeleton';
+import { mockUser } from '@/lib/data';
 import type { UserProfile } from '@/lib/data';
 
 export default function ProfilePage() {
@@ -17,27 +16,32 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 900));
-        const res = await fetch('/api/user-profile');
-        if (!res.ok) {
-          if (res.status === 404) return;
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        const data = await res.json();
-        setUser(data);
-      } catch {
-        setUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchUser();
+    // Simulate API delay, then load existing mock data
+    const timer = setTimeout(() => {
+      setUser(mockUser);
+      setIsLoading(false);
+    }, 900);
+    return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {
     return <LoadingScreen />;
+  }
+
+  if (!user) {
+    return (
+      <div className="profile-page-bg flex min-h-[100dvh] items-center justify-center p-4">
+        <div className="rounded-[var(--radius-xl)] border border-[var(--border)] bg-[var(--surface)] p-8 text-center shadow-[var(--shadow-featured)]">
+          <h2 className="mb-2 text-xl font-bold">Something went wrong</h2>
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded-[var(--radius-md)] bg-[var(--blush)] px-4 py-2 text-white"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -50,7 +54,7 @@ export default function ProfilePage() {
             transition={{ duration: 0.4 }}
           >
             <ProfileShell
-              user={user!}
+              user={user}
               onUserUpdate={setUser}
             />
             <BackToTop />
@@ -65,20 +69,15 @@ function LoadingScreen() {
   return (
     <div className="profile-page-bg min-h-[100dvh] p-4 pb-20 lg:p-8">
       <div className="mx-auto grid max-w-[900px] gap-5 lg:grid-cols-[340px_1fr] lg:gap-8">
-        {/* Left Sidebar Skeleton */}
         <div className="h-fit">
           <ProfileHeaderSkeleton />
         </div>
-
-        {/* Right Content Skeleton */}
         <div className="min-w-0">
-          {/* Tab strip skeleton */}
           <div className="mb-4 grid grid-cols-5 gap-1.5 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] p-1.5">
             {Array.from({ length: 5 }).map((_, i) => (
               <SkeletonBox key={i} width="100%" height="72px" borderRadius="var(--radius-md)" />
             ))}
           </div>
-          {/* Content skeleton */}
           <ContentSkeleton />
         </div>
       </div>

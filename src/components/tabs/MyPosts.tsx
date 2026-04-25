@@ -39,7 +39,7 @@ export default function MyPosts({ posts }: MyPostsProps) {
     'linear-gradient(135deg, #C8DDF0, #E8E0F0)',
   ];
 
-  if (posts.length === 0) {
+  if (safePosts.length === 0) {
     return (
       <EmptyState
         icon={<Camera size={44} className="text-[var(--blush-deep)]" strokeWidth={1.5} />}
@@ -50,14 +50,14 @@ export default function MyPosts({ posts }: MyPostsProps) {
       />
     );
   }
-
+const safePosts = posts ?? [];
   return (
     <div className="fade-in-up">
       <TabContent>
         {/* View toggle */}
         <motion.div variants={tabViewVariants.item} className="mb-4 flex items-center justify-between px-1">
           <span className={`${typo.subheading} font-semibold`}>
-            {posts.length} {posts.length === 1 ? 'moment' : 'moments'}
+            {safePosts.length} {posts.length === 1 ? 'moment' : 'moments'}
           </span>
           <div className="flex gap-1 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--cream-deep)]/50 p-1 shadow-inner">
             <button

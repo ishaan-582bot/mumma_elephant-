@@ -102,8 +102,3 @@ export default function Toast({ message, show, onClose, action, duration = 5000,
     </AnimatePresence>
   );
 }
-iv>
-      )}
-    </AnimatePresence>
-  );
-}

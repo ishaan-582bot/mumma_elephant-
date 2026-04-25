@@ -150,16 +150,17 @@ export const MyTipsSkeleton = () => (
     ))}
   </div>
 );
-ap-2.5 rounded-[var(--radius-lg)] bg-[var(--bg-card)] p-4 transition-shadow hover:shadow-sm">
+export const JourneySkeleton = () => (
+  <div className="flex flex-col gap-3 px-4 py-6">
+    {Array.from({ length: 3 }).map((_, i) => (
+      <div key={i} className="flex flex-col gap-2.5 rounded-[var(--radius-lg)] bg-[var(--bg-card)] p-4 transition-shadow hover:shadow-sm">
         <SkeletonBox width="90%" height="14px" borderRadius="6px" />
         <SkeletonBox width="70%" height="12px" borderRadius="6px" />
         <SkeletonBox width="50%" height="12px" borderRadius="6px" />
-        {/* Tag row */}
         <div className="mt-1 flex gap-1.5">
           <SkeletonBox width="48px" height="20px" borderRadius="var(--radius-full)" />
           <SkeletonBox width="56px" height="20px" borderRadius="var(--radius-full)" />
         </div>
-        {/* Bar */}
         <div className="mt-2">
           <SkeletonBox width="100%" height="6px" borderRadius="var(--radius-full)" />
         </div>
@@ -167,3 +168,4 @@ ap-2.5 rounded-[var(--radius-lg)] bg-[var(--bg-card)] p-4 transition-shadow hove
     ))}
   </div>
 );
+

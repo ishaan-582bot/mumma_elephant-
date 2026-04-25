@@ -36,11 +36,3 @@ export default function TabContent({ children, maxWidth = 'max-w-3xl' }: TabCont
     </motion.div>
   );
 }
-"
-      animate="visible"
-      className={`mx-auto w-full ${maxWidth} px-4 sm:px-8 lg:px-10 ${dense ? 'py-4 sm:py-6 lg:py-6' : 'py-6 sm:py-8 lg:py-10'}`}
-    >
-      {children}
-    </motion.div>
-  );
-}

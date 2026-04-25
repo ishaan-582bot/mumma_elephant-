@@ -15,7 +15,7 @@ import Badge from '@/components/ui/Badge';
 
 const MEMORIES = [
   {
-    id: 'm1', title: 'Emma, remember this', date: 'Feb 14, 2026', body: 'On the night you were born, the moon was full and the room smelled of lavender. You were so small, your father's hand covered your entire back. He cried. I smiled. That was the moment I understood what unconditional love truly meant. Never forget how wanted you were, how loved you are, and how strong you will become. - Mum', locked: true,
+    id: 'm1', title: 'Emma, remember this', date: 'Feb 14, 2026', body: 'On the night you were born, the moon was full and the room smelled of lavender. You were so small, your father\'s hand covered your entire back. He cried. I smiled. That was the moment I understood what unconditional love truly meant. Never forget how wanted you were, how loved you are, and how strong you will become. - Mum', locked: true,
   },
   {
     id: 'm2', title: 'The Memory Wall', date: '2024 — 2026', body: 'A scrapbook of photos showing Sarah\'s first trimester bump, the nursery being painted, the baby shower, and the first family photo with Emma in the hospital.', locked: true,
@@ -224,7 +224,7 @@ export default function Journey() {
                     transition={{ duration: 1.5 }}
                   >
                     <p className={`${typo.body} mx-auto max-w-sm text-left italic leading-loose`}>
-                      On the night you were born, the moon was full and the room smelled of lavender. You were so small, your father's hand covered your entire back. He cried. I smiled. That was the moment I understood what unconditional love truly meant. Never forget how wanted you were, how loved you are, and how strong you will become. - Mum
+                      On the night you were born, the moon was full and the room smelled of lavender. You were so small, your father\'s hand covered your entire back. He cried. I smiled. That was the moment I understood what unconditional love truly meant. Never forget how wanted you were, how loved you are, and how strong you will become. - Mum
                     </p>
                     <button
                       type="button"
@@ -297,3 +297,4 @@ export default function Journey() {
     </div>
   );
 }
+
