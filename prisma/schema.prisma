@@ -1,0 +1,323 @@
+// Prisma schema for MummaElephant
+// Models match frontend interfaces in src/lib/data.ts
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                  String   @id @default(cuid())
+  email               String   @unique
+  passwordHash        String
+  name                String
+  avatar              String?
+  motherhoodStage     String   // 'Trying to Conceive' | 'Pregnant' | 'New Mum' | 'Toddler Mum' | 'Experienced Mum'
+  motherhoodMonths    Int      @default(0)
+  occupation          String   @default("")
+  country             String   @default("")
+  countryFlag         String   @default("")
+  location            String   @default("")
+  phone               String   @default("")
+  isVerified          Boolean  @default(false)
+  verificationStatus  String   @default("Not Submitted") // 'Verified' | 'Pending' | 'Not Submitted'
+  profileCompletion   Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  deletedAt           DateTime?
+
+  // Relations
+  posts               Post[]
+  tips                Tip[]
+  children            Child[]
+  vaultDocuments      VaultDocument[]
+  privacyLogs         PrivacyLog[]
+  connectionsInitiated Connection[] @relation("ConnectionInitiator")
+  connectionsReceived  Connection[] @relation("ConnectionReceiver")
+  badges              CommunityBadge[]
+  gratitudeSent       GratitudeMessage[] @relation("GratitudeFrom")
+  gratitudeReceived    GratitudeMessage[] @relation("GratitudeTo")
+  moodEntries         MoodEntry[]
+  selfCareGoals       SelfCareGoal[]
+  journeyEvents       JourneyEvent[]
+  legacyLetters       LegacyLetter[]
+  historicalMemories  HistoricalMemory[]
+
+  @@index([email])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  userId      String
+  thumbnail   String   @default("")
+  caption     String
+  privacy     String   @default("public") // 'public' | 'private'
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model Tip {
+  id            String   @id @default(cuid())
+  userId        String
+  text          String
+  tags          String[] // TipTag[] stored as strings
+  helpfulPercent Int     @default(0)
+  upvotes       Int      @default(0)
+  downvotes     Int      @default(0)
+  views         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model Child {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String
+  photo         String?
+  dateOfBirth   String   // ISO date string
+  sex           String   @default("") // 'Male' | 'Female' | 'Prefer not to say' | ''
+  isPregnancy   Boolean  @default(false)
+  dueDate       String?  // ISO date string, nullable
+  publicFields  String[] @default([])
+  allergies     String[] @default([])
+  medicalNotes  String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weight        WeightEntry[]
+  height        HeightEntry[]
+  vaccinations  Vaccination[]
+  milestones    Milestone[]
+  photoTimeline PhotoTimelineEntry[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model WeightEntry {
+  id      String @id @default(cuid())
+  childId String
+  date    String // e.g., '2026-04'
+  value   Float
+
+  child   Child  @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+}
+
+model HeightEntry {
+  id      String @id @default(cuid())
+  childId String
+  date    String // e.g., '2026-04'
+  value   Float
+
+  child   Child  @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+}
+
+model Vaccination {
+  id        String  @id @default(cuid())
+  childId   String
+  name      String
+  date      String? // ISO date string or null
+  isDue     Boolean @default(false)
+  dueDate   String? // ISO date string or null
+
+  child     Child   @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+}
+
+model Milestone {
+  id            String  @id @default(cuid())
+  childId       String
+  label         String
+  achieved      Boolean @default(false)
+  achievedDate  String? // ISO date string
+
+  child         Child   @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+}
+
+model PhotoTimelineEntry {
+  id      String @id @default(cuid())
+  childId String
+  date    String // e.g., '2026-04'
+  photo   String @default("")
+  note    String @default("")
+
+  child   Child  @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+}
+
+model VaultDocument {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  category    String
+  owner       String   // 'mother' | 'child'
+  type        String   // 'pdf' | 'image'
+  size        String
+  date        String   // ISO date string
+  note        String?
+  isOffline   Boolean  @default(false)
+  url         String   @default("") // file URL
+  pinHash     String?  // hashed PIN for vault access
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([deletedAt])
+}
+
+model PrivacyLog {
+  id      String @id @default(cuid())
+  userId  String
+  action  String
+  date    String // relative date string like '2 days ago'
+  details String
+
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Connection {
+  id        String   @id @default(cuid())
+  initiatorId String
+  receiverId  String
+  status    String   @default("pending") // 'pending' | 'accepted' | 'declined'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  initiator User     @relation("ConnectionInitiator", fields: [initiatorId], references: [id], onDelete: Cascade)
+  receiver  User     @relation("ConnectionReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([initiatorId])
+  @@index([receiverId])
+  @@unique([initiatorId, receiverId])
+}
+
+model CommunityBadge {
+  id          String   @id @default(cuid())
+  userId      String
+  label       String
+  icon        String
+  desc        String
+  color       String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model GratitudeMessage {
+  id      String @id @default(cuid())
+  fromId  String
+  toId    String
+  text    String
+  date    String // relative date string
+
+  from    User   @relation("GratitudeFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to      User   @relation("GratitudeTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@index([fromId])
+  @@index([toId])
+}
+
+model MoodEntry {
+  id      String  @id @default(cuid())
+  userId  String
+  emoji   String
+  label   String
+  date    String  // relative date string
+  note    String?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model SelfCareGoal {
+  id        String  @id @default(cuid())
+  userId    String
+  label     String
+  completed Boolean @default(false)
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model JourneyEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // 'milestone' | 'post' | 'system'
+  title     String
+  date      String   // ISO date string
+  icon      String   // 'calendar' | 'lightbulb' | 'baby' | 'heart'
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model LegacyLetter {
+  id          String   @id @default(cuid())
+  userId      String
+  to          String
+  date        String   // ISO date string
+  unlockDate  String   // ISO date string
+  preview     String
+  content     String   @default("") // full letter content
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model HistoricalMemory {
+  id        String   @id @default(cuid())
+  userId    String
+  photo     String   @default("")
+  caption   String
+  date      String   // relative date string
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

@@ -74,7 +74,7 @@ export default function PersonalInfo({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateForm()) return;
     const updatedData = { ...editData, profileCompletion: calculateProfileCompletion(editData) };
     if (updatedData.motherhoodStage !== user.motherhoodStage) {
@@ -83,7 +83,19 @@ export default function PersonalInfo({
     } else {
       showToast('Profile updated successfully ✨', 'success');
     }
-    onUpdate(updatedData);
+    try {
+      const res = await fetch('/api/user-profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData),
+      });
+      const json = await res.json();
+      if (json.success) {
+        onUpdate({ ...user, ...updatedData, profileCompletion: updatedData.profileCompletion });
+      }
+    } catch {
+      showToast('Failed to save profile', 'error');
+    }
     setEditing(false);
     setErrors({});
   };

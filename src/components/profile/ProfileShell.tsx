@@ -24,13 +24,13 @@ export default function ProfileShell({ user, onUserUpdate }: ProfileShellProps) 
       case 'personal':
         return <PersonalInfo user={user} onUpdate={onUserUpdate} />;
       case 'posts':
-        return <MyPosts posts={user.posts} />;
+        return <MyPosts posts={user.posts || []} />;
       case 'tips':
-        return <MyTips tips={user.tips} />;
+        return <MyTips tips={user.tips || []} />;
       case 'children':
-        return <MyChildren childrenList={user.children} />;
+        return <MyChildren childrenList={user.children || []} />;
       case 'vault':
-        return <SafeVault documents={user.vaultDocuments} />;
+        return <SafeVault documents={user.vaultDocuments || []} />;
       case 'privacy':
         return <PrivacySafety />;
       case 'community':

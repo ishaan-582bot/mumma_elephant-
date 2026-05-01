@@ -8,7 +8,6 @@ import BackToTop from '@/components/ui/BackToTop';
 import {
   SkeletonBox, ProfileHeaderSkeleton, ContentSkeleton,
 } from '@/components/ui/Skeleton';
-import { mockUser } from '@/lib/data';
 import type { UserProfile } from '@/lib/data';
 
 export default function ProfilePage() {
@@ -16,12 +15,22 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API delay, then load existing mock data
-    const timer = setTimeout(() => {
-      setUser(mockUser);
-      setIsLoading(false);
-    }, 900);
-    return () => clearTimeout(timer);
+    async function loadUser() {
+      try {
+        const res = await fetch('/api/user-profile');
+        const json = await res.json();
+        if (json.success) {
+          setUser(json.data);
+        } else {
+          setUser(null);
+        }
+      } catch {
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadUser();
   }, []);
 
   if (isLoading) {

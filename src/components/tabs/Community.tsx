@@ -1,26 +1,89 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Users, Heart, Award, History,
   ArrowRight, MessageSquareHeart, Sparkles
 } from 'lucide-react';
 import { useToast } from '../ui/ToastContext';
-import {
-  mockConnections, mockBadges, mockGratitude, mockCommunityTimeline
-} from '@/lib/data';
 import { typo } from '@/lib/typography';
 import Card from '@/components/ui/Card';
 import TabContent, { tabViewVariants } from '@/components/ui/TabContent';
 import SectionHero from '@/components/ui/SectionHero';
 import Badge from '@/components/ui/Badge';
 
+interface Connection {
+  id: string;
+  name: string;
+  avatar: string | null;
+  role: string;
+}
+
+interface CommunityBadge {
+  id: string;
+  label: string;
+  icon: string;
+  desc: string;
+  color: string;
+}
+
+interface GratitudeMessage {
+  id: string;
+  from: string;
+  text: string;
+  date: string;
+}
+
+interface TimelineItem {
+  action: string;
+  date: string;
+}
+
 export default function Community() {
   const { showToast } = useToast();
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [badges, setBadges] = useState<CommunityBadge[]>([]);
+  const [gratitude, setGratitude] = useState<GratitudeMessage[]>([]);
+  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch('/api/community');
+        const json = await res.json();
+        if (json.success) {
+          setConnections(json.data.connections || []);
+          setBadges(json.data.badges || []);
+          setGratitude(json.data.gratitude || []);
+          setTimeline(json.data.timeline || []);
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   const sendHug = (name: string) => {
     showToast(`A heart-warming hug sent to ${name}! ❤️`, 'success');
   };
+
+  if (loading) {
+    return (
+      <div className="fade-in-up">
+        <TabContent>
+          <div className="animate-pulse space-y-4">
+            <div className="h-32 rounded-xl bg-[var(--cream-deep)]" />
+            <div className="h-24 rounded-xl bg-[var(--cream-deep)]" />
+            <div className="h-24 rounded-xl bg-[var(--cream-deep)]" />
+          </div>
+        </TabContent>
+      </div>
+    );
+  }
 
   return (
     <div className="fade-in-up">
@@ -41,7 +104,7 @@ export default function Community() {
             <Heart size={17} className="text-[var(--terracotta)]" /> Trusted Connections
           </h3>
           <div className="hide-scrollbar flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory">
-            {mockConnections.map((conn: any) => (
+            {connections.map((conn: any) => (
               <motion.div
                 key={conn.id}
                 whileTap={{ scale: 0.97 }}
@@ -73,7 +136,7 @@ export default function Community() {
             <MessageSquareHeart size={17} className="text-[var(--mauve)]" /> Gratitude Board
           </h3>
           <div className="flex flex-col gap-3">
-            {mockGratitude.map((msg: any) => (
+            {gratitude.map((msg: any) => (
               <motion.div
                 key={msg.id}
                 whileHover={{ y: -2 }}
@@ -102,7 +165,7 @@ export default function Community() {
             <Award size={17} className="text-[var(--sky-blue)]" /> Community Badges
           </h3>
           <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-            {mockBadges.map((badge: any) => (
+            {badges.map((badge: any) => (
               <motion.div
                 key={badge.id}
                 whileTap={{ scale: 0.97 }}
@@ -125,7 +188,7 @@ export default function Community() {
             <History size={17} className="text-[var(--sage-deep)]" /> Your Journey
           </h3>
           <div className="ml-3 border-l-2 border-[var(--border)] pb-5 pl-7">
-            {mockCommunityTimeline.map((item: any, i: number) => (
+            {timeline.map((item: any, i: number) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, x: -8 }}

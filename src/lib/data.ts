@@ -1,4 +1,5 @@
 export interface UserProfile {
+  id?: string;
   name: string;
   avatar: string | null;
   motherhoodStage: 'Trying to Conceive' | 'Pregnant' | 'New Mum' | 'Toddler Mum' | 'Experienced Mum';
@@ -15,6 +16,10 @@ export interface UserProfile {
   tipsCount: number;
   childrenCount: number;
   profileCompletion: number;
+  posts?: Post[];
+  tips?: Tip[];
+  children?: Child[];
+  vaultDocuments?: VaultDocument[];
 }
 
 export interface Post {

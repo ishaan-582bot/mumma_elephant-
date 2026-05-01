@@ -68,17 +68,25 @@ export default function ProfileHeader({ user, onEdit, onNavigate, onAvatarChange
 
   const handleAvatarClick = () => fileInputRef.current?.click();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (uploadEvent) => {
-        const result = uploadEvent.target?.result as string;
-        setCurrentAvatar(result);
-        onAvatarChange?.(result);
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      const res = await fetch('/api/avatar', { method: 'POST', body: formData });
+      const json = await res.json();
+      if (json.success && json.data.avatarUrl) {
+        setCurrentAvatar(json.data.avatarUrl);
+        onAvatarChange?.(json.data.avatarUrl);
         showToast('Looking good, mum! Avatar updated.', 'success');
-      };
-      reader.readAsDataURL(file);
+      } else {
+        showToast('Failed to update avatar', 'error');
+      }
+    } catch {
+      showToast('Failed to update avatar', 'error');
     }
   };
 

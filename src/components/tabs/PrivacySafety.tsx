@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Shield, Eye, Lock, Globe,
@@ -12,24 +12,43 @@ import HoldToDeleteButton from '../ui/HoldToDeleteButton';
 import { useToast } from '../ui/ToastContext';
 import BottomSheet from '../ui/BottomSheet';
 import TabContent, { tabViewVariants } from '../ui/TabContent';
-import SectionHero from '../ui/SectionHero';
-import { mockPrivacyLogs } from '@/lib/data';
+import SectionHero from '@/components/ui/SectionHero';
 import { typo } from '@/lib/typography';
 import FieldLabel from '@/components/ui/FieldLabel';
 import Card from '@/components/ui/Card';
 
+interface PrivacyLog {
+  id: string;
+  action: string;
+  date: string;
+  details: string;
+}
+
 export default function PrivacySafety() {
   const [activePreset, setActivePreset] = useState<'Maximum' | 'Community' | 'Open' | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [logs, setLogs] = useState<PrivacyLog[]>([]);
+  const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
 
-  const stats = [
-    { label: 'Private', value: 12, icon: <Lock size={15} />, color: 'var(--mauve)' },
-    { label: 'Connections', value: 5, icon: <ShieldCheck size={15} />, color: 'var(--sage)' },
-    { label: 'Visible to All', value: 2, icon: <Globe size={15} />, color: 'var(--sky-blue)' },
-  ];
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch('/api/privacy');
+        const json = await res.json();
+        if (json.success && json.data.logs) {
+          setLogs(json.data.logs);
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
-  const applyPreset = (preset: 'Maximum' | 'Community' | 'Open') => {
+  const applyPreset = async (preset: 'Maximum' | 'Community' | 'Open') => {
     setActivePreset(preset);
     const messages = {
       Maximum: 'Maximum Privacy applied: Everything is now private',
@@ -37,7 +56,42 @@ export default function PrivacySafety() {
       Open: 'Open Book applied: Profile visible to community',
     };
     showToast(messages[preset], 'success');
+    try {
+      await fetch('/api/privacy', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preset }),
+      });
+      await fetch('/api/privacy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'Preset Applied', details: `${preset} Privacy mode activated` }),
+      });
+      setLogs(prev => [{ id: 'new', action: 'Preset Applied', date: 'Just now', details: `${preset} Privacy mode activated` }, ...prev]);
+    } catch {
+      // ignore
+    }
   };
+
+  const stats = [
+    { label: 'Private', value: 12, icon: <Lock size={15} />, color: 'var(--mauve)' },
+    { label: 'Connections', value: 5, icon: <ShieldCheck size={15} />, color: 'var(--sage)' },
+    { label: 'Visible to All', value: 2, icon: <Globe size={15} />, color: 'var(--sky-blue)' },
+  ];
+
+  if (loading) {
+    return (
+      <div className="fade-in-up">
+        <TabContent>
+          <div className="animate-pulse space-y-4">
+            <div className="h-32 rounded-xl bg-[var(--cream-deep)]" />
+            <div className="h-24 rounded-xl bg-[var(--cream-deep)]" />
+            <div className="h-24 rounded-xl bg-[var(--cream-deep)]" />
+          </div>
+        </TabContent>
+      </div>
+    );
+  }
 
   return (
     <div className="fade-in-up">
@@ -155,7 +209,7 @@ export default function PrivacySafety() {
             <History size={17} className="text-[var(--sky-blue)]" /> Recent Privacy Changes
           </h3>
           <Card elevation="featured" bodyClassName="p-2">
-            {mockPrivacyLogs.map((log: any) => (
+            {logs.map((log: any) => (
               <div key={log.id} className="flex items-center justify-between border-b border-[var(--border-light)] px-4 py-3 last:border-none hover:bg-[var(--surface-elevated)] transition-colors duration-150 rounded-[var(--radius-md)] m-1">
                 <div>
                   <div className={typo.body}>{log.action}</div>
