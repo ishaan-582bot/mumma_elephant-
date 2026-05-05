@@ -6,6 +6,73 @@ import {
 } from '@/lib/api-utils';
 import { successResponse, errorResponse, PostUpdateSchema } from '@/lib/shared-types';
 
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const auth = await getAuthUser(req);
+    if (!auth) return unauthorized();
+
+    const { id } = await params;
+
+    const post = await prisma.post.findUnique({
+      where: { id, deletedAt: null },
+      include: {
+        user: {
+          select: { name: true, avatar: true },
+        },
+        _count: {
+          select: { comments: true, reactions: true },
+        },
+        reactions: {
+          where: { userId: auth.sub },
+          select: { id: true },
+        },
+        comments: {
+          orderBy: { createdAt: 'asc' },
+          include: {
+            author: {
+              select: { name: true, avatar: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!post) return jsonResponse(errorResponse('Post not found'), 404);
+
+    // Check if user can view (public or own post)
+    if (post.privacy === 'private' && post.userId !== auth.sub) {
+      return jsonResponse(errorResponse('You do not have permission to view this post'), 403);
+    }
+
+    const data = {
+      id: post.id,
+      caption: post.caption,
+      privacy: post.privacy,
+      isAnonymous: post.userId !== auth.sub && false, // Show anonymous logic if needed
+      authorName: post.user?.name || null,
+      authorAvatar: post.user?.avatar || null,
+      createdAt: post.createdAt.toISOString(),
+      _count: {
+        comments: post._count.comments,
+        reactions: post._count.reactions,
+      },
+      hasReacted: post.reactions.length > 0,
+      comments: post.comments.map((c) => ({
+        id: c.id,
+        content: c.content,
+        isAnonymous: c.isAnonymous,
+        authorName: c.isAnonymous ? null : c.author?.name || null,
+        authorAvatar: c.isAnonymous ? null : c.author?.avatar || null,
+        createdAt: c.createdAt.toISOString(),
+      })),
+    };
+
+    return jsonResponse(successResponse(data));
+  } catch {
+    return serverError();
+  }
+}
+
 async function getPostOwner(postId: string, userId: string) {
   const post = await prisma.post.findFirst({
     where: { id: postId, userId, deletedAt: null },

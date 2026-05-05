@@ -16,7 +16,7 @@ model User {
   passwordHash        String
   name                String
   avatar              String?
-  motherhoodStage     String   // 'Trying to Conceive' | 'Pregnant' | 'New Mum' | 'Toddler Mum' | 'Experienced Mum'
+  motherhoodStage     String   @default("") // 'Trying to Conceive' | 'Pregnant' | 'New Mum' | 'Toddler Mum' | 'Experienced Mum'
   motherhoodMonths    Int      @default(0)
   occupation          String   @default("")
   country             String   @default("")
@@ -26,12 +26,19 @@ model User {
   isVerified          Boolean  @default(false)
   verificationStatus  String   @default("Not Submitted") // 'Verified' | 'Pending' | 'Not Submitted'
   profileCompletion   Int      @default(0)
+  onboardingDone      Boolean  @default(false)
+  verifyToken         String?
+  verifyTokenExpiry   DateTime?
+  resetToken          String?
+  resetTokenExpiry    DateTime?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
   deletedAt           DateTime?
 
   // Relations
   posts               Post[]
+  comments            Comment[]
+  reactions           Reaction[]
   tips                Tip[]
   children            Child[]
   vaultDocuments      VaultDocument[]
@@ -63,10 +70,39 @@ model Post {
   deletedAt   DateTime?
 
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments    Comment[]
+  reactions   Reaction[]
 
   @@index([userId])
   @@index([createdAt])
   @@index([deletedAt])
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  content     String
+  isAnonymous Boolean  @default(false)
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  postId      String
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([authorId])
+  @@index([postId])
+  @@index([createdAt])
+}
+
+model Reaction {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId   String
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  type     String @default("heart")
+
+  @@unique([userId, postId])
+  @@index([postId])
 }
 
 model Tip {

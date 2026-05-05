@@ -4,6 +4,7 @@ import { hashPassword, createToken, setAuthCookie } from '@/lib/auth';
 import { RegisterSchema } from '@/lib/shared-types';
 import { validate, parseJson, jsonResponse, badRequest, serverError, rateLimit } from '@/lib/api-utils';
 import { successResponse, errorResponse } from '@/lib/shared-types';
+import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for') || 'unknown';
@@ -27,6 +28,8 @@ export async function POST(req: NextRequest) {
     }
 
     const passwordHash = await hashPassword(password);
+    const verifyToken = crypto.randomBytes(32).toString('hex');
+    const verifyTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     const user = await prisma.user.create({
       data: {
@@ -34,8 +37,14 @@ export async function POST(req: NextRequest) {
         passwordHash,
         name,
         profileCompletion: 25, // name + email
+        verifyToken,
+        verifyTokenExpiry,
       },
     });
+
+    // Log verification link in dev
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    console.log(`[DEV] Verify email link: ${baseUrl}/verify-email?token=${verifyToken}`);
 
     const token = await createToken(user.id, user.email);
     await setAuthCookie(token);

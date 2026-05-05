@@ -47,6 +47,7 @@ export const UserProfileUpdateSchema = z.object({
   phone: z.string().optional(),
   isVerified: z.boolean().optional(),
   verificationStatus: VerificationStatus.optional(),
+  onboardingDone: z.boolean().optional(),
 });
 
 // Post schemas
